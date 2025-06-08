@@ -229,5 +229,17 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   // Backward compat: auto-replace old /shop URLs in stored config
   const configStr = JSON.stringify(config);
   const patched = JSON.parse(configStr.replace(/\/shop(\/|"|'|\?)/g, "/cua-hang$1"));
+  // Phase 9e: migrate hasMegaMenu boolean -> submenuType enum in topNavItems
+  if (patched.navigation?.topNavItems) {
+    patched.navigation.topNavItems = patched.navigation.topNavItems.map((item: any) => {
+      if ("hasMegaMenu" in item && !("submenuType" in item)) {
+        item.submenuType = item.hasMegaMenu ? "mega" : "none";
+        delete item.hasMegaMenu;
+      }
+      if (!item.simpleSubmenu) item.simpleSubmenu = [];
+      if (!item.submenuType) item.submenuType = "none";
+      return item;
+    });
+  }
   return patched as SiteConfig;
 }

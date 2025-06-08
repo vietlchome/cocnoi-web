@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/cart.store";
 import SearchOverlay from "./SearchOverlay";
 import type { SiteConfig } from "@/lib/site-config-validate";
 import MegaMenuMobile from "../store/MegaMenuMobile";
+import { SimpleSubmenu } from "../store/SimpleSubmenu";
 
 interface HeaderClientProps {
   config: SiteConfig;
@@ -142,14 +143,15 @@ export default function HeaderClient({
           {/* DESKTOP NAVIGATION */}
           <nav className="hidden lg:flex items-center gap-8">
             {topNavItems.map((item, i) => {
+              const hasSubmenu = item.submenuType === "mega" || item.submenuType === "simple";
               return (
-                <div 
-                  key={i} 
-                  className={`group/item py-2 ${item.hasMegaMenu ? "" : "relative"}`}
+                <div
+                  key={i}
+                  className={`group/item py-2 ${item.submenuType === "mega" ? "" : "relative"}`}
                   onMouseEnter={() => setHoveredItem(i)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
-                  <Link 
+                  <Link
                     href={item.href}
                     target={item.openInNewTab ? "_blank" : undefined}
                     className={`font-bvp text-sm font-medium tracking-wide flex items-center gap-1 py-1 border-b-2 transition-all duration-300 ${
@@ -157,16 +159,22 @@ export default function HeaderClient({
                         ? "border-accent text-accent animate-fade-in"
                         : "border-transparent text-primary hover:text-accent hover:border-accent/40"
                     }`}
-                    style={{ 
+                    style={{
                       color: isLinkActive(item.href) ? "var(--color-terracotta)" : "var(--color-deep-indigo)",
                       borderBottomColor: isLinkActive(item.href) ? "var(--color-terracotta)" : "transparent"
                     }}
                   >
                     {item.label}
-                    {item.hasMegaMenu && <ChevronDown className="w-3.5 h-3.5 opacity-60 group-hover/item:rotate-180 transition-transform duration-300" />}
+                    {hasSubmenu && <ChevronDown className="w-3.5 h-3.5 opacity-60 group-hover/item:rotate-180 transition-transform duration-300" />}
                   </Link>
-                  
-                  {item.hasMegaMenu && hoveredItem === i && megaMenuContent}
+
+                  {/* Mega menu */}
+                  {item.submenuType === "mega" && hoveredItem === i && megaMenuContent}
+
+                  {/* Simple dropdown */}
+                  {item.submenuType === "simple" && hoveredItem === i && item.simpleSubmenu?.length > 0 && (
+                    <SimpleSubmenu items={item.simpleSubmenu} />
+                  )}
                 </div>
               );
             })}
@@ -240,9 +248,9 @@ export default function HeaderClient({
               {topNavItems.map((item, idx) => {
                 return (
                   <div key={idx} className="flex flex-col gap-2">
-                    {item.hasMegaMenu ? (
+                    {item.submenuType === "mega" ? (
                       <>
-                        <Link 
+                        <Link
                           href={item.href}
                           onClick={() => setIsOpen(false)}
                           className="font-playfair text-lg font-semibold text-primary hover:text-accent transition-colors"
@@ -253,12 +261,31 @@ export default function HeaderClient({
                           categories={categories}
                           productGroups={productGroups}
                           finishes={finishes}
-                          config={config.navigation.megaMenu}
+                          config={config.navigation?.megaMenu}
                           onClose={() => setIsOpen(false)}
                         />
                       </>
+                    ) : item.submenuType === "simple" && item.simpleSubmenu?.length > 0 ? (
+                      <details className="group/detail">
+                        <summary className="font-playfair text-lg font-semibold text-primary hover:text-accent transition-colors cursor-pointer list-none flex items-center justify-between">
+                          {item.label}
+                          <ChevronDown className="w-4 h-4 opacity-60 group-open/detail:rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="mt-2 ml-4 flex flex-col gap-1 border-l-2 pl-4" style={{ borderColor: "var(--color-sand, #e8e0d5)" }}>
+                          {item.simpleSubmenu.map((sub: { label: string; href: string }, si: number) => (
+                            <Link
+                              key={si}
+                              href={sub.href}
+                              onClick={() => setIsOpen(false)}
+                              className="font-bvp text-sm text-secondary hover:text-accent transition-colors py-1"
+                            >
+                              {sub.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </details>
                     ) : (
-                      <Link 
+                      <Link
                         href={item.href}
                         target={item.openInNewTab ? "_blank" : undefined}
                         onClick={() => setIsOpen(false)}

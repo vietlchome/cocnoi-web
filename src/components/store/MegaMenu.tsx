@@ -54,11 +54,11 @@ export async function MegaMenu({ config }: MegaMenuProps) {
   const { categories, productGroups, finishes } = await getCachedMegaMenuData();
 
   return (
-    <div className="absolute top-full left-0 w-screen bg-warm-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shadow-xl pt-3 z-50">
+    <div className="absolute top-full left-0 w-screen bg-warm-white border-b border-gray-100 shadow-xl pt-3 z-50">
       <div className="max-w-[1280px] mx-auto px-8 py-10 grid grid-cols-12 gap-8 font-bvp">
         {/* Cột 1 - Danh mục */}
         <div className="col-span-3">
-          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 dark:text-gray-300 font-bold mb-4 uppercase">
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 font-bold mb-4 uppercase">
             {config.column1.title}
           </h3>
           <ul className="space-y-2.5 text-xs font-semibold">
@@ -82,7 +82,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 2 - BST */}
         <div className="col-span-3">
-          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 dark:text-gray-300 font-bold mb-4 uppercase">
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 font-bold mb-4 uppercase">
             {config.column2.title}
           </h3>
           <ul className="space-y-2.5 text-xs font-semibold">
@@ -106,7 +106,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 3 - Hoàn thiện */}
         <div className="col-span-3">
-          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 dark:text-gray-300 font-bold mb-4 uppercase">
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary/80 font-bold mb-4 uppercase">
             {config.column3.title}
           </h3>
           <ul className="space-y-2.5 text-xs font-semibold">

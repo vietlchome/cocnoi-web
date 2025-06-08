@@ -180,8 +180,13 @@ export const SiteConfigSchema = z.object({
     topNavItems: z.array(z.object({
       label: textValidator,
       href: urlValidator,
-      hasMegaMenu: booleanValidator,
+      submenuType: z.enum(["none", "simple", "mega"]).default("none"),
+      simpleSubmenu: z.array(z.object({
+        label: textValidator,
+        href: urlValidator,
+      })).default([]),
       openInNewTab: booleanValidator,
+      hasMegaMenu: booleanValidator.optional(), // backward compat
     })),
     megaMenu: z.object({
       column1: z.object({

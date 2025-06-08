@@ -621,15 +621,47 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         type: "repeatable",
         label: "Danh sách mục điều hướng",
         default: [
-          { label: "Sản phẩm", href: "/cua-hang", hasMegaMenu: true, openInNewTab: false },
-          { label: "Khám phá", href: "/discover", hasMegaMenu: false, openInNewTab: false },
-          { label: "Cộng đồng", href: "/community", hasMegaMenu: false, openInNewTab: false },
-          { label: "Đối tác", href: "/partners", hasMegaMenu: false, openInNewTab: false },
+          { label: "CỬA HÀNG", href: "/cua-hang", submenuType: "mega", simpleSubmenu: [], openInNewTab: false },
+          { label: "KHÁM PHÁ", href: "/discover", submenuType: "simple", simpleSubmenu: [
+            { label: "Câu chuyện của chúng tôi", href: "/discover/our-story" },
+            { label: "Người làm gốm", href: "/discover/our-human" },
+            { label: "Quy trình thủ công", href: "/discover/our-craft" },
+            { label: "Giá trị cốt lõi", href: "/discover/our-values" },
+          ], openInNewTab: false },
+          { label: "CỘNG ĐỒNG", href: "/community/nguoi-noi", submenuType: "simple", simpleSubmenu: [
+            { label: "Người Nối", href: "/community/nguoi-noi" },
+            { label: "Câu chuyện của bạn", href: "/community/your-stories" },
+          ], openInNewTab: false },
+          { label: "ĐỐI TÁC", href: "/partners", submenuType: "simple", simpleSubmenu: [
+            { label: "Cửa hàng đối tác", href: "/partners/stockists" },
+            { label: "Trở thành đối tác", href: "/partners/become-a-stockist" },
+            { label: "Quà tặng doanh nghiệp", href: "/partners/corporate-gifting" },
+          ], openInNewTab: false },
+          { label: "HÀNH TRÌNH", href: "/journey", submenuType: "none", simpleSubmenu: [], openInNewTab: false },
         ],
         itemSchema: {
           label: { type: "text", label: "Nhãn hiển thị", default: "" },
           href: { type: "url", label: "Đường dẫn", default: "/" },
-          hasMegaMenu: { type: "boolean", label: "Mở Mega Menu khi hover", default: false },
+          submenuType: {
+            type: "select",
+            label: "Loại submenu",
+            options: [
+              { value: "none", label: "Không có submenu" },
+              { value: "simple", label: "Dropdown list đơn giản" },
+              { value: "mega", label: "Mega menu (chỉ CỬA HÀNG)" },
+            ],
+            default: "none",
+          },
+          simpleSubmenu: {
+            type: "repeatable",
+            label: "Items submenu (chỉ khi loại = Dropdown list)",
+            max: 10,
+            default: [],
+            itemSchema: {
+              label: { type: "text", label: "Tên hiển thị", default: "" },
+              href: { type: "url", label: "Link", default: "/" },
+            }
+          },
           openInNewTab: { type: "boolean", label: "Mở tab mới", default: false },
         }
       },
