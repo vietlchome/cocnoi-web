@@ -41,7 +41,7 @@ export default function Footer() {
   const footerCopyright = themeConfig?.footer?.copyright || "© 2024 CỐC NỐI. All rights reserved.";
 
   return (
-    <footer className="bg-subtle text-primary border-t border-border mt-auto" style={{ backgroundColor: "var(--color-warm-white)" }}>
+    <footer className="bg-subtle text-primary border-t border-border mt-auto">
       
       {/* Primary Footer Content */}
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
