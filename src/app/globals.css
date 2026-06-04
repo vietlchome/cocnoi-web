@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+:root {
+  /* Primary Colors */
+  --color-warm-white: #FEFCF9;
+  --color-deep-indigo: #131829;
+  --color-terracotta: #C2703E;
+  
+  /* Secondary Colors */
+  --color-cream: #F4ECE0;
+  --color-sand: #D4C5B2;
+  --color-dark-brown: #3D2B1F;
+  --color-light-terracotta: #E8A87C;
+  
+  /* Semantic Colors */
+  --color-brick: #A8512B;
+  --color-olive: #6B7B4E;
+  --color-mustard: #C99A4F;
+}
+
+@theme inline {
+  /* Colors */
+  --color-canvas: var(--color-warm-white);
+  --color-primary: var(--color-deep-indigo);
+  --color-accent: var(--color-terracotta);
+  --color-subtle: var(--color-cream);
+  --color-border: var(--color-sand);
+  --color-secondary: var(--color-dark-brown);
+  --color-accent-hover: var(--color-light-terracotta);
+  --color-error: var(--color-brick);
+  --color-success: var(--color-olive);
+  --color-warning: var(--color-mustard);
+
+  /* Fonts */
+  --font-playfair: var(--font-playfair), "Libre Baskerville", Georgia, serif;
+  --font-bvp: var(--font-bvp), Inter, "Nunito Sans", sans-serif;
+  --font-quicksand: var(--font-quicksand), "Poppins", sans-serif;
+  
+  /* Radii scale based on Design System */
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 12px;
+  --radius-4: 16px;
+  --radius-6: 24px;
+  --radius-pill: 100px;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-primary);
+  /* Typography rules: Tiếng Việt cần line-height >= 1.6 */
+  line-height: 1.65;
+}
+
+/* Custom Prose Styles for Elegant Editorial Typography */
+.prose {
+  max-width: 65ch;
+  margin: 0 auto;
+  font-family: var(--font-bvp), sans-serif;
+  color: var(--color-secondary); /* warm deep brown */
+  font-size: 1.0625rem; /* ~17px */
+  line-height: 1.8;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: var(--font-playfair), serif;
+  color: var(--color-primary); /* deep indigo */
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.prose h1 { font-size: 2.25rem; }
+.prose h2 { font-size: 1.75rem; }
+.prose h3 { font-size: 1.4rem; }
+.prose h4 { font-size: 1.2rem; }
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(194, 112, 62, 0.3);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1.5rem;
+  font-style: italic;
+  color: var(--color-secondary);
+  opacity: 0.85;
+  margin: 2rem 0;
+}
+
+.prose ul, .prose ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.5rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose img {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+  border-radius: 4px;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose iframe {
+  margin-top: 2em;
+  margin-bottom: 2em;
+  max-width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 4px;
+}
+
+/* Dark Mode Overrides for Prose (Matches Cốc Nối Rustic Aesthetic) */
+@media (prefers-color-scheme: dark) {
+  .prose {
+    color: var(--color-subtle) !important;
+  }
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose strong {
+    color: var(--color-canvas) !important;
+  }
+  .prose blockquote {
+    color: var(--color-subtle) !important;
+    border-left-color: var(--color-accent) !important;
+  }
+}
+
+.dark .prose {
+  color: var(--color-subtle) !important;
+}
+.dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4, .dark .prose strong {
+  color: var(--color-canvas) !important;
+}
+.dark .prose blockquote {
+  color: var(--color-subtle) !important;
+  border-left-color: var(--color-accent) !important;
+}
+
+/* Custom Micro-Animations for Ceramic Aesthetic */
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-left {
+  animation: slide-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
