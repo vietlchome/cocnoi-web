@@ -66,7 +66,7 @@ export default async function StoreHome() {
       } else {
         sortedProducts = dbProducts.slice(0, 8);
       }
-    } else if (displayType === "best_selling") {
+    } else if (displayType === "bestseller") {
       sortedProducts.sort((a, b) => {
         const aReviews = a.reviews?.length || 0;
         const bReviews = b.reviews?.length || 0;

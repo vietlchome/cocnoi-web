@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function ContactPage() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [themeConfig, setThemeConfig] = useState<any>(null);
   
   useEffect(() => {
     const fetchSettings = async () => {
@@ -13,7 +13,7 @@ export default function ContactPage() {
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            setSettings(data.settings);
+            setThemeConfig(data.config);
           }
         }
       } catch (e) {
@@ -67,6 +67,10 @@ export default function ContactPage() {
     }
   };
 
+  const contactAddress = themeConfig?.footer?.address || "Xưởng gốm gia đình Cốc Nối, Xóm 3 Giang Cao, Làng cổ Bát Tràng, Gia Lâm, Hà Nội";
+  const contactPhone = themeConfig?.footer?.phone || "+84 (0) 98 765 4321";
+  const contactEmail = themeConfig?.footer?.email || "hello@cocnoi.com";
+
   return (
     <div className="bg-canvas py-16 md:py-24">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8">
@@ -95,7 +99,7 @@ export default function ContactPage() {
                 <MapPin className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-primary text-xs uppercase tracking-wider mb-1">Xưởng sản xuất chính</h4>
-                  <p>{settings.contact_address || "Xưởng gốm gia đình Cốc Nối, Xóm 3 Giang Cao, Làng cổ Bát Tràng, Gia Lâm, Hà Nội"}</p>
+                  <p>{contactAddress}</p>
                 </div>
               </div>
 
@@ -103,7 +107,7 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-primary text-xs uppercase tracking-wider mb-1">Điện thoại hotline</h4>
-                  <p>{settings.contact_phone || "+84 (0) 98 765 4321"}</p>
+                  <p>{contactPhone}</p>
                   <p className="text-xs text-secondary/75">(Hỗ trợ Zalo tư vấn 24/7)</p>
                 </div>
               </div>
@@ -112,7 +116,7 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-primary text-xs uppercase tracking-wider mb-1">Hòm thư điện tử</h4>
-                  <p>{settings.contact_email || "hello@cocnoi.com"}</p>
+                  <p>{contactEmail}</p>
                   <p>b2b@cocnoi.com (Hợp tác doanh nghiệp)</p>
                 </div>
               </div>
