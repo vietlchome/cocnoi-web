@@ -305,7 +305,7 @@ export default async function StoreHome() {
                 {config.campaign.badge}
               </span>
               <span className={`font-playfair italic text-xs truncate max-w-[200px] ${config.campaign.heroImageUrl ? "text-accent/90" : "text-primary"}`} style={{ color: config.campaign.heroImageUrl ? undefined : "var(--color-terracotta)" }}>
-                "{config.campaign.heroQuote.slice(0, 30)}..."
+                "{config.campaign.heroQuote === "Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó." ? "Đất có linh hồn..." : config.campaign.heroQuote.slice(0, 30)}..."
               </span>
             </div>
           </div>
