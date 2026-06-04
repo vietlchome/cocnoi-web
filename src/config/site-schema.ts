@@ -150,7 +150,12 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       items: {
         type: "repeatable",
         label: "Các đặc trưng",
-        default: [],
+        default: [
+          { title: "Mộc Mạc", desc: "Không trang điểm bóng bẩy. Giữ trọn texture tự nhiên của đất nung Bát Tràng và lớp vân men độc bản." },
+          { title: "Chân Thành", desc: "Mỗi sản phẩm đi kèm một câu chuyện thật, một thông điệp chân thành gửi gắm sự kết nối tình thân." },
+          { title: "Bền Bỉ", desc: "Gốm nung ở nhiệt độ cao trên 1250°C, đảm bảo độ bền cơ học cao, an toàn tuyệt đối khi sử dụng." },
+          { title: "Chỉn Chu", desc: "Từ khâu vuốt gốm, bọc gói bao bì kraft đến thiệp viết tay chân thành trao gửi khách hàng." }
+        ],
         itemSchema: {
           title: { type: "text", label: "Tiêu đề", default: "" },
           desc: { type: "textarea", label: "Mô tả", default: "" }
@@ -171,8 +176,60 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       title: { type: "text", label: "Tiêu đề", default: "Giải đáp thắc mắc", aliases: ["faq_title"] },
       retailTitle: { type: "text", label: "Tiêu đề Khách lẻ", default: "Khách hàng lẻ", aliases: ["faq_retail_title"] },
       b2bTitle: { type: "text", label: "Tiêu đề Doanh nghiệp", default: "Đối tác doanh nghiệp (B2B)", aliases: ["faq_b2b_title"] },
-      itemsRetail: { type: "json", label: "Danh sách B2C", default: [], aliases: ["faq_items"] },
-      itemsB2b: { type: "json", label: "Danh sách B2B", default: [], aliases: ["faq_items_b2b"] }
+      itemsRetail: {
+        type: "json",
+        label: "Danh sách B2C",
+        default: [
+          {
+            question: "Gốm Cốc Nối có an toàn khi sử dụng với lò vi sóng và máy rửa bát không?",
+            answer: "Có. Gốm Cốc Nối được nung ở nhiệt độ cao (>1250°C), kết cấu xương gốm đanh chắc và men tự nhiên không chứa chì. Sản phẩm hoàn toàn an toàn khi sử dụng trong lò vi sóng, lò nướng và máy rửa bát."
+          },
+          {
+            question: "Tôi muốn mua làm quà tặng, Cốc Nối có hỗ trợ đóng gói và viết thiệp không?",
+            answer: "Tất cả sản phẩm Cốc Nối khi gửi đi đều được đóng gói chỉn chu trong hộp bồi kraft lót rơm mộc mạc. Chúng tôi luôn tặng kèm một tấm thiệp nhỏ, bạn có thể tự viết hoặc để lại lời nhắn, chúng tôi sẽ viết tay giúp bạn."
+          },
+          {
+            question: "Tôi ở xa, nếu quá trình vận chuyển bị vỡ hỏng thì sao?",
+            answer: "Cốc Nối đóng gói chống sốc vô cùng cẩn thận với nhiều lớp bảo vệ an toàn. Nếu không may sản phẩm bị nứt vỡ do vận chuyển, bạn chỉ cần gửi video quay lúc mở hàng, chúng tôi sẽ đền bù sản phẩm mới 100% hoàn toàn miễn phí."
+          },
+          {
+            question: "Mỗi chiếc cốc có giống hệt nhau như trong ảnh không?",
+            answer: "Vì là sản phẩm vuốt tay và tráng men thủ công 100%, mỗi chiếc cốc sẽ có sự biến thiên nhỏ về màu men và vân hỏa biến (tùy vào vị trí đặt trong lò nung). Đó chính là nét độc bản (unique) làm nên giá trị của gốm thủ công Cốc Nối."
+          },
+          {
+            question: "Thời gian giao hàng là bao lâu?",
+            answer: "Các đơn hàng nội thành Hà Nội thường nhận được trong 1-2 ngày. Các tỉnh thành khác từ 3-5 ngày làm việc."
+          }
+        ],
+        aliases: ["faq_items"]
+      },
+      itemsB2b: {
+        type: "json",
+        label: "Danh sách B2B",
+        default: [
+          {
+            question: "Cốc Nối có nhận sản xuất số lượng lớn và in logo doanh nghiệp không?",
+            answer: "Có. Chúng tôi cung cấp giải pháp quà tặng doanh nghiệp toàn diện. Cốc Nối hỗ trợ thiết kế logo khắc chìm, in decal nung hoặc vẽ tay lên sản phẩm với số lượng linh hoạt, giúp tôn vinh dấu ấn thương hiệu của bạn."
+          },
+          {
+            question: "Số lượng đặt hàng tối thiểu (MOQ) cho đơn B2B là bao nhiêu?",
+            answer: "Để có mức chiết khấu tốt nhất, số lượng tối thiểu cho một đơn hàng tùy chỉnh logo thường từ 50 - 100 sản phẩm. Tuy nhiên, chúng tôi luôn linh hoạt hỗ trợ các doanh nghiệp vừa và nhỏ với số lượng phù hợp."
+          },
+          {
+            question: "Thời gian hoàn thành một đơn hàng doanh nghiệp là bao lâu?",
+            answer: "Thời gian sản xuất phụ thuộc vào số lượng và độ phức tạp của thiết kế. Thông thường quá trình làm đất, vuốt tay, phơi khô và nung lò sẽ mất khoảng 15-25 ngày làm việc."
+          },
+          {
+            question: "Chúng tôi có được xem mẫu thực tế trước khi sản xuất hàng loạt không?",
+            answer: "Chắc chắn rồi. Trước khi tiến hành sản xuất hàng loạt, Cốc Nối luôn làm mẫu thực tế (gồm cả việc khắc/in logo) gửi tới doanh nghiệp để kiểm duyệt chất lượng, màu sắc và kiểu dáng."
+          },
+          {
+            question: "Chính sách chiết khấu và thanh toán cho đối tác B2B như thế nào?",
+            answer: "Cốc Nối có thang chiết khấu rất hấp dẫn tùy theo số lượng đặt hàng. Quy trình thanh toán thường chia làm 2 đợt: đặt cọc 50% khi chốt mẫu và thanh toán 50% trước khi giao hàng. Vui lòng liên hệ Hotline để nhận báo giá chi tiết."
+          }
+        ],
+        aliases: ["faq_items_b2b"]
+      }
     }
   },
   footer: {
