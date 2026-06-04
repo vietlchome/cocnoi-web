@@ -24,9 +24,9 @@ export default function FloatingActions() {
     fetchSettings();
   }, []);
 
-  const socialInstagram = themeConfig?.social?.instagram || "";
-  const socialFacebook = themeConfig?.social?.facebook || "";
-  const socialZalo = themeConfig?.social?.zalo || "";
+  const socialInstagram = themeConfig ? (themeConfig.social?.instagram || "") : "https://instagram.com/";
+  const socialFacebook = themeConfig ? (themeConfig.social?.facebook || "") : "https://facebook.com/";
+  const socialZalo = themeConfig ? (themeConfig.social?.zalo || "") : "https://zalo.me/";
 
   return (
     <div className="fixed right-4 bottom-24 md:bottom-32 z-50 flex flex-col gap-3">
