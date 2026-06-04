@@ -65,12 +65,9 @@ export default async function StoreHome() {
 
     featuredProducts = sortedProducts.map((p, idx) => {
       let firstImage = 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80';
-      try {
-        const imgs = JSON.parse(p.images);
-        if (Array.isArray(imgs) && imgs.length > 0) {
-          firstImage = imgs[0];
-        }
-      } catch (e) {}
+      if (Array.isArray(p.images) && p.images.length > 0) {
+        firstImage = p.images[0];
+      }
 
       const reviews = (p as any).reviews || [];
       const reviewCount = reviews.length;

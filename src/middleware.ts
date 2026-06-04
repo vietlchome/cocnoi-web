@@ -9,10 +9,10 @@ export default auth((req) => {
   const userRole = req.auth?.user?.role;
 
   const isAdminRoute = nextUrl.pathname.startsWith('/admin');
-  const isAdminApiRoute = nextUrl.pathname.startsWith('/api/admin') || nextUrl.pathname === '/api/upload';
+  const isAdminApiRoute = nextUrl.pathname.startsWith('/api/admin');
   const isAuthRoute = nextUrl.pathname.startsWith('/login');
 
-  // 1. Bảo vệ API Admin (/api/admin/* và /api/upload)
+  // 1. Bảo vệ API Admin (/api/admin/*)
   if (isAdminApiRoute) {
     if (!isLoggedIn) {
       return new Response(
@@ -50,7 +50,6 @@ export const config = {
   // Matcher khớp với:
   // - Tất cả route admin (/admin, /admin/...)
   // - Tất cả API admin (/api/admin, /api/admin/...)
-  // - API upload (/api/upload)
   // - Trang login (/login)
-  matcher: ['/admin/:path*', '/api/admin/:path*', '/api/upload', '/login'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/login'],
 };

@@ -114,12 +114,9 @@ export default function OrderTrackingClient() {
   if (reviewOrder) {
     const item = reviewOrder.highestValueItem;
     let firstImage = 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80';
-    try {
-      const imgs = JSON.parse(item.images);
-      if (Array.isArray(imgs) && imgs.length > 0) {
-        firstImage = imgs[0];
-      }
-    } catch (e) {}
+    if (Array.isArray(item.images) && item.images.length > 0) {
+      firstImage = item.images[0];
+    }
 
     return (
       <div className="border border-border/80 rounded-4 p-6 md:p-10 bg-[#FAF8F5]/40 mt-8 max-w-2xl mx-auto shadow-sm animate-fade-in">

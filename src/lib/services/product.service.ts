@@ -62,7 +62,7 @@ export class ProductService {
         compareAtPrice: data.compareAtPrice || null,
         stockQuantity: data.stockQuantity ?? 0,
         weight: data.weight ?? 0,
-        images: JSON.stringify(data.images),
+        images: data.images,
         productGroupId: data.productGroupId || null,
         colorId: data.colorId || null,
         sizeId: data.sizeId || null,
@@ -146,7 +146,7 @@ export class ProductService {
     if (data.compareAtPrice !== undefined) updateData.compareAtPrice = data.compareAtPrice;
     if (data.stockQuantity !== undefined) updateData.stockQuantity = data.stockQuantity;
     if (data.weight !== undefined) updateData.weight = data.weight;
-    if (data.images !== undefined) updateData.images = JSON.stringify(data.images);
+    if (data.images !== undefined) updateData.images = data.images;
     if (data.productGroupId !== undefined) updateData.productGroupId = data.productGroupId || null;
     if (data.colorId !== undefined) updateData.colorId = data.colorId || null;
     if (data.sizeId !== undefined) updateData.sizeId = data.sizeId || null;

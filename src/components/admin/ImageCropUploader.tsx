@@ -114,7 +114,7 @@ export default function ImageCropUploader({
       }
 
       // 3. Tải lên server qua API
-      const res = await fetch("/api/upload", {
+      const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
       });
@@ -122,8 +122,8 @@ export default function ImageCropUploader({
       if (!res.ok) throw new Error("Tải ảnh lên máy chủ thất bại.");
 
       const data = await res.json();
-      if (data.success && data.url) {
-        onChange(data.url); // Trả URL về cho Form cha
+      if (data.success && data.urls && data.urls.length > 0) {
+        onChange(data.urls[0]); // Trả URL về cho Form cha
         setImageSrc(null); // Đóng modal crop
       } else {
         alert(data.error || "Gặp lỗi khi tải ảnh.");

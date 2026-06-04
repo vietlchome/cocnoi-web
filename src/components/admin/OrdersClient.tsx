@@ -714,11 +714,8 @@ export default function OrdersClient({ initialOrders, bankSettings = {} }: Order
                   <div className="border border-gray-200/80 rounded-xl overflow-hidden divide-y divide-gray-200/60">
                     {(selectedOrder.items || []).map((item: any) => {
                       let imgUrl = ''
-                      try {
-                        const parsed = JSON.parse(item.product.images)
-                        imgUrl = Array.isArray(parsed) ? parsed[0] : item.product.images
-                      } catch (e) {
-                        imgUrl = item.product.images
+                      if (Array.isArray(item.product.images) && item.product.images.length > 0) {
+                        imgUrl = item.product.images[0];
                       }
 
                       return (

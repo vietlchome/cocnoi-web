@@ -41,7 +41,7 @@ interface InitialProduct {
   compareAtPrice?: number | null
   stockQuantity: number
   weight?: number | null
-  images: string // JSON string array
+  images: any
   categoryId: string | null
   productGroupId?: string | null
   colorId?: string | null
@@ -105,10 +105,8 @@ export default function ProductForm({
 
   // Khởi tạo ảnh
   let initialImages: string[] = []
-  if (initialProduct?.images) {
-    try {
-      initialImages = JSON.parse(initialProduct.images)
-    } catch (e) {}
+  if (initialProduct?.images && Array.isArray(initialProduct.images)) {
+    initialImages = initialProduct.images
   }
   const [images, setImages] = useState<string[]>(initialImages)
 
@@ -205,30 +203,22 @@ export default function ProductForm({
 
     const formData = new FormData()
     files.forEach(file => {
-      formData.append('file', file) // API mong đợi trường 'file' đơn lẻ
+      formData.append('files', file) // API admin upload mong đợi mảng 'files'
     })
+    formData.append('folder', 'products')
 
     try {
-      // Để hỗ trợ upload đồng thời, ta gọi tuần tự hoặc song song các request
-      const uploadPromises = files.map(async (file) => {
-        const singleFormData = new FormData()
-        singleFormData.append('file', file)
-        singleFormData.append('folder', 'products')
-        
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: singleFormData
-        })
-        const data = await res.json()
-        if (res.ok && data.success && data.url) {
-          return data.url
-        } else {
-          throw new Error(data.error || 'Lỗi khi tải ảnh lên.')
-        }
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
       })
-
-      const urls = await Promise.all(uploadPromises)
-      setImages(prev => [...prev, ...urls].slice(0, 6))
+      const data = await res.json()
+      
+      if (res.ok && data.success && data.urls) {
+        setImages(prev => [...prev, ...data.urls].slice(0, 6))
+      } else {
+        throw new Error(data.error || 'Lỗi khi tải ảnh lên.')
+      }
     } catch (err: any) {
       setError(err.message || 'Lỗi kết nối khi tải ảnh lên.')
     } finally {

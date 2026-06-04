@@ -164,7 +164,7 @@ model Product {
   compareAtPrice   Int?          // Giá so sánh / Giá gốc trước khi giảm
   stockQuantity    Int           @default(0)
   weight           Int?          @default(0) // Khối lượng sản phẩm (grams)
-  images           String        // JSON string array (tối đa 6 ảnh)
+  images           String[]      // Mảng ảnh (tối đa 6 ảnh)
   
   // Các trường phục vụ Flat Catalog (Mỗi Màu/Cỡ là 1 sản phẩm)
   productGroupId   String?       // Mã nhóm liên kết các sản phẩm cùng bộ sưu tập

@@ -11,7 +11,7 @@ interface Review {
   product: {
     name: string;
     slug: string;
-    images?: string;
+    images?: any;
   };
 }
 
@@ -41,11 +41,8 @@ export default function TestimonialSection({ reviews }: TestimonialSectionProps)
           {reviews.map((review) => {
             let imgUrl = '';
             if (review.product.images) {
-              try {
-                const parsed = JSON.parse(review.product.images);
-                imgUrl = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : review.product.images;
-              } catch (e) {
-                imgUrl = review.product.images;
+              if (Array.isArray(review.product.images) && review.product.images.length > 0) {
+                imgUrl = review.product.images[0];
               }
             }
 

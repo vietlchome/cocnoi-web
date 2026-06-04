@@ -51,11 +51,8 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ product, siblings = [], ratingData }: ProductDetailClientProps) {
-  // Parse images JSON safely
-  let imgUrls: string[] = []
-  try {
-    imgUrls = JSON.parse(product.images || '[]')
-  } catch (e) {}
+  // Safely assign images
+  let imgUrls: string[] = Array.isArray(product.images) ? product.images : []
 
   // Fallback to placeholder if no images
   if (imgUrls.length === 0) {

@@ -63,13 +63,10 @@ export default async function ShopPage({ searchParams }: PageProps) {
   })
 
   // Đọc danh sách ảnh
-  const getFirstImage = (imagesStr: string) => {
-    try {
-      const parsed = JSON.parse(imagesStr)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed[0]
-      }
-    } catch (e) {}
+  const getFirstImage = (images: any) => {
+    if (Array.isArray(images) && images.length > 0) {
+      return images[0]
+    }
     return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80' // Fallback
   }
 

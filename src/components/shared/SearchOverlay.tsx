@@ -17,7 +17,7 @@ interface ProductResult {
   slug: string;
   price: number;
   compareAtPrice: number | null;
-  images: string;
+  images: any;
 }
 
 interface PostResult {
@@ -266,10 +266,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   <div className="flex flex-col gap-2">
                     {results.products.map((p) => {
                       let firstImage = "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=120&q=80";
-                      try {
-                        const parsed = JSON.parse(p.images);
-                        if (Array.isArray(parsed) && parsed.length > 0) firstImage = parsed[0];
-                      } catch (e) {}
+                      if (Array.isArray(p.images) && p.images.length > 0) {
+                        firstImage = p.images[0];
+                      }
 
                       const flatIndex = flatItems.findIndex((item) => item.id === p.id);
                       const isHighlighted = activeIndex === flatIndex;

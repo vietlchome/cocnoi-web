@@ -39,15 +39,12 @@ export const useCartStore = create<CartState>()(
           const isPreOrder = product.stockQuantity <= 0
           
           let imgUrl = ''
-          try {
-            const parsed = JSON.parse(product.images)
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              imgUrl = parsed[0]
-            }
-          } catch (e) {
-            imgUrl = typeof product.images === 'string' && !product.images.startsWith('[') 
-              ? product.images 
-              : 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&q=80'
+          if (Array.isArray(product.images) && product.images.length > 0) {
+            imgUrl = product.images[0]
+          } else if (typeof product.images === 'string' && product.images) {
+            imgUrl = product.images
+          } else {
+            imgUrl = 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&q=80'
           }
 
           if (existingItemIndex > -1) {

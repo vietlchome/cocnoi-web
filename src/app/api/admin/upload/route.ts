@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const files = formData.getAll('files') as File[];
 
+    const folder = formData.get('folder') as string | null;
+
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'Không tìm thấy file nào được tải lên.' }, { status: 400 });
     }
@@ -25,7 +27,15 @@ export async function POST(req: NextRequest) {
     const uploadedUrls: string[] = [];
     
     // Thư mục lưu trữ tĩnh trong Next.js
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    let uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    let relativeFolder = '';
+    if (folder) {
+      // Bảo vệ tránh directory traversal bằng cách chỉ lấy chữ cái và số
+      relativeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, "");
+      if (relativeFolder) {
+        uploadDir = path.join(uploadDir, relativeFolder);
+      }
+    }
     
     // Tạo thư mục nếu chưa tồn tại
     await mkdir(uploadDir, { recursive: true });
@@ -34,6 +44,12 @@ export async function POST(req: NextRequest) {
       // Đảm bảo file là ảnh
       if (!file.type.startsWith('image/')) {
         return NextResponse.json({ error: `File ${file.name} không phải là hình ảnh.` }, { status: 400 });
+      }
+
+      // Giới hạn 5MB
+      const MAX_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        return NextResponse.json({ error: `Kích thước hình ảnh ${file.name} vượt quá 5MB.` }, { status: 400 });
       }
 
       // Tạo tên tệp độc nhất bằng timestamp + tên ngẫu nhiên + đuôi mở rộng gốc
@@ -48,7 +64,8 @@ export async function POST(req: NextRequest) {
       await writeFile(filePath, buffer);
 
       // Đường dẫn tĩnh truy cập từ trình duyệt
-      uploadedUrls.push(`/uploads/${cleanFileName}`);
+      const fileUrl = relativeFolder ? `/uploads/${relativeFolder}/${cleanFileName}` : `/uploads/${cleanFileName}`;
+      uploadedUrls.push(fileUrl);
     }
 
     return NextResponse.json({ 

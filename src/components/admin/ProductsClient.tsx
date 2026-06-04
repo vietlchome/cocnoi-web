@@ -15,7 +15,7 @@ interface Product {
   description: string
   price: number
   stockQuantity: number
-  images: string // JSON string array
+  images: any
   isActive: boolean
   categoryId: string | null
   category: {
@@ -112,13 +112,10 @@ export default function ProductsClient({ initialProducts, categories }: Products
   }
 
   // Đọc danh sách ảnh
-  const getFirstImage = (imagesStr: string) => {
-    try {
-      const parsed = JSON.parse(imagesStr)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed[0]
-      }
-    } catch (e) {}
+  const getFirstImage = (images: any) => {
+    if (Array.isArray(images) && images.length > 0) {
+      return images[0]
+    }
     return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=100&q=80' // Placeholder
   }
 

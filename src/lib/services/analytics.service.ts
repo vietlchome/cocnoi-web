@@ -275,7 +275,7 @@ export class AnalyticsService {
       if (!item.product) return;
 
       const pId = item.productId;
-      const imagesArr = JSON.parse(item.product.images || '[]');
+      const imagesArr = item.product.images || [];
       const coverImage = imagesArr[0] || null;
 
       if (!productStatsMap[pId]) {

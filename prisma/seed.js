@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log('Bắt đầu dọn dẹp dữ liệu cũ (tuân thủ giới hạn khóa ngoại)...')
-  await prisma.siteSettings.deleteMany()
+  await prisma.themeSetting.deleteMany()
   await prisma.review.deleteMany()
   await prisma.orderItem.deleteMany()
   await prisma.orderInquiry.deleteMany()
@@ -84,7 +84,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 20,
       weight: 450,
-      images: JSON.stringify([mugImages[0], mugImages[1]]),
+      images: [mugImages[0], mugImages[1]],
       categoryId: categories[0].id,
       productGroupId: 'fu-rung',
       colorName: 'Hồng Phù Dung',
@@ -99,7 +99,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 15,
       weight: 550,
-      images: JSON.stringify([mugImages[1], mugImages[2]]),
+      images: [mugImages[1], mugImages[2]],
       categoryId: categories[0].id,
       productGroupId: 'fu-rung',
       colorName: 'Hồng Phù Dung',
@@ -116,7 +116,7 @@ async function main() {
       compareAtPrice: 320000,
       stockQuantity: 25,
       weight: 350,
-      images: JSON.stringify([mugImages[2], mugImages[3]]),
+      images: [mugImages[2], mugImages[3]],
       categoryId: categories[0].id,
       productGroupId: 'lanh',
       colorName: 'Mộc Sợi Lanh',
@@ -133,7 +133,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 30,
       weight: 450,
-      images: JSON.stringify([mugImages[3], mugImages[4]]),
+      images: [mugImages[3], mugImages[4]],
       categoryId: categories[0].id,
       productGroupId: 'mano',
       colorName: 'Cream Nâu',
@@ -150,7 +150,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 10,
       weight: 500,
-      images: JSON.stringify([mugImages[4], mugImages[5]]),
+      images: [mugImages[4], mugImages[5]],
       categoryId: categories[0].id,
       productGroupId: 'asa',
       colorName: 'Trắng Sữa Sáng',
@@ -167,7 +167,7 @@ async function main() {
       compareAtPrice: 500000,
       stockQuantity: 15,
       weight: 550,
-      images: JSON.stringify([mugImages[5], mugImages[0]]),
+      images: [mugImages[5], mugImages[0]],
       categoryId: categories[0].id,
       productGroupId: 'terra',
       colorName: 'Đỏ Nâu Đất',
@@ -184,7 +184,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 20,
       weight: 500,
-      images: JSON.stringify([mugImages[0], mugImages[2]]),
+      images: [mugImages[0], mugImages[2]],
       categoryId: categories[0].id,
       productGroupId: 'dara',
       colorName: 'Xanh Lá Sồi',
@@ -201,7 +201,7 @@ async function main() {
       compareAtPrice: null,
       stockQuantity: 15,
       weight: 350,
-      images: JSON.stringify([mugImages[1], mugImages[3]]),
+      images: [mugImages[1], mugImages[3]],
       categoryId: categories[0].id,
       productGroupId: 'nami',
       colorName: 'Xanh Nước Biển',
@@ -218,7 +218,7 @@ async function main() {
       compareAtPrice: 500000,
       stockQuantity: 25,
       weight: 550,
-      images: JSON.stringify([mugImages[2], mugImages[4]]),
+      images: [mugImages[2], mugImages[4]],
       categoryId: categories[0].id,
       productGroupId: 'covo',
       colorName: 'Xám Len Khói',
@@ -300,11 +300,11 @@ async function main() {
     })
   }
 
-  console.log('Khởi tạo cấu hình giao diện mặc định (SiteSettings)...')
-  await prisma.siteSettings.create({
+  console.log('Khởi tạo cấu hình giao diện mặc định (ThemeSetting)...')
+  await prisma.themeSetting.create({
     data: {
       key: 'main_config',
-      value: {
+      value: JSON.stringify({
         global: {
           logoUrl: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=200&q=80',
           faviconUrl: '',
@@ -362,7 +362,7 @@ async function main() {
             answer: 'Với năng lực sản xuất tại xưởng gốm thủ công của Cốc Nối, thời gian sản xuất dao động từ 15 - 25 ngày kể từ ngày ký hợp đồng và duyệt mẫu thử nghiệm. Vui lòng liên hệ hotline B2B để nhận tiến độ chính xác nhất.',
           },
         ],
-      }
+      })
     }
   })
 

@@ -418,7 +418,7 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden relative shrink-0 border border-gray-200/80 bg-white">
                         <img 
-                          src={JSON.parse(activeInquiry.product.images)[0]} 
+                          src={Array.isArray(activeInquiry.product.images) ? activeInquiry.product.images[0] : ''} 
                           alt={activeInquiry.product.name} 
                           className="w-full h-full object-cover"
                         />
