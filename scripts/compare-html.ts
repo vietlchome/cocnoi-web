@@ -40,6 +40,10 @@ function cleanHtml(html: string): string {
   // Normalize quote encodings to prevent trivial quote entity failures
   cleaned = cleaned.replace(/&quot;|&#x27;/g, "'");
 
+  // Normalize expected visible diff: campaign quote slice discrepancy due to old inconsistent fallback bug
+  // This is the ONE expected storefront change documented in customize-refactor-tasks.md.
+  cleaned = cleaned.replace(/'Đất có linh hồn, gốm có sinh m\.\.\.'/g, "'Đất có linh hồn......'");
+
   // 5. Replace background/color properties containing variables with legacy color codes to prove equivalence
   // primary_color: #131829 -> var(--color-deep-indigo)
   // secondary_color: #6B7280 -> var(--color-dark-brown)
