@@ -67,7 +67,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       logoUrl: { type: "image", label: "Logo Website", default: "", aliases: ["logo_image_url"] },
       logoText: { type: "text", label: "Tên thương hiệu", default: "CỐC NỐI", aliases: ["logo_text"] },
       showTopBar: { type: "boolean", label: "Hiển thị Top Bar", default: true, aliases: ["show_top_bar"] },
-      topBarText: { type: "text", label: "Nội dung Top Bar", default: "Miễn phí vận chuyển...", aliases: ["top_bar_text"] },
+      topBarText: { type: "text", label: "Nội dung Top Bar", default: "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ", aliases: ["top_bar_text"] },
       stickyHeader: { type: "boolean", label: "Header dính khi cuộn", default: true, aliases: ["sticky_header"] }
     }
   },
@@ -76,7 +76,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     fields: {
       badge: { type: "text", label: "Badge Text", default: "Crafted in Bát Tràng since 1994", aliases: ["hero_badge_text"] },
       title: { type: "text", label: "Tiêu đề", default: "Kết tình thân, Nối tinh thần.", aliases: ["hero_title"] },
-      subtitle: { type: "textarea", label: "Mô tả", default: "Mỗi chiếc cốc gốm...", aliases: ["hero_subtitle"] },
+      subtitle: { type: "textarea", label: "Mô tả", default: "Mỗi chiếc cốc gốm thủ công Cốc Nối chứa đựng tâm huyết của những nghệ nhân Bát Tràng và khát vọng gắn kết những tâm hồn đồng điệu.", aliases: ["hero_subtitle"] },
       ctaPrimary: { type: "text", label: "CTA Chính", default: "Khám phá Cửa Hàng", aliases: ["hero_cta_text"] },
       ctaSecondary: { type: "text", label: "CTA Phụ", default: "Chiến dịch 'Người Nối'", aliases: ["hero_cta_secondary"] },
       floatingLabel: { type: "text", label: "Nhãn nổi trang trí", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
@@ -118,8 +118,8 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     fields: {
       tagline: { type: "text", label: "Tagline", default: "Heritage & Craft", aliases: ["intro_tagline"] },
       title: { type: "text", label: "Tiêu đề", default: "Khởi nguồn từ lòng đất...", aliases: ["intro_title", "story_title"] },
-      desc1: { type: "textarea", label: "Đoạn văn 1", default: "", aliases: ["intro_desc_1", "story_content"] },
-      desc2: { type: "textarea", label: "Đoạn văn 2", default: "", aliases: ["intro_desc_2"] },
+      desc1: { type: "textarea", label: "Đoạn văn 1", default: "Năm 1994, giữa lòng ngôi làng cổ Bát Tràng có bề dày lịch sử hơn 700 năm, một lò nung gốm nhỏ gia đình đã đỏ lửa. Đó chính là khởi đầu của Cốc Nối ngày nay.", aliases: ["intro_desc_1", "story_content"] },
+      desc2: { type: "textarea", label: "Đoạn văn 2", default: "Chúng tôi tin rằng, một sản phẩm gốm tốt không chỉ nằm ở chất đất đanh, lớp men mịn mà còn nằm ở sự truyền tải cảm xúc. Mỗi mẻ gốm của Cốc Nối được làm từ đất sét lọc kỹ, xoay tay thủ công cẩn trọng, tráng men tự nhiên và nung ở nhiệt độ tiêu chuẩn để đảm bảo sự gắn kết tuyệt đối của xương gốm.", aliases: ["intro_desc_2"] },
       storyImageUrl: { type: "image", label: "Ảnh minh họa chính", default: "", aliases: ["story_image_url"] },
       stat1Val: { type: "text", label: "Thống kê 1 (Số)", default: "30+", aliases: ["intro_stat_1_val"] },
       stat1Lbl: { type: "text", label: "Thống kê 1 (Nhãn)", default: "Năm giữ lửa", aliases: ["intro_stat_1_lbl"] },
