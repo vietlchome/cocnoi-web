@@ -13,8 +13,8 @@ function cleanHtml(html: string): string {
   // 1. Remove script tags completely
   cleaned = cleaned.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
 
-  // 2. Remove stylesheet link tags
-  cleaned = cleaned.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*>/gi, "");
+  // 2. Remove all link tags (stylesheets, preloads, favicons, etc.)
+  cleaned = cleaned.replace(/<link\b[^>]*>/gi, "");
 
   // 3. Remove Next.js metadata and build-specific tags (like next-head, nextjs portal overlay, hot reload scripts)
   cleaned = cleaned.replace(/<next-route-announcer>[\s\S]*?<\/next-route-announcer>/gi, "");
@@ -86,11 +86,13 @@ function diffPages(prePath: string, postPath: string): boolean {
       }
     }
 
-    if (firstDiffIndex !== -1) {
-      console.log(`  First difference at index: ${firstDiffIndex}`);
-      console.log(`  Pre context:  ...${cleanPre.substring(Math.max(0, firstDiffIndex - 40), Math.min(cleanPre.length, firstDiffIndex + 60))}...`);
-      console.log(`  Post context: ...${cleanPost.substring(Math.max(0, firstDiffIndex - 40), Math.min(cleanPost.length, firstDiffIndex + 60))}...`);
+    if (firstDiffIndex === -1) {
+      firstDiffIndex = minLength;
     }
+
+    console.log(`  First difference at index: ${firstDiffIndex}`);
+    console.log(`  Pre context:  ...${cleanPre.substring(Math.max(0, firstDiffIndex - 40), Math.min(cleanPre.length, firstDiffIndex + 60))}...`);
+    console.log(`  Post context: ...${cleanPost.substring(Math.max(0, firstDiffIndex - 40), Math.min(cleanPost.length, firstDiffIndex + 60))}...`);
     console.log();
     return false;
   }
