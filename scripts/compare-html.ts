@@ -40,10 +40,6 @@ function cleanHtml(html: string): string {
   // Normalize quote encodings to prevent trivial quote entity failures
   cleaned = cleaned.replace(/&quot;|&#x27;/g, "'");
 
-  // Normalize campaign quote slice discrepancy caused by inconsistent old fallback defaults
-  cleaned = cleaned.replace(/'Đất có linh hồn\.\.\.\.\.\.'/g, "'QUOTE_SLICED'");
-  cleaned = cleaned.replace(/'Đất có linh hồn, gốm có sinh m\.\.\.'/g, "'QUOTE_SLICED'");
-
   // 5. Replace background/color properties containing variables with legacy color codes to prove equivalence
   // primary_color: #131829 -> var(--color-deep-indigo)
   // secondary_color: #6B7280 -> var(--color-dark-brown)
@@ -53,9 +49,6 @@ function cleanHtml(html: string): string {
   cleaned = cleaned.replace(/var\(--color-dark-brown\)/g, "#6B7280");
   cleaned = cleaned.replace(/var\(--color-terracotta\)/g, "#C2703E");
   cleaned = cleaned.replace(/var\(--color-warm-white\)/g, "#FEFCF9");
-
-  // Normalize copyright notice (handling default schema vs hardcoded system year/language)
-  cleaned = cleaned.replace(/© 2024 CỐC NỐI\. All rights reserved\./g, "© 2026 CỐC NỐI. Bảo lưu mọi quyền.");
 
   // 6. Normalize whitespace
   cleaned = cleaned.replace(/\s+/g, " ").trim();
