@@ -20,7 +20,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
   const [verifiedOrder, setVerifiedOrder] = useState<{
     orderId: string;
     customerName: string;
-    items: Array<{ productId: string; name: string; slug: string; images: string }>;
+    items: Array<{ productId: string; name: string; slug: string; images: string[] }>;
   } | null>(null);
 
   // Form input state

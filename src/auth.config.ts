@@ -11,6 +11,10 @@ export const authConfig = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
+      // LUU Y QUAN TRONG: Khong duoc import Prisma hoac thuc hien bat ky truy van database nao o day.
+      // File nay duoc tai va chay boi Middleware tren Edge Runtime. Khi do, Prisma hoac cac thu vien
+      // Node.js truyen thong se gay ra loi.
+      // Ham authorize o day bat buoc phai tra ve null. Logic xac thuc/truy van thuc te duoc viet tai src/auth.ts (Node Runtime).
       async authorize(credentials) {
         // Validation logic sẽ được mở rộng ở auth.ts (vì cần prisma để tra cứu DB)
         // Đây chỉ là khung để next-auth nhận diện Provider

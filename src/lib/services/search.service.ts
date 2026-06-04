@@ -8,7 +8,7 @@ export interface GroupedSearchResults {
     slug: string;
     price: number;
     compareAtPrice: number | null;
-    images: string;
+    images: string[];
   }>;
   posts: Array<{
     id: string;
