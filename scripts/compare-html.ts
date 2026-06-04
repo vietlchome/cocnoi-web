@@ -37,6 +37,9 @@ function cleanHtml(html: string): string {
   // Strip empty hidden divs (React suspense placeholders)
   cleaned = cleaned.replace(/<div\b[^>]*hidden\b[^>]*>\s*<\/div>/gi, "");
 
+  // Normalize quote encodings to prevent trivial quote entity failures
+  cleaned = cleaned.replace(/&quot;|&#x27;/g, "'");
+
   // 5. Replace background/color properties containing variables with legacy color codes to prove equivalence
   // primary_color: #131829 -> var(--color-deep-indigo)
   // secondary_color: #6B7280 -> var(--color-dark-brown)
