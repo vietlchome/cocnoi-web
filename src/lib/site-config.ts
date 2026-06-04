@@ -1,0 +1,84 @@
+import { SITE_SCHEMA, SchemaField } from '@/config/site-schema';
+import { SettingsService } from '@/lib/services/settings.service';
+import { SiteConfig } from '@/lib/site-config-validate';
+
+function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Record<string, string>, sectionBlob: any) {
+  // Ưu tiên đọc từ JSON blob của section trước (dữ liệu mới)
+  if (sectionBlob && sectionBlob[fieldKey] !== undefined) {
+    return sectionBlob[fieldKey];
+  }
+
+  // Nếu là repeatable field, có cấu hình aliasGroups để map dữ liệu cũ
+  if (fieldDef.type === 'repeatable' && fieldDef.aliasGroups) {
+    const items: any[] = [];
+    for (const group of fieldDef.aliasGroups) {
+      let hasData = false;
+      const item: any = {};
+      
+      for (const [subKey, aliasKey] of Object.entries(group)) {
+        if (dbSettings[aliasKey] !== undefined && dbSettings[aliasKey] !== '') {
+          item[subKey] = dbSettings[aliasKey];
+          hasData = true;
+        } else {
+          item[subKey] = fieldDef.itemSchema[subKey]?.default || "";
+        }
+      }
+      
+      if (hasData) items.push(item);
+    }
+    
+    return items.length > 0 ? items : (fieldDef.default || []);
+  }
+
+  // Nếu là các field cơ bản, tìm qua danh sách aliases (dữ liệu flat cũ)
+  if (fieldDef.aliases) {
+    for (const alias of fieldDef.aliases) {
+      if (dbSettings[alias] !== undefined && dbSettings[alias] !== '') {
+        const val = dbSettings[alias];
+        
+        if (fieldDef.type === 'boolean') {
+          return val === 'true';
+        }
+        if (fieldDef.type === 'json') {
+          try { return JSON.parse(val); } catch { return fieldDef.default; }
+        }
+        return val;
+      }
+    }
+  }
+
+  // Mặc định trả về giá trị default trong schema
+  return fieldDef.default;
+}
+
+export async function getSiteConfig(): Promise<SiteConfig> {
+  let dbSettings: Record<string, string> = {};
+  
+  try {
+    dbSettings = await SettingsService.getAllSettings();
+  } catch (error) {
+    console.warn("Failed to fetch settings from DB, using defaults:", error);
+  }
+
+  const config: Record<string, any> = {};
+
+  for (const [sectionName, sectionDef] of Object.entries(SITE_SCHEMA)) {
+    config[sectionName] = {};
+    
+    let sectionBlob = null;
+    const blobKey = `section.${sectionName}`;
+    if (dbSettings[blobKey]) {
+      try {
+        sectionBlob = JSON.parse(dbSettings[blobKey]);
+      } catch (e) {
+        console.warn(`Failed to parse JSON for ${blobKey}`);
+      }
+    }
+
+    for (const [fieldKey, fieldDef] of Object.entries(sectionDef.fields)) {
+      config[sectionName][fieldKey] = resolveField(fieldKey, fieldDef, dbSettings, sectionBlob);
+    }
+  }
+
+  return config as SiteConfig;
+}
