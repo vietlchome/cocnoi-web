@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PackageSearch } from "lucide-react";
 
 export default function FloatingActions() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [themeConfig, setThemeConfig] = useState<any>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -14,7 +14,7 @@ export default function FloatingActions() {
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            setSettings(data.settings);
+            setThemeConfig(data.config);
           }
         }
       } catch (e) {
@@ -24,17 +24,17 @@ export default function FloatingActions() {
     fetchSettings();
   }, []);
 
-  const getSetting = (key: string, fallback: string) => {
-    return settings[key] || fallback;
-  };
+  const socialInstagram = themeConfig?.social?.instagram || "";
+  const socialFacebook = themeConfig?.social?.facebook || "";
+  const socialZalo = themeConfig?.social?.zalo || "";
 
   return (
     <div className="fixed right-4 bottom-24 md:bottom-32 z-50 flex flex-col gap-3">
       
       {/* Instagram */}
-      {getSetting("contact_instagram", "https://instagram.com") !== "" && (
+      {socialInstagram !== "" && (
         <a
-          href={getSetting("contact_instagram", "https://instagram.com/")}
+          href={socialInstagram}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] hover:opacity-90 text-white flex flex-col items-center justify-center rounded-full shadow-md transition-all hover:-translate-x-1"
@@ -47,9 +47,9 @@ export default function FloatingActions() {
       )}
       
       {/* Facebook */}
-      {getSetting("contact_facebook", "https://facebook.com") !== "" && (
+      {socialFacebook !== "" && (
         <a
-          href={getSetting("contact_facebook", "https://facebook.com/")}
+          href={socialFacebook}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 md:w-11 md:h-11 bg-[#1877F2] hover:bg-[#166fe5] text-white flex flex-col items-center justify-center rounded-full shadow-md transition-all hover:-translate-x-1"
@@ -62,9 +62,9 @@ export default function FloatingActions() {
       )}
 
       {/* Zalo */}
-      {getSetting("contact_zalo", "https://zalo.me") !== "" && (
+      {socialZalo !== "" && (
         <a
-          href={getSetting("contact_zalo", "https://zalo.me/")}
+          href={socialZalo}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 md:w-11 md:h-11 bg-[#0068FF] hover:bg-[#005ce6] text-white flex flex-col items-center justify-center rounded-full shadow-md transition-all hover:-translate-x-1"
@@ -80,7 +80,7 @@ export default function FloatingActions() {
       {/* Đơn hàng */}
       <Link
         href="/don-hang"
-        style={{ backgroundColor: getSetting("accent_color", "#C2703E") }}
+        style={{ backgroundColor: "var(--color-terracotta)" }}
         className="w-10 h-10 md:w-11 md:h-11 hover:opacity-90 text-white flex flex-col items-center justify-center rounded-full shadow-md transition-all hover:-translate-x-1"
         title="Tra cứu Đơn hàng"
       >
