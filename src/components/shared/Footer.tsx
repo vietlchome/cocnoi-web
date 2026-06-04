@@ -38,7 +38,7 @@ export default function Footer() {
   const footerEmail = themeConfig?.footer?.email || "hello@cocnoi.com";
   const footerNewsletterTitle = themeConfig?.footer?.newsletterTitle || "Hộp tin Cốc Nối";
   const footerNewsletterDesc = themeConfig?.footer?.newsletterDesc || "Đăng ký để nhận câu chuyện mới về 'Người Nối' và ưu đãi sớm nhất của các bộ sưu tập.";
-  const footerCopyright = themeConfig?.footer?.copyright || "© 2026 CỐC NỐI. Bảo lưu mọi quyền.";
+  const footerCopyright = themeConfig?.footer?.copyright || "CỐC NỐI. Bảo lưu mọi quyền.";
 
   return (
     <footer className="bg-subtle text-primary border-t border-border mt-auto">
@@ -175,7 +175,7 @@ export default function Footer() {
       <div className="bg-canvas border-t border-border py-8">
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4 font-bvp text-xs text-secondary">
           <span>
-            {footerCopyright}
+            &copy; {new Date().getFullYear()} {footerCopyright}
           </span>
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-accent transition-colors">Điều khoản dịch vụ</Link>
