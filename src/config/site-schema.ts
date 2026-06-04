@@ -87,11 +87,11 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     label: "Chiến dịch",
     fields: {
       badge: { type: "text", label: "Campaign Badge", default: "Signature Campaign", aliases: ["campaign_badge"] },
-      title: { type: "text", label: "Tiêu đề", default: "", aliases: ["campaign_title"] },
-      desc: { type: "textarea", label: "Mô tả", default: "", aliases: ["campaign_desc"] },
+      title: { type: "text", label: "Tiêu đề", default: "Chiến dịch 'Người Nối' - Vinh danh sự gắn kết thầm lặng.", aliases: ["campaign_title"] },
+      desc: { type: "textarea", label: "Mô tả", default: "Lấy cảm hứng từ những cống hiến âm thầm của cộng đồng, Người Nối là chiến dịch trọng tâm của Cốc Nối nhằm tôn vinh những người lao động nghệ thuật, những người kết nối sợi dây tình cảm trong gia đình và xã hội.", aliases: ["campaign_desc"] },
       heroImageUrl: { type: "image", label: "Ảnh Nhân vật", default: "", aliases: ["campaign_hero_image_url"] },
       heroName: { type: "text", label: "Tên nhân vật", default: "Bác Cường Lò Bầu", aliases: ["campaign_hero_name"] },
-      heroQuote: { type: "text", label: "Câu trích dẫn", default: "Đất có linh hồn...", aliases: ["campaign_hero_quote"] }
+      heroQuote: { type: "text", label: "Câu trích dẫn", default: "Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó.", aliases: ["campaign_hero_quote"] }
     }
   },
   products: {
