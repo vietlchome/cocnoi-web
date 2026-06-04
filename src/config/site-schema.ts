@@ -240,7 +240,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       email: { type: "text", label: "Email", default: "", aliases: ["contact_email"] },
       newsletterTitle: { type: "text", label: "Tiêu đề Newsletter", default: "Hộp tin Cốc Nối", aliases: ["footer_newsletter_title"] },
       newsletterDesc: { type: "text", label: "Mô tả Newsletter", default: "", aliases: ["footer_newsletter_desc"] },
-      copyright: { type: "text", label: "Bản quyền", default: "© 2024 CỐC NỐI. All rights reserved.", aliases: ["footer_copyright"] }
+      copyright: { type: "text", label: "Bản quyền", default: "© 2026 CỐC NỐI. Bảo lưu mọi quyền.", aliases: ["footer_copyright"] }
     }
   },
   social: {
