@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { ContentService } from "@/lib/services/content.service";
+import { getSiteConfig } from "@/lib/site-config";
 
 export async function GET() {
   try {
     // Lấy toàn bộ setting từ CSDL thông qua Service (Service đã xử lý sẵn JSON.parse)
     const settingsMap = await ContentService.getAllThemeSettings();
+    const config = await getSiteConfig();
 
-    return NextResponse.json({ success: true, settings: settingsMap });
+    return NextResponse.json({ success: true, settings: settingsMap, config });
   } catch (error: any) {
     console.error("Theme Settings GET Error:", error);
     return NextResponse.json(
