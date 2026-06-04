@@ -15,3 +15,9 @@
 ## TODO Future
 
 - **Server-Side Config (props injection)**: Convert client-side customizer dependent components (`Header`/`Footer`/`FloatingActions`) from client-side API fetching to Server Components that receive resolved `config` via props. This will eliminate client-side fetching delay and prevent Flash of Unstyled Content (FOUC).
+
+## Phase 2 - Documented Behavior Changes
+
+- **Campaign Quote Floating Snippet**: The floating quote snippet in the campaign visual card changed from displaying `"Đất có linh hồn......"` to `"Đất có linh hồn, gốm có sinh m..."`. This is an intentional bug fix because the pre-migration code used two different fallback defaults for the same DB key `campaign_hero_quote` (`"Đất có linh hồn..."` on line 214 vs the full quote `"Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó."` on line 224). The refactored code correctly slices the unified schema default value.
+- **Dynamic Year Copyright**: The copyright notice year is kept dynamic in the `Footer.tsx` storefront rendering via `&copy; {new Date().getFullYear()}`, appending the customizer-configured copyright text (default: `"CỐC NỐI. Bảo lưu mọi quyền."`). The year prefix is excluded from the schema default string to ensure it never becomes stale.
+
