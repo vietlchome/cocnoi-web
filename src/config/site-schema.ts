@@ -117,7 +117,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     label: "Câu chuyện thương hiệu",
     fields: {
       tagline: { type: "text", label: "Tagline", default: "Heritage & Craft", aliases: ["intro_tagline"] },
-      title: { type: "text", label: "Tiêu đề", default: "Khởi nguồn từ lòng đất...", aliases: ["intro_title", "story_title"] },
+      title: { type: "text", label: "Tiêu đề", default: "Khởi nguồn từ lòng đất, Giữ lửa qua ba thập kỷ.", aliases: ["intro_title", "story_title"] },
       desc1: { type: "textarea", label: "Đoạn văn 1", default: "Năm 1994, giữa lòng ngôi làng cổ Bát Tràng có bề dày lịch sử hơn 700 năm, một lò nung gốm nhỏ gia đình đã đỏ lửa. Đó chính là khởi đầu của Cốc Nối ngày nay.", aliases: ["intro_desc_1", "story_content"] },
       desc2: { type: "textarea", label: "Đoạn văn 2", default: "Chúng tôi tin rằng, một sản phẩm gốm tốt không chỉ nằm ở chất đất đanh, lớp men mịn mà còn nằm ở sự truyền tải cảm xúc. Mỗi mẻ gốm của Cốc Nối được làm từ đất sét lọc kỹ, xoay tay thủ công cẩn trọng, tráng men tự nhiên và nung ở nhiệt độ tiêu chuẩn để đảm bảo sự gắn kết tuyệt đối của xương gốm.", aliases: ["intro_desc_2"] },
       storyImageUrl: { type: "image", label: "Ảnh minh họa chính", default: "", aliases: ["story_image_url"] },
