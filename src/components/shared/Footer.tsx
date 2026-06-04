@@ -38,7 +38,7 @@ export default function Footer() {
   const footerEmail = themeConfig?.footer?.email || "hello@cocnoi.com";
   const footerNewsletterTitle = themeConfig?.footer?.newsletterTitle || "Hộp tin Cốc Nối";
   const footerNewsletterDesc = themeConfig?.footer?.newsletterDesc || "Đăng ký để nhận câu chuyện mới về 'Người Nối' và ưu đãi sớm nhất của các bộ sưu tập.";
-  const footerCopyright = themeConfig?.footer?.copyright || "© 2024 CỐC NỐI. All rights reserved.";
+  const footerCopyright = themeConfig?.footer?.copyright || "© 2026 CỐC NỐI. Bảo lưu mọi quyền.";
 
   return (
     <footer className="bg-subtle text-primary border-t border-border mt-auto">
