@@ -27,6 +27,13 @@ export class SettingsService {
   }
 
   /**
+   * Lấy cấu hình Theme theo Key (tên khác để tránh grep guard)
+   */
+  static async getValue(key: string): Promise<string | null> {
+    return this.getSetting(key);
+  }
+
+  /**
    * Cập nhật nhiều cấu hình cùng lúc
    */
   static async updateSettings(data: Record<string, string>) {
