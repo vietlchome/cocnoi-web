@@ -34,6 +34,9 @@ function cleanHtml(html: string): string {
   // Normalize React Suspense IDs (e.g. id="S:0" -> id="S:ID")
   cleaned = cleaned.replace(/\bid=["']S:\d+["']/gi, 'id="S:ID"');
 
+  // Strip empty hidden divs (React suspense placeholders)
+  cleaned = cleaned.replace(/<div\b[^>]*hidden\b[^>]*>\s*<\/div>/gi, "");
+
   // 5. Replace background/color properties containing variables with legacy color codes to prove equivalence
   // primary_color: #131829 -> var(--color-deep-indigo)
   // secondary_color: #6B7280 -> var(--color-dark-brown)
