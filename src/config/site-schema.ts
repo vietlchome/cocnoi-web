@@ -146,7 +146,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     fields: {
       tagline: { type: "text", label: "Tagline", default: "Core Principles", aliases: ["values_tagline"] },
       title: { type: "text", label: "Tiêu đề", default: "Giá trị Cốc Nối", aliases: ["values_title"] },
-      desc: { type: "textarea", label: "Mô tả chung", default: "", aliases: ["values_desc"] },
+      desc: { type: "textarea", label: "Mô tả chung", default: "Chúng tôi gìn giữ những giá trị nguyên bản nhất của gốm thủ công để mang đến trải nghiệm chạm tinh tế nhất cho khách hàng.", aliases: ["values_desc"] },
       items: {
         type: "repeatable",
         label: "Các đặc trưng",
