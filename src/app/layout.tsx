@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Be_Vietnam_Pro, Quicksand } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { ContentService } from "@/lib/services/content.service";
+import { getSiteConfig } from "@/lib/site-config";
+import { SettingsService } from "@/lib/services/settings.service";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -24,10 +25,14 @@ const quicksand = Quicksand({
   weight: ["300", "400"],
 });
 
-export const metadata: Metadata = {
-  title: "Cốc Nối · Gốm thủ công Bát Tràng",
-  description: "Kết tình thân, Nối tinh thần. Cốc gốm thủ công từ xưởng gia đình tại Bát Tràng từ 1994.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getSiteConfig();
+  return {
+    title: config.seo.siteTitle || "Cốc Nối · Gốm thủ công Bát Tràng",
+    description: config.seo.siteDescription || "Kết tình thân, Nối tinh thần. Cốc gốm thủ công từ xưởng gia đình tại Bát Tràng từ 1994.",
+    keywords: config.seo.siteKeywords || undefined,
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -35,7 +40,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Lấy dữ liệu cấu hình giao diện từ DB để ghi đè màu sắc CSS
-  const settings = await ContentService.getAllThemeSettings();
+  const settings = await SettingsService.getAllSettings();
   
   // Tạo đoạn CSS chèn động các màu sắc thương hiệu
   const themeStyles = `
