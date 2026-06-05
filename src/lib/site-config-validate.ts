@@ -3,7 +3,10 @@ import { z } from "zod";
 // Các base validator
 const textValidator = z.string();
 const urlValidator = z.string().url().or(z.literal(""));
-const imageValidator = z.string();
+const imageValidator = z.string().regex(
+  /^(https?:\/\/.+|\/[^\/].*|)$/,
+  "Image phải là URL hợp lệ, đường dẫn tuyệt đối (/path), hoặc để trống"
+);
 const booleanValidator = z.boolean();
 const colorValidator = z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Invalid hex color").or(z.literal(""));
 
@@ -37,6 +40,7 @@ export const SiteConfigSchema = z.object({
     title: textValidator,
     desc: textValidator,
     type: z.enum(["latest", "bestseller", "manual"]),
+    manualProductIds: z.array(z.string()),
   }),
   story: z.object({
     tagline: textValidator,

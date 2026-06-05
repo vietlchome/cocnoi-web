@@ -42,6 +42,21 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
     return items.length > 0 ? items : (fieldDef.default || []);
   }
 
+  // Nếu là product-picker và có aliases, kiểm tra xem có alias nào lưu trữ JSON string của một mảng không
+  if (fieldDef.type === 'product-picker' as any) {
+    if (fieldDef.aliases) {
+      for (const alias of fieldDef.aliases) {
+        if (dbSettings[alias] !== undefined && dbSettings[alias] !== '') {
+          try {
+            const parsed = JSON.parse(dbSettings[alias]);
+            if (Array.isArray(parsed)) return parsed.filter((id): id is string => typeof id === 'string');
+          } catch {}
+        }
+      }
+    }
+    return fieldDef.default ?? [];
+  }
+
   // Nếu là các field cơ bản, tìm qua danh sách aliases (dữ liệu flat cũ)
   if (fieldDef.aliases) {
     for (const alias of fieldDef.aliases) {

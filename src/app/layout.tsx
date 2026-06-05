@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Be_Vietnam_Pro, Quicksand } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { getSiteConfig } from "@/lib/site-config";
 import { SettingsService } from "@/lib/services/settings.service";
 import "./globals.css";
@@ -84,9 +83,6 @@ export default async function RootLayout({
         <style dangerouslySetInnerHTML={{ __html: themeStyles }} />
         {children}
       </body>
-      {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-      )}
     </html>
   );
 }
