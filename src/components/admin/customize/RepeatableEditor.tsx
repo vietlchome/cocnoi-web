@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import type { RepeatableField } from "@/config/site-schema";
 import { Plus, Trash2, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";

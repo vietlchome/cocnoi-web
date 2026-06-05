@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { SITE_SCHEMA } from "@/config/site-schema";
 import SectionEditor from "../SectionEditor";

@@ -14,7 +14,7 @@ Tạo bộ component **pure, schema-driven, controlled** để render UI cho m�
 - Là **controlled components**: nhận `value` + `onChange`, không quản state nội bộ (trừ UI state thuần — accordion open/close, drag handle).
 - Không gọi server action, không fetch, không biết về `settings.service`.
 - Type-safe: prop `field: SchemaField` ràng buộc đúng cái `value` được nhận.
-- Có **sandbox route `/admin/_sandbox/customize-preview`** để Việt mở browser xem live.
+- Có **sandbox route `/admin/sandbox/customize-preview`** để Việt mở browser xem live.
 
 Sau Phase 3a, `SiteCustomizerClient.tsx` vẫn nguyên xi 480 dòng. Phase 3b sẽ thay nó.
 
@@ -149,7 +149,7 @@ Lý do: ColorFieldInput cần dùng, không muốn import từ client component 
 
 ## 5. Sandbox route — bắt buộc để verify
 
-**File:** `src/app/(admin)/admin/_sandbox/customize-preview/page.tsx`
+**File:** `src/app/(admin)/admin/sandbox/customize-preview/page.tsx`
 
 Server component mỏng (chỉ render client component). Trang này:
 
@@ -194,7 +194,7 @@ URL: `http://localhost:3000/admin/sandbox/customize-preview`
 
 1. `pnpm build` — pass, không TS error.
 2. `pnpm lint` — clean.
-3. `pnpm dev`, login admin, mở `/admin/_sandbox/customize-preview`.
+3. `pnpm dev`, login admin, mở `/admin/sandbox/customize-preview`.
 4. Chọn từng section trong dropdown. Mỗi section:
    - Gõ vào text/textarea → JSON bên phải update realtime.
    - Toggle boolean → JSON update.
@@ -225,7 +225,7 @@ Screenshot 2 thứ trong PR: sandbox đang render 1 section repeatable + storefr
 
 - [ ] Mọi component dưới `src/components/admin/customize/` xuất default + có JSDoc 1 dòng mô tả contract.
 - [ ] Không `any` ngoại trừ JsonFieldInput value (vì JSON nested có thể là gì cũng được).
-- [ ] Sandbox route `_sandbox/customize-preview` ẩn sau requireAdmin.
+- [ ] Sandbox route `sandbox/customize-preview` ẩn sau requireAdmin.
 - [ ] `BRAND_COLORS` đã chuyển sang `src/lib/brand-colors.ts`, `SiteCustomizerClient.tsx` import từ file mới.
 - [ ] PR description ghi: "Phase 3a closed. Library ready. Phase 3b sẽ rewrite SiteCustomizerClient."
 - [ ] Screenshot sandbox.

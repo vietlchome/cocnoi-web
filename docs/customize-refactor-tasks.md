@@ -4,7 +4,7 @@
 
 **Spec:** `docs/customize-refactor-spec-phase3a.md`.
 
-Build `FieldRenderer` / `SectionEditor` / `RepeatableEditor` + sub `*FieldInput` components under `src/components/admin/customize/`. Add sandbox route `/admin/_sandbox/customize-preview` for manual verification. Do NOT touch `SiteCustomizerClient.tsx`, `settings.actions.ts`, schema, or `getSiteConfig`. Phase 3b (rewrite admin form + migration + delete dead code) starts only after Phase 3a is merged.
+Build `FieldRenderer` / `SectionEditor` / `RepeatableEditor` + sub `*FieldInput` components under `src/components/admin/customize/`. Add sandbox route `/admin/sandbox/customize-preview` for manual verification. Do NOT touch `SiteCustomizerClient.tsx`, `settings.actions.ts`, schema, or `getSiteConfig`. Phase 3b (rewrite admin form + migration + delete dead code) starts only after Phase 3a is merged.
 
 ## TODO Phase 3b (after 3a)
 
