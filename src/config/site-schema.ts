@@ -257,6 +257,14 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       legal: {
         type: "group",
         label: "Thông tin pháp lý (NĐ52)",
+        default: {
+          businessName: "",
+          taxId: "",
+          businessLicense: "",
+          licensedBy: "",
+          licensedDate: "",
+          hours: "8:00 - 18:00 (T2-T7)"
+        },
         fields: {
           businessName: { type: "text", label: "Tên doanh nghiệp đầy đủ", default: "", helpText: "Theo Giấy chứng nhận ĐKKD" },
           taxId: { type: "text", label: "Mã số thuế (MST)", default: "", helpText: "10 hoặc 13 chữ số" },

@@ -59,6 +59,17 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
     }
   }
 
+  if (fieldDef.type === 'group') {
+    // Build nested object from sub-field defaults if no value
+    const groupDefault: Record<string, any> = fieldDef.default ?? {};
+    for (const [subKey, subDef] of Object.entries(fieldDef.fields)) {
+      if (groupDefault[subKey] === undefined) {
+        groupDefault[subKey] = (subDef as any).default ?? "";
+      }
+    }
+    return groupDefault;
+  }
+
   // Mặc định trả về giá trị default trong schema
   return fieldDef.default;
 }
