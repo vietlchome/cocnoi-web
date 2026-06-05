@@ -16,14 +16,21 @@ export const SiteConfigSchema = z.object({
     logoText: textValidator,
     showTopBar: booleanValidator,
     topBarText: textValidator,
+    topBarLink: urlValidator,
     stickyHeader: booleanValidator,
   }),
   hero: z.object({
     badge: textValidator,
     title: textValidator,
     subtitle: textValidator,
-    ctaPrimary: textValidator,
-    ctaSecondary: textValidator,
+    ctaPrimary: z.object({
+      text: textValidator,
+      url: urlValidator,
+    }),
+    ctaSecondary: z.object({
+      text: textValidator,
+      url: urlValidator,
+    }),
     floatingLabel: textValidator,
     imageUrl: imageValidator,
   }),
@@ -34,6 +41,10 @@ export const SiteConfigSchema = z.object({
     heroImageUrl: imageValidator,
     heroName: textValidator,
     heroQuote: textValidator,
+    cta: z.object({
+      text: textValidator,
+      url: urlValidator,
+    }),
   }),
   products: z.object({
     tagline: textValidator,
@@ -114,6 +125,12 @@ export const SiteConfigSchema = z.object({
     googleAnalyticsId: z.string().regex(/^G-[A-Z0-9]+$/, "Google Analytics 4 ID không hợp lệ (phải bắt đầu bằng G-)").or(z.literal("")),
     facebookPixelId: z.string().regex(/^\d{15,16}$/, "Facebook Pixel ID phải gồm 15-16 chữ số").or(z.literal("")),
     tiktokPixelId: z.string().regex(/^[A-Za-z0-9]+$/, "TikTok Pixel ID phải là chuỗi chữ và số").or(z.literal("")),
+  }),
+  homepage: z.object({
+    sections: z.array(z.object({
+      key: z.enum(["hero", "campaign", "products", "story", "values", "faq"]),
+      visible: booleanValidator,
+    })),
   })
 });
 

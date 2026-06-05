@@ -111,6 +111,7 @@ export default function Header() {
   const headerLogoText = themeConfig?.header?.logoText || "CỐC NỐI";
   const headerShowTopBar = themeConfig ? themeConfig.header.showTopBar : true;
   const headerTopBarText = themeConfig?.header?.topBarText || "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ";
+  const headerTopBarLink = themeConfig?.header?.topBarLink || "";
   const isSticky = themeConfig ? themeConfig.header.stickyHeader : true;
 
   // Cấu hình menu động từ database
@@ -166,7 +167,13 @@ export default function Header() {
           style={{ backgroundColor: "var(--color-terracotta)" }}
           className="w-full text-center text-canvas py-2 px-4 text-[10px] md:text-xs font-bold font-bvp select-none truncate"
         >
-          {headerTopBarText}
+          {headerTopBarLink ? (
+            <Link href={headerTopBarLink} className="hover:underline text-canvas">
+              {headerTopBarText}
+            </Link>
+          ) : (
+            headerTopBarText
+          )}
         </div>
       )}
 
