@@ -52,14 +52,8 @@ export default async function StoreHome() {
     let sortedProducts = [...dbProducts];
 
     if (displayType === "manual") {
-      let manualIds = [];
-      try {
-        const idsVal = await SettingsService.getValue("featured_products_manual_ids") || "[]";
-        manualIds = typeof idsVal === "string" ? JSON.parse(idsVal) : idsVal;
-      } catch (e) {
-        manualIds = [];
-      }
-      if (Array.isArray(manualIds) && manualIds.length > 0) {
+      const manualIds = config.products.manualProductIds || [];
+      if (manualIds.length > 0) {
         sortedProducts = manualIds
           .map(id => dbProducts.find(p => p.id === id))
           .filter((p): p is typeof dbProducts[number] => !!p);

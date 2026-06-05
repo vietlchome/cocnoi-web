@@ -1,7 +1,8 @@
 import React from "react";
 import type { 
   SchemaField, TextField, TextareaField, UrlField, ImageField, 
-  BooleanField, SelectField, ColorField, JsonField, GroupField, RepeatableField 
+  BooleanField, SelectField, ColorField, JsonField, GroupField, RepeatableField,
+  ProductPickerField
 } from "@/config/site-schema";
 import TextFieldInput from "./fields/TextFieldInput";
 import TextareaFieldInput from "./fields/TextareaFieldInput";
@@ -14,6 +15,7 @@ import IconPickerFieldInput from "./fields/IconPickerFieldInput";
 import JsonFieldInput from "./fields/JsonFieldInput";
 import GroupFieldInput from "./fields/GroupFieldInput";
 import RepeatableEditor from "./RepeatableEditor";
+import ProductPickerFieldInput from "./fields/ProductPickerFieldInput";
 
 export interface FieldRendererProps {
   field: SchemaField;
@@ -240,6 +242,20 @@ export default function FieldRenderer({
           value={(coerced as any[]) ?? []}
           onChange={onChange}
           path={path}
+          disabled={disabled}
+        />
+      );
+    }
+
+    case "product-picker": {
+      const v = Array.isArray(value) ? (value as string[]) : [];
+      return (
+        <ProductPickerFieldInput
+          field={field as ProductPickerField}
+          value={v}
+          onChange={onChange as (next: string[]) => void}
+          path={path}
+          error={error}
           disabled={disabled}
         />
       );

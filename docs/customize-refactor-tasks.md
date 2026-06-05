@@ -12,10 +12,12 @@
 - **[x] Phase 4a - Convert FAQ Fields**: Convert `faq.itemsRetail` and `faq.itemsB2b` from `type: "json"` to `type: "repeatable"` with `itemSchema: { question: text, answer: textarea }`.
 - **[x] Phase 4a - Rename schema namespace**: Rename namespace `footer.address/phone/email` to `contact.*`. The `footer` namespace keeps newsletter and copyright fields, and adds `legal` group. Fallback reader implemented.
 - **[x] Phase 4a - Compliance, SEO, & Analytics**: Added ecommerce compliance (Nghị định 52) legal info group, SEO properties (robots, favicon, OG image) mapped via Metadata API, and GA4 / Facebook / TikTok analytics tracking tags conditionally loaded in store layout.
+- **[x] Phase 4b - Product Picker**: Added `manualProductIds: type "product-picker"` field, built custom `ProductPickerFieldInput` component, and wired it in admin Customizer. Storefront home page reads from config.
+- **[x] Phase 4b - Stricter Image Validation**: Image paths matching regex `^(https?:\/\/.+|\/[^\/].*|)$` (allowing absolute path or full URL, or empty string).
+- **[x] Phase 4b - Cleanup GA**: Removed duplicate GoogleAnalytics injection from root layout to prevent double tracking.
 - **[ ] Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
-- **[ ] Stricter Image Validation**: Validate image field values more strictly (must be a valid URL format or path format).
 - **[ ] Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
-- **[ ] Advanced Customizer Controls**: Support MST, OG image, drag-reorder with `@dnd-kit`, product pickers, and visibility/order controls.
+- **[ ] Advanced Customizer Controls**: Support MST, OG image, drag-reorder with `@dnd-kit`, and visibility/order controls (Phase 4c).
 
 ---
 

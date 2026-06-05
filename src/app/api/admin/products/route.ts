@@ -2,6 +2,40 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { ProductService } from "@/lib/services/product.service";
 
+export async function GET(request: Request) {
+  try {
+    await requireAdmin();
+  } catch (authError: any) {
+    return NextResponse.json(
+      { error: authError.message || "Unauthorized" },
+      { status: authError.message?.includes("Forbidden") ? 403 : 401 }
+    );
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const all = searchParams.get("all") === "true";
+    const query = searchParams.get("query") || searchParams.get("search") || undefined;
+
+    // Mặc định trả về sản phẩm đã xuất bản (isActive: true). Nếu all=true mới hiện cả bản nháp (isActive: undefined).
+    const isActive = all ? undefined : true;
+
+    const result = await ProductService.listProducts({
+      query,
+      isActive,
+      pageSize: 200,
+    });
+
+    return NextResponse.json({ success: true, data: result.data });
+  } catch (error: any) {
+    console.error("Admin Product GET Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Gặp sự cố khi lấy danh sách sản phẩm." },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   // 1. Phân quyền: Chỉ ADMIN được tạo sản phẩm qua API này
   try {

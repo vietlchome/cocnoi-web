@@ -9,6 +9,7 @@ export type FieldType =
   | 'group' 
   | 'repeatable' 
   | 'icon-picker'
+  | 'product-picker'
   | 'json'; // json cho faq_items
 
 export interface BaseField {
@@ -27,6 +28,7 @@ export interface BooleanField extends BaseField { type: 'boolean'; default: bool
 export interface SelectField extends BaseField { type: 'select'; default: string; options: {value: string, label: string}[]; }
 export interface ColorField extends BaseField { type: 'color'; default: string; }
 export interface JsonField extends BaseField { type: 'json'; default: any; }
+export interface ProductPickerField extends BaseField { type: 'product-picker'; default: string[]; }
 
 export interface GroupField extends BaseField {
   type: 'group';
@@ -53,7 +55,8 @@ export type SchemaField =
   | ColorField 
   | JsonField
   | GroupField 
-  | RepeatableField;
+  | RepeatableField
+  | ProductPickerField;
 
 export interface SectionSchema {
   label: string;
@@ -110,6 +113,13 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           { value: "bestseller", label: "Bán chạy" },
           { value: "manual", label: "Chọn tay" }
         ]
+      },
+      manualProductIds: {
+        type: "product-picker",
+        label: "Danh sách sản phẩm chọn tay",
+        default: [],
+        aliases: ["featured_products_manual_ids"],
+        helpText: "Chỉ áp dụng khi 'Cách chọn SP' = 'Chọn tay'. Dùng các nút mũi tên để thay đổi thứ tự."
       }
     }
   },
