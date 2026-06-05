@@ -1,29 +1,31 @@
 # Tasks for Customize Refactor (Theme Settings)
 
-## ACTIVE — Phase 3a (Library only, no admin wiring)
+## CLOSED — Phase 3a & 3b (Refactor Library + Admin Form Wiring + Migration)
 
-**Spec:** `docs/customize-refactor-spec-phase3a.md`.
+- **Phase 3a**: Built `FieldRenderer` / `SectionEditor` / `RepeatableEditor` + 10 fields inputs. Checked in-memory controlled states in Sandbox route `/admin/sandbox/customize-preview`.
+- **Phase 3b**: Wired SectionEditor to the main customization admin form `/admin/customize` (reduced `SiteCustomizerClient.tsx` from 475 to under 110 lines). Implemented Zod-validated `updateSiteConfigAction` and idempotent migration script `scripts/migrate-settings-to-sections.ts` to pack settings into JSON blobs. Cleaned up legacy unimported files (`HomepageCustomizerClient.tsx`) and seed data.
 
-Build `FieldRenderer` / `SectionEditor` / `RepeatableEditor` + sub `*FieldInput` components under `src/components/admin/customize/`. Add sandbox route `/admin/sandbox/customize-preview` for manual verification. Do NOT touch `SiteCustomizerClient.tsx`, `settings.actions.ts`, schema, or `getSiteConfig`. Phase 3b (rewrite admin form + migration + delete dead code) starts only after Phase 3a is merged.
+---
 
-## TODO Phase 3b (after 3a)
+## ACTIVE — Phase 4 (FAQ schema, refactoring fields, advanced controls)
 
-- **Convert FAQ Fields**: Convert `faq.itemsRetail` and `faq.itemsB2b` from `type: "json"` to `type: "repeatable"` with `itemSchema: { q: text, a: textarea }`.
-- **Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
-- **Stricter Image Validation**: Validate image field values more strictly (must be a valid URL format or path format).
-- **Rename schema namespace**: Rename namespace `footer.address/phone/email` to `contact.*`. The `footer` namespace should only keep newsletter and copyright fields. Keep original legacy aliases in place.
-- **Cleanup**: `prisma/seed.js` has seed `main_config` which is not consumed. Phase 3 or a separate cleanup PR should delete this database entry (or rewrite it to match flat keys + JSON blob matching the new schema).
+- **[ ] Convert FAQ Fields**: Convert `faq.itemsRetail` and `faq.itemsB2b` from `type: "json"` to `type: "repeatable"` with `itemSchema: { q: text, a: textarea }`.
+- **[ ] Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
+- **[ ] Stricter Image Validation**: Validate image field values more strictly (must be a valid URL format or path format).
+- **[ ] Rename schema namespace**: Rename namespace `footer.address/phone/email` to `contact.*`. The `footer` namespace should only keep newsletter and copyright fields. Keep original legacy aliases in place.
+- **[ ] Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
+- **[ ] Advanced Customizer Controls**: Support MST, OG image, drag-reorder with `@dnd-kit`, product pickers, and visibility/order controls.
 
-## TODO Phase 4
+---
 
-- **Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
+## TODO Future — Phase 5
 
-## TODO Future
+- **[ ] Draft/Preview/Publish states**: Implement settings staging, allowing admins to edit config in draft mode and preview before publishing to live storefront.
+- **[ ] Server-Side Config (props injection)**: Convert client-side customizer dependent components (`Header`/`Footer`/`FloatingActions`) from client-side API fetching to Server Components that receive resolved `config` via props. This will eliminate client-side fetching delay and prevent Flash of Unstyled Content (FOUC).
 
-- **Server-Side Config (props injection)**: Convert client-side customizer dependent components (`Header`/`Footer`/`FloatingActions`) from client-side API fetching to Server Components that receive resolved `config` via props. This will eliminate client-side fetching delay and prevent Flash of Unstyled Content (FOUC).
+---
 
 ## Phase 2 - Documented Behavior Changes
 
 - **Campaign Quote Floating Snippet**: The floating quote snippet in the campaign visual card changed from displaying `"Đất có linh hồn......"` to `"Đất có linh hồn, gốm có sinh m..."`. This is an intentional bug fix because the pre-migration code used two different fallback defaults for the same DB key `campaign_hero_quote` (`"Đất có linh hồn..."` on line 214 vs the full quote `"Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó."` on line 224). The refactored code correctly slices the unified schema default value.
 - **Dynamic Year Copyright**: The copyright notice year is kept dynamic in the `Footer.tsx` storefront rendering via `&copy; {new Date().getFullYear()}`, appending the customizer-configured copyright text (default: `"CỐC NỐI. Bảo lưu mọi quyền."`). The year prefix is excluded from the schema default string to ensure it never becomes stale.
-

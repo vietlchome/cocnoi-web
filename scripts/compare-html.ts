@@ -31,8 +31,8 @@ function cleanHtml(html: string): string {
   cleaned = cleaned.replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, "");
   cleaned = cleaned.replace(/<meta\b[^>]*>/gi, "");
 
-  // Normalize React Suspense IDs (e.g. id="S:0" -> id="S:ID")
-  cleaned = cleaned.replace(/\bid=["']S:\d+["']/gi, 'id="S:ID"');
+  // Normalize React Suspense IDs (e.g. id="S:0" or id="S:a" -> id="S:ID")
+  cleaned = cleaned.replace(/\bid=["']S:[a-zA-Z0-9]+["']/gi, 'id="S:ID"');
 
   // Strip empty hidden divs (React suspense placeholders)
   cleaned = cleaned.replace(/<div\b[^>]*hidden\b[^>]*>\s*<\/div>/gi, "");
