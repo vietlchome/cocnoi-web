@@ -177,8 +177,8 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       retailTitle: { type: "text", label: "Tiêu đề Khách lẻ", default: "Khách hàng lẻ", aliases: ["faq_retail_title"] },
       b2bTitle: { type: "text", label: "Tiêu đề Doanh nghiệp", default: "Đối tác doanh nghiệp (B2B)", aliases: ["faq_b2b_title"] },
       itemsRetail: {
-        type: "json",
-        label: "Danh sách B2C",
+        type: "repeatable",
+        label: "Câu hỏi - Khách lẻ (B2C)",
         default: [
           {
             question: "Gốm Cốc Nối có an toàn khi sử dụng với lò vi sóng và máy rửa bát không?",
@@ -201,11 +201,15 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
             answer: "Các đơn hàng nội thành Hà Nội thường nhận được trong 1-2 ngày. Các tỉnh thành khác từ 3-5 ngày làm việc."
           }
         ],
+        itemSchema: {
+          question: { type: "text", label: "Câu hỏi", default: "" },
+          answer: { type: "textarea", label: "Trả lời", default: "" }
+        },
         aliases: ["faq_items"]
       },
       itemsB2b: {
-        type: "json",
-        label: "Danh sách B2B",
+        type: "repeatable",
+        label: "Câu hỏi - Doanh nghiệp (B2B)",
         default: [
           {
             question: "Cốc Nối có nhận sản xuất số lượng lớn và in logo doanh nghiệp không?",
@@ -228,19 +232,40 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
             answer: "Cốc Nối có thang chiết khấu rất hấp dẫn tùy theo số lượng đặt hàng. Quy trình thanh toán thường chia làm 2 đợt: đặt cọc 50% khi chốt mẫu và thanh toán 50% trước khi giao hàng. Vui lòng liên hệ Hotline để nhận báo giá chi tiết."
           }
         ],
+        itemSchema: {
+          question: { type: "text", label: "Câu hỏi", default: "" },
+          answer: { type: "textarea", label: "Trả lời", default: "" }
+        },
         aliases: ["faq_items_b2b"]
       }
+    }
+  },
+  contact: {
+    label: "Thông tin liên hệ",
+    fields: {
+      address: { type: "text", label: "Địa chỉ", default: "", aliases: ["contact_address"], helpText: "Hiển thị ở Footer + trang Liên hệ" },
+      phone: { type: "text", label: "Điện thoại", default: "", aliases: ["contact_phone"] },
+      email: { type: "text", label: "Email", default: "", aliases: ["contact_email"] }
     }
   },
   footer: {
     label: "Footer",
     fields: {
-      address: { type: "text", label: "Địa chỉ", default: "", aliases: ["contact_address"] },
-      phone: { type: "text", label: "Điện thoại", default: "", aliases: ["contact_phone"] },
-      email: { type: "text", label: "Email", default: "", aliases: ["contact_email"] },
       newsletterTitle: { type: "text", label: "Tiêu đề Newsletter", default: "Hộp tin Cốc Nối", aliases: ["footer_newsletter_title"] },
       newsletterDesc: { type: "text", label: "Mô tả Newsletter", default: "", aliases: ["footer_newsletter_desc"] },
-      copyright: { type: "text", label: "Bản quyền", default: "CỐC NỐI. Bảo lưu mọi quyền.", aliases: ["footer_copyright"] }
+      copyright: { type: "text", label: "Bản quyền", default: "CỐC NỐI. Bảo lưu mọi quyền.", aliases: ["footer_copyright"] },
+      legal: {
+        type: "group",
+        label: "Thông tin pháp lý (NĐ52)",
+        fields: {
+          businessName: { type: "text", label: "Tên doanh nghiệp đầy đủ", default: "", helpText: "Theo Giấy chứng nhận ĐKKD" },
+          taxId: { type: "text", label: "Mã số thuế (MST)", default: "", helpText: "10 hoặc 13 chữ số" },
+          businessLicense: { type: "text", label: "Số Giấy chứng nhận ĐKKD", default: "" },
+          licensedBy: { type: "text", label: "Cơ quan cấp phép", default: "", helpText: "VD: Sở KH&ĐT TP. Hà Nội" },
+          licensedDate: { type: "text", label: "Ngày cấp", default: "", helpText: "DD/MM/YYYY" },
+          hours: { type: "text", label: "Giờ hoạt động", default: "8:00 - 18:00 (T2-T7)" }
+        }
+      }
     }
   },
   social: {
@@ -256,7 +281,18 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
     fields: {
       siteTitle: { type: "text", label: "Meta Title", default: "Cốc Nối · Gốm thủ công Bát Tràng", aliases: ["site_title"] },
       siteDescription: { type: "textarea", label: "Meta Description", default: "Kết tình thân, Nối tinh thần. Cốc gốm thủ công từ xưởng gia đình tại Bát Tràng từ 1994.", aliases: ["site_description"] },
-      siteKeywords: { type: "text", label: "Meta Keywords", default: "", aliases: ["site_keywords"] }
+      ogImage: { type: "image", label: "Ảnh chia sẻ (OG Image)", default: "", aspectRatio: 1200/630, folder: "theme/og", helpText: "1200x630px. Hiện khi share lên Facebook/Zalo." },
+      ogImageAlt: { type: "text", label: "Mô tả OG image", default: "", helpText: "Alt text cho ảnh share, hỗ trợ screen reader" },
+      favicon: { type: "image", label: "Favicon", default: "", aspectRatio: 1, folder: "theme/favicon", helpText: "PNG vuông, tối thiểu 32x32" },
+      robotsIndexable: { type: "boolean", label: "Cho phép Google index", default: true, helpText: "Tắt khi đang test, bật khi public" }
+    }
+  },
+  analytics: {
+    label: "Tracking & Analytics",
+    fields: {
+      googleAnalyticsId: { type: "text", label: "Google Analytics 4 ID", default: "", helpText: "G-XXXXXXXXXX" },
+      facebookPixelId: { type: "text", label: "Facebook Pixel ID", default: "", helpText: "Chuỗi 15-16 chữ số" },
+      tiktokPixelId: { type: "text", label: "TikTok Pixel ID", default: "", helpText: "Chuỗi alphanumeric" }
     }
   }
 };

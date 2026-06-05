@@ -66,16 +66,32 @@ export const SiteConfigSchema = z.object({
     title: textValidator,
     retailTitle: textValidator,
     b2bTitle: textValidator,
-    itemsRetail: z.array(z.any()), // Có thể chi tiết hơn: z.array(z.object({q: z.string(), a: z.string()}))
-    itemsB2b: z.array(z.any()),
+    itemsRetail: z.array(z.object({
+      question: textValidator,
+      answer: textValidator,
+    })),
+    itemsB2b: z.array(z.object({
+      question: textValidator,
+      answer: textValidator,
+    })),
   }),
-  footer: z.object({
+  contact: z.object({
     address: textValidator,
     phone: textValidator,
     email: textValidator,
+  }),
+  footer: z.object({
     newsletterTitle: textValidator,
     newsletterDesc: textValidator,
     copyright: textValidator,
+    legal: z.object({
+      businessName: textValidator,
+      taxId: z.string().regex(/^(\d{10}|\d{13}|)$/, "MST phải là 10 hoặc 13 chữ số (hoặc để trống)"),
+      businessLicense: textValidator,
+      licensedBy: textValidator,
+      licensedDate: textValidator,
+      hours: textValidator,
+    }),
   }),
   social: z.object({
     facebook: urlValidator,
@@ -85,7 +101,15 @@ export const SiteConfigSchema = z.object({
   seo: z.object({
     siteTitle: textValidator,
     siteDescription: textValidator,
-    siteKeywords: textValidator,
+    ogImage: imageValidator,
+    ogImageAlt: textValidator,
+    favicon: imageValidator,
+    robotsIndexable: booleanValidator,
+  }),
+  analytics: z.object({
+    googleAnalyticsId: z.string().regex(/^G-[A-Z0-9]+$/, "Google Analytics 4 ID không hợp lệ (phải bắt đầu bằng G-)").or(z.literal("")),
+    facebookPixelId: z.string().regex(/^\d{15,16}$/, "Facebook Pixel ID phải gồm 15-16 chữ số").or(z.literal("")),
+    tiktokPixelId: z.string().regex(/^[A-Za-z0-9]+$/, "TikTok Pixel ID phải là chuỗi chữ và số").or(z.literal("")),
   })
 });
 

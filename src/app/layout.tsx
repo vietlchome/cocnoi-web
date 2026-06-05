@@ -30,7 +30,23 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: config.seo.siteTitle || "Cốc Nối · Gốm thủ công Bát Tràng",
     description: config.seo.siteDescription || "Kết tình thân, Nối tinh thần. Cốc gốm thủ công từ xưởng gia đình tại Bát Tràng từ 1994.",
-    keywords: config.seo.siteKeywords || undefined,
+    robots: {
+      index: config.seo.robotsIndexable ?? true,
+      follow: config.seo.robotsIndexable ?? true,
+    },
+    icons: config.seo.favicon ? {
+      icon: config.seo.favicon,
+    } : undefined,
+    openGraph: config.seo.ogImage ? {
+      title: config.seo.siteTitle || "Cốc Nối · Gốm thủ công Bát Tràng",
+      description: config.seo.siteDescription || "Kết tình thân, Nối tinh thần. Cốc gốm thủ công từ xưởng gia đình tại Bát Tràng từ 1994.",
+      images: [
+        {
+          url: config.seo.ogImage,
+          alt: config.seo.ogImageAlt || undefined,
+        }
+      ]
+    } : undefined,
   };
 }
 

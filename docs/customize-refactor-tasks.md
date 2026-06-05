@@ -9,10 +9,11 @@
 
 ## ACTIVE — Phase 4 (FAQ schema, refactoring fields, advanced controls)
 
-- **[ ] Convert FAQ Fields**: Convert `faq.itemsRetail` and `faq.itemsB2b` from `type: "json"` to `type: "repeatable"` with `itemSchema: { q: text, a: textarea }`.
+- **[x] Phase 4a - Convert FAQ Fields**: Convert `faq.itemsRetail` and `faq.itemsB2b` from `type: "json"` to `type: "repeatable"` with `itemSchema: { question: text, answer: textarea }`.
+- **[x] Phase 4a - Rename schema namespace**: Rename namespace `footer.address/phone/email` to `contact.*`. The `footer` namespace keeps newsletter and copyright fields, and adds `legal` group. Fallback reader implemented.
+- **[x] Phase 4a - Compliance, SEO, & Analytics**: Added ecommerce compliance (Nghị định 52) legal info group, SEO properties (robots, favicon, OG image) mapped via Metadata API, and GA4 / Facebook / TikTok analytics tracking tags conditionally loaded in store layout.
 - **[ ] Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
 - **[ ] Stricter Image Validation**: Validate image field values more strictly (must be a valid URL format or path format).
-- **[ ] Rename schema namespace**: Rename namespace `footer.address/phone/email` to `contact.*`. The `footer` namespace should only keep newsletter and copyright fields. Keep original legacy aliases in place.
 - **[ ] Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
 - **[ ] Advanced Customizer Controls**: Support MST, OG image, drag-reorder with `@dnd-kit`, product pickers, and visibility/order controls.
 
