@@ -41,8 +41,9 @@ src/components/admin/customize/
 └── __sandbox__/
     └── SandboxPage.tsx        # client component cho sandbox route
 
-src/app/(admin)/admin/_sandbox/customize-preview/
+src/app/(admin)/admin/sandbox/customize-preview/
 └── page.tsx                   # server page mỏng, render <SandboxPage />
+                               # ⚠ KHÔNG đặt tên folder bắt đầu bằng "_" — Next.js loại khỏi routing
 ```
 
 **Không động** tới: `SiteCustomizerClient.tsx`, `HomepageCustomizerClient.tsx`, `settings.actions.ts`, `site-config.ts`, `site-config-validate.ts`, `site-schema.ts`, route `/admin/customize`.
@@ -160,7 +161,9 @@ Server component mỏng (chỉ render client component). Trang này:
 
 Bảo vệ route: thêm `requireAdmin()` ở server component để không lộ ngoài. Layout `(admin)` đã có auth chung, kiểm tra lại.
 
-URL: `http://localhost:3000/admin/_sandbox/customize-preview`
+URL: `http://localhost:3000/admin/sandbox/customize-preview`
+
+> **Lưu ý Next.js routing:** Folder bắt đầu bằng `_` (vd `_sandbox`) bị App Router treat là **private folder** và LOẠI KHỎI routing → 404. Dùng tên `sandbox` (không underscore) cho route segment. Folder `__sandbox__` dưới `src/components/` vẫn OK vì không phải route.
 
 ---
 
