@@ -1,11 +1,14 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { HelpCircle, ChevronDown } from "lucide-react";
+import { getSiteConfig } from "@/lib/site-config";
 
-export default function FAQPage() {
-  const faqs = [
+export default async function FAQPage() {
+  const config = await getSiteConfig();
+  
+  const itemsRetail = config.faq?.itemsRetail || [];
+  const itemsB2b = config.faq?.itemsB2b || [];
+
+  const fallbackFaqs = [
     {
       q: "Gốm Cốc Nối nung ở nhiệt độ bao nhiêu? Có dùng được máy rửa bát không?",
       a: "Tất cả sản phẩm của Cốc Nối đều được nung chín ở nhiệt độ chuẩn xác 1250 độ C trong lò ga hiện đại. Ở mức nhiệt cực cao này, xương đất cao lanh và các oxit kim loại trong men thủy tinh hoàn toàn nóng chảy kết hợp chặt chẽ, tạo cấu trúc xương gốm đanh thép như đá. Sản phẩm chịu nhiệt tốt và hoàn toàn an toàn khi sử dụng với máy rửa bát, lò vi sóng, tủ đông.",
@@ -40,11 +43,14 @@ export default function FAQPage() {
     },
   ];
 
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  let faqs = [
+    ...itemsRetail.map((item: any) => ({ q: item.question, a: item.answer })),
+    ...itemsB2b.map((item: any) => ({ q: item.question, a: item.answer })),
+  ];
 
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  if (faqs.length === 0) {
+    faqs = fallbackFaqs;
+  }
 
   return (
     <div className="bg-canvas py-16 md:py-24 text-primary min-h-screen">
@@ -53,43 +59,37 @@ export default function FAQPage() {
         {/* HEADER */}
         <div className="border-b border-border/60 pb-8 mb-12 text-center">
           <HelpCircle className="w-10 h-10 text-accent mx-auto mb-4" />
-          <h1 className="font-playfair font-bold text-3xl md:text-5xl text-primary mb-3">Câu hỏi thường gặp</h1>
+          <h1 className="font-playfair font-bold text-3xl md:text-5xl text-primary mb-3">
+            {config.faq?.title || "Câu hỏi thường gặp"}
+          </h1>
           <p className="font-bvp text-xs text-secondary">
-            Giải đáp nhanh chóng các thắc mắc phổ biến về chất lượng gốm Bát Tràng và dịch vụ hợp tác
+            {config.faq?.tagline || "Giải đáp nhanh chóng các thắc mắc phổ biến về chất lượng gốm Bát Tràng và dịch vụ hợp tác"}
           </p>
         </div>
 
         {/* FAQ ACCORDION LIST */}
         <div className="flex flex-col gap-4">
           {faqs.map((faq, idx) => {
-            const isOpen = openIndex === idx;
             return (
-              <div 
+              <details 
                 key={idx} 
-                className="bg-[#FAF8F5] border border-border/60 rounded-3 overflow-hidden transition-all duration-300"
+                className="group bg-[#FAF8F5] border border-border/60 rounded-3 overflow-hidden transition-all duration-300"
               >
-                <button
-                  onClick={() => toggleFAQ(idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 focus:outline-none"
-                >
-                  <h3 className="font-playfair text-sm md:text-base font-bold text-primary leading-tight">
+                <summary className="w-full list-none p-5 text-left flex items-center justify-between gap-4 focus:outline-none cursor-pointer select-none [&::-webkit-details-marker]:hidden">
+                  <h3 className="font-playfair text-sm md:text-base font-bold text-primary leading-tight inline">
                     {faq.q}
                   </h3>
                   <span className="text-accent shrink-0">
-                    {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    <ChevronDown className="w-4 h-4 text-secondary group-open:rotate-180 transition-transform duration-300" />
                   </span>
-                </button>
+                </summary>
 
-                <div 
-                  className={`overflow-hidden transition-all duration-300 ${
-                    isOpen ? "max-h-[300px] border-t border-border/40 p-5 bg-canvas" : "max-h-0"
-                  }`}
-                >
+                <div className="border-t border-border/40 p-5 bg-canvas">
                   <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed">
                     {faq.a}
                   </p>
                 </div>
-              </div>
+              </details>
             );
           })}
         </div>

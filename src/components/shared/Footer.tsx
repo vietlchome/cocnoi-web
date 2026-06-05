@@ -33,12 +33,13 @@ export default function Footer() {
   // Các cấu hình từ SiteConfig
   const footerLogoUrl = themeConfig?.header?.logoUrl || "";
   const footerLogoText = themeConfig?.header?.logoText || "CỐC NỐI";
-  const footerAddress = themeConfig?.footer?.address || "Xưởng gốm Cốc Nối, Bát Tràng, Gia Lâm, Hà Nội";
-  const footerPhone = themeConfig?.footer?.phone || "+84 (0) 98 765 4321";
-  const footerEmail = themeConfig?.footer?.email || "hello@cocnoi.com";
+  const footerAddress = themeConfig?.contact?.address || themeConfig?.footer?.address || "Xưởng gốm Cốc Nối, Bát Tràng, Gia Lâm, Hà Nội";
+  const footerPhone = themeConfig?.contact?.phone || themeConfig?.footer?.phone || "+84 (0) 98 765 4321";
+  const footerEmail = themeConfig?.contact?.email || themeConfig?.footer?.email || "hello@cocnoi.com";
   const footerNewsletterTitle = themeConfig?.footer?.newsletterTitle || "Hộp tin Cốc Nối";
   const footerNewsletterDesc = themeConfig?.footer?.newsletterDesc || "Đăng ký để nhận câu chuyện mới về 'Người Nối' và ưu đãi sớm nhất của các bộ sưu tập.";
   const footerCopyright = themeConfig?.footer?.copyright || "CỐC NỐI. Bảo lưu mọi quyền.";
+  const footerLegal = themeConfig?.footer?.legal || {};
 
   return (
     <footer className="bg-subtle text-primary border-t border-border mt-auto">
@@ -174,9 +175,32 @@ export default function Footer() {
       {/* Footer Bottom */}
       <div className="bg-canvas border-t border-border py-8">
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4 font-bvp text-xs text-secondary">
-          <span>
-            &copy; {new Date().getFullYear()} {footerCopyright}
-          </span>
+          <div className="flex flex-col gap-2">
+            <span>
+              &copy; {new Date().getFullYear()} {footerCopyright}
+            </span>
+            {(footerLegal.businessName || footerLegal.taxId || footerLegal.businessLicense || footerLegal.licensedBy || footerLegal.licensedDate || footerLegal.hours) && (
+              <div className="flex flex-col gap-1 text-[11px] text-secondary/80 mt-1">
+                {footerLegal.businessName && (
+                  <span>
+                    {footerLegal.businessName} {footerLegal.taxId ? `— MST: ${footerLegal.taxId}` : ""}
+                  </span>
+                )}
+                {footerLegal.businessLicense && (
+                  <span>
+                    GCN ĐKKD: {footerLegal.businessLicense}
+                    {footerLegal.licensedBy ? ` do ${footerLegal.licensedBy}` : ""}
+                    {footerLegal.licensedDate ? ` cấp ngày ${footerLegal.licensedDate}` : ""}
+                  </span>
+                )}
+                {footerLegal.hours && (
+                  <span>
+                    Giờ hoạt động: {footerLegal.hours}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-accent transition-colors">Điều khoản dịch vụ</Link>
             <Link href="/privacy" className="hover:text-accent transition-colors">Chính sách bảo mật</Link>

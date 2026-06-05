@@ -8,6 +8,18 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
     return sectionBlob[fieldKey];
   }
 
+  // Nếu là repeatable field và có aliases, kiểm tra xem có alias nào lưu trữ JSON string của một mảng không
+  if (fieldDef.type === 'repeatable' && fieldDef.aliases) {
+    for (const alias of fieldDef.aliases) {
+      if (dbSettings[alias] !== undefined && dbSettings[alias] !== '') {
+        try {
+          const parsed = JSON.parse(dbSettings[alias]);
+          if (Array.isArray(parsed)) return parsed;
+        } catch {}
+      }
+    }
+  }
+
   // Nếu là repeatable field, có cấu hình aliasGroups để map dữ liệu cũ
   if (fieldDef.type === 'repeatable' && fieldDef.aliasGroups) {
     const items: any[] = [];
@@ -47,6 +59,17 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
     }
   }
 
+  if (fieldDef.type === 'group') {
+    // Build nested object from sub-field defaults if no value
+    const groupDefault: Record<string, any> = fieldDef.default ?? {};
+    for (const [subKey, subDef] of Object.entries(fieldDef.fields)) {
+      if (groupDefault[subKey] === undefined) {
+        groupDefault[subKey] = (subDef as any).default ?? "";
+      }
+    }
+    return groupDefault;
+  }
+
   // Mặc định trả về giá trị default trong schema
   return fieldDef.default;
 }
@@ -72,6 +95,25 @@ export async function getSiteConfig(): Promise<SiteConfig> {
         sectionBlob = JSON.parse(dbSettings[blobKey]);
       } catch (e) {
         console.warn(`Failed to parse JSON for ${blobKey}`);
+      }
+    }
+
+    // Fallback đọc từ section.footer cũ cho contact section nếu chưa tồn tại section.contact
+    if (sectionName === 'contact' && !sectionBlob) {
+      const footerBlobStr = dbSettings['section.footer'];
+      if (footerBlobStr) {
+        try {
+          const footerBlob = JSON.parse(footerBlobStr);
+          if (footerBlob) {
+            sectionBlob = {
+              address: footerBlob.address,
+              phone: footerBlob.phone,
+              email: footerBlob.email,
+            };
+          }
+        } catch (e) {
+          console.warn(`Failed to parse footer blob for contact fallback`);
+        }
       }
     }
 

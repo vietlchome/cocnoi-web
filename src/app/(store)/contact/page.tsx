@@ -67,9 +67,9 @@ export default function ContactPage() {
     }
   };
 
-  const contactAddress = themeConfig?.footer?.address || "Xưởng gốm gia đình Cốc Nối, Xóm 3 Giang Cao, Làng cổ Bát Tràng, Gia Lâm, Hà Nội";
-  const contactPhone = themeConfig?.footer?.phone || "+84 (0) 98 765 4321";
-  const contactEmail = themeConfig?.footer?.email || "hello@cocnoi.com";
+  const contactAddress = themeConfig?.contact?.address || themeConfig?.footer?.address || "Xưởng gốm gia đình Cốc Nối, Xóm 3 Giang Cao, Làng cổ Bát Tràng, Gia Lâm, Hà Nội";
+  const contactPhone = themeConfig?.contact?.phone || themeConfig?.footer?.phone || "+84 (0) 98 765 4321";
+  const contactEmail = themeConfig?.contact?.email || themeConfig?.footer?.email || "hello@cocnoi.com";
 
   return (
     <div className="bg-canvas py-16 md:py-24">
