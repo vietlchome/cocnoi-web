@@ -300,73 +300,7 @@ async function main() {
     })
   }
 
-  console.log('Khởi tạo cấu hình giao diện mặc định (ThemeSetting)...')
-  await prisma.themeSetting.create({
-    data: {
-      key: 'main_config',
-      value: JSON.stringify({
-        global: {
-          logoUrl: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=200&q=80',
-          faviconUrl: '',
-          hotline: '0987.654.321',
-          email: 'hello@cocnoi.vn',
-          address: 'Làng gốm Bát Tràng, Gia Lâm, Hà Nội',
-          facebookUrl: 'https://facebook.com/cocnoi',
-          instagramUrl: 'https://instagram.com/cocnoi',
-          zaloUrl: '0987654321',
-        },
-        hero: {
-          imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1920&q=80',
-          title: 'CỐC NỐI — Gốm Mộc & Nghệ Thuật Sống',
-          subtitle: 'Nối kết giá trị thủ công truyền thống vào nhịp sống hiện đại qua những tác phẩm gốm mộc độc bản.',
-        },
-        features: [
-          {
-            imageUrl: 'https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?auto=format&fit=crop&w=600&q=80',
-            title: 'Đất Nung Thô Sần',
-            linkUrl: '/shop',
-          },
-          {
-            imageUrl: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=600&q=80',
-            title: 'Men Tro Độc Bản',
-            linkUrl: '/shop',
-          },
-          {
-            imageUrl: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80',
-            title: 'Tác Phẩm Độc Bản',
-            linkUrl: '/shop',
-          },
-          {
-            imageUrl: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=600&q=80',
-            title: 'Kỹ Thuật Vuốt Tay',
-            linkUrl: '/shop',
-          },
-        ],
-        faqsB2C: [
-          {
-            question: 'Cốc Nối có ship tỉnh không và nếu vỡ gốm thì xử lý thế nào?',
-            answer: 'Cốc Nối giao hàng toàn quốc. Đối với đồ gốm sứ dễ vỡ, chúng tôi đóng gói chống sốc chuyên dụng 3 lớp. Trong trường hợp hi hữu sản phẩm bị sứt mẻ/nứt vỡ do vận chuyển, Cốc Nối cam kết đền bù 1-đổi-1 miễn phí hoặc hoàn tiền 100% khi nhận được video khui hàng của quý khách.',
-          },
-          {
-            question: 'Đồ gốm mộc của Cốc Nối có dùng được trong lò vi sóng không?',
-            answer: 'Tất cả các sản phẩm gốm mộc tại Cốc Nối đều được nung ở nhiệt độ cao trên 1250°C, khử hoàn toàn kim loại nặng, tuyệt đối an toàn để sử dụng trong lò vi sóng, lò nướng và máy rửa bát.',
-          },
-        ],
-        faqsB2B: [
-          {
-            question: 'Chính sách chiết khấu gốm sỉ quà tặng doanh nghiệp như thế nào?',
-            answer: 'Chúng tôi hỗ trợ mức chiết khấu cực kỳ ưu đãi từ 15% - 35% tùy thuộc vào số lượng đặt hàng thực tế. Cốc Nối cũng cung cấp dịch vụ in ấn logo doanh nghiệp dập chìm/dưới men cao cấp cho các đơn hàng quà tặng.',
-          },
-          {
-            question: 'Thời gian hoàn thiện đơn hàng quà tặng doanh nghiệp số lượng lớn là bao lâu?',
-            answer: 'Với năng lực sản xuất tại xưởng gốm thủ công của Cốc Nối, thời gian sản xuất dao động từ 15 - 25 ngày kể từ ngày ký hợp đồng và duyệt mẫu thử nghiệm. Vui lòng liên hệ hotline B2B để nhận tiến độ chính xác nhất.',
-          },
-        ],
-      })
-    }
-  })
-
-  console.log('✅ Đã nạp thành công hệ thống dữ liệu mẫu Flat Product mới và SiteSettings mặc định!')
+  console.log('✅ Đã nạp thành công hệ thống dữ liệu mẫu Flat Product mới!')
   console.log(`Tài khoản Admin: admin@cocnoi.vn | Mật khẩu: admin123`)
 }
 

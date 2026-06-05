@@ -1,5 +1,8 @@
 import React from "react";
-import type { SchemaField } from "@/config/site-schema";
+import type { 
+  SchemaField, TextField, TextareaField, UrlField, ImageField, 
+  BooleanField, SelectField, ColorField, JsonField, GroupField, RepeatableField 
+} from "@/config/site-schema";
 import TextFieldInput from "./fields/TextFieldInput";
 import TextareaFieldInput from "./fields/TextareaFieldInput";
 import UrlFieldInput from "./fields/UrlFieldInput";
@@ -26,12 +29,12 @@ export interface FieldRendererProps {
  */
 function UnknownField({ field, value }: { field: SchemaField; value: unknown }) {
   React.useEffect(() => {
-    console.warn(`Kiểu field lạ hoặc chưa được hỗ trợ: ${(field as any).type}`);
+    console.warn(`Kiểu field lạ hoặc chưa được hỗ trợ: ${field.type}`);
   }, [field]);
 
   return (
     <div className="border border-amber-300 bg-amber-50 p-4 rounded-3 text-amber-800 text-xs font-mono w-full">
-      <p className="font-bold mb-1">Kiểu trường lạ: {(field as any).type}</p>
+      <p className="font-bold mb-1">Kiểu trường lạ: {field.type}</p>
       <pre className="overflow-x-auto">{JSON.stringify({ field, value }, null, 2)}</pre>
     </div>
   );
@@ -49,9 +52,7 @@ export default function FieldRenderer({
   error,
   disabled,
 }: FieldRendererProps) {
-  const type = field.type as any;
-
-  switch (type) {
+  switch (field.type as string) {
     case "text": {
       let coerced = value;
       if (value !== undefined && typeof value !== "string") {
@@ -60,7 +61,7 @@ export default function FieldRenderer({
       }
       return (
         <TextFieldInput
-          field={field as any}
+          field={field as TextField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -78,7 +79,7 @@ export default function FieldRenderer({
       }
       return (
         <TextareaFieldInput
-          field={field as any}
+          field={field as TextareaField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -96,7 +97,7 @@ export default function FieldRenderer({
       }
       return (
         <UrlFieldInput
-          field={field as any}
+          field={field as UrlField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -114,7 +115,7 @@ export default function FieldRenderer({
       }
       return (
         <ImageFieldInput
-          field={field as any}
+          field={field as ImageField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -132,7 +133,7 @@ export default function FieldRenderer({
       }
       return (
         <BooleanFieldInput
-          field={field as any}
+          field={field as BooleanField}
           value={!!coerced}
           onChange={onChange}
           path={path}
@@ -150,7 +151,7 @@ export default function FieldRenderer({
       }
       return (
         <SelectFieldInput
-          field={field as any}
+          field={field as SelectField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -168,7 +169,7 @@ export default function FieldRenderer({
       }
       return (
         <ColorFieldInput
-          field={field as any}
+          field={field as ColorField}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -186,7 +187,7 @@ export default function FieldRenderer({
       }
       return (
         <IconPickerFieldInput
-          field={field as any}
+          field={field}
           value={coerced as string}
           onChange={onChange}
           path={path}
@@ -199,7 +200,7 @@ export default function FieldRenderer({
     case "json": {
       return (
         <JsonFieldInput
-          field={field as any}
+          field={field as JsonField}
           value={value}
           onChange={onChange}
           path={path}
@@ -217,7 +218,7 @@ export default function FieldRenderer({
       }
       return (
         <GroupFieldInput
-          field={field as any}
+          field={field as GroupField}
           value={coerced as Record<string, any>}
           onChange={onChange}
           path={path}
@@ -235,7 +236,7 @@ export default function FieldRenderer({
       }
       return (
         <RepeatableEditor
-          field={field as any}
+          field={field as RepeatableField}
           value={(coerced as any[]) ?? []}
           onChange={onChange}
           path={path}

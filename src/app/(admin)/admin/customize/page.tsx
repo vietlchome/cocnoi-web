@@ -1,4 +1,4 @@
-import { SettingsService } from "@/lib/services/settings.service";
+import { getSiteConfig } from "@/lib/site-config";
 import SiteCustomizerClient from "@/components/admin/settings/SiteCustomizerClient";
 import { requireAdmin } from "@/lib/auth-helpers";
 
@@ -11,11 +11,11 @@ export default async function CustomizePage() {
   await requireAdmin();
 
   // Lấy dữ liệu cấu hình hiện tại
-  const initialSettings = await SettingsService.getAllSettings();
+  const initialConfig = await getSiteConfig();
 
   return (
     <div className="max-w-6xl mx-auto py-8">
-      <SiteCustomizerClient initialSettings={initialSettings} />
+      <SiteCustomizerClient initialConfig={initialConfig} />
     </div>
   );
 }
