@@ -24,9 +24,16 @@ export default function FloatingActions() {
     fetchSettings();
   }, []);
 
-  const socialInstagram = themeConfig ? (themeConfig.social?.instagram || "") : "https://instagram.com/";
-  const socialFacebook = themeConfig ? (themeConfig.social?.facebook || "") : "https://facebook.com/";
-  const socialZalo = themeConfig ? (themeConfig.social?.zalo || "") : "https://zalo.me/";
+  const links = themeConfig?.social?.links;
+  const getPlatformUrl = (platform: string, fallback: string) => {
+    if (!themeConfig) return fallback;
+    const item = links?.find((l: any) => l.platform === platform);
+    return item && item.visible ? (item.url || "") : "";
+  };
+
+  const socialInstagram = getPlatformUrl("instagram", "https://instagram.com/");
+  const socialFacebook = getPlatformUrl("facebook", "https://facebook.com/");
+  const socialZalo = getPlatformUrl("zalo", "https://zalo.me/");
 
   return (
     <div className="fixed right-4 bottom-24 md:bottom-32 z-50 flex flex-col gap-3">

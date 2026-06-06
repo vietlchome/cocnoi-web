@@ -19,7 +19,7 @@
 - **[x] Phase 4c - Section Visibility & Order**: Added section layout configuration under `homepage.sections` (repeatable list of sections with `key` and `visible` properties). Refactored storefront `page.tsx` using Option A (sub-components) to dynamically map and render homepage sections.
 - **[ ] Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
 - **[ ] Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
-- **[ ] Advanced Customizer Controls**: Support MST, OG image, drag-reorder with `@dnd-kit` (Phase 4d).
+- **[x] Phase 4d - Advanced Customizer Controls & Repeatable Upgrades**: Added repeatable upgrades (story image alts for SEO, values Lucide icon picker, social repeatable platform links). Implemented smooth drag-reorder via `@dnd-kit` in `RepeatableEditor` and `ProductPickerFieldInput` (replacing old ↑/↓ buttons). Flattened Zod validation errors to arbitrary depth, displayed flat error panel at customize screen top, and regrouped for section level inline validation display.
 
 ---
 

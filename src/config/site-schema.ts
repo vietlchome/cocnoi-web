@@ -29,6 +29,7 @@ export interface SelectField extends BaseField { type: 'select'; default: string
 export interface ColorField extends BaseField { type: 'color'; default: string; }
 export interface JsonField extends BaseField { type: 'json'; default: any; }
 export interface ProductPickerField extends BaseField { type: 'product-picker'; default: string[]; }
+export interface IconPickerField extends BaseField { type: 'icon-picker'; default: string; }
 
 export interface GroupField extends BaseField {
   type: 'group';
@@ -56,7 +57,8 @@ export type SchemaField =
   | JsonField
   | GroupField 
   | RepeatableField
-  | ProductPickerField;
+  | ProductPickerField
+  | IconPickerField;
 
 export interface SectionSchema {
   label: string;
@@ -164,9 +166,15 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       features: {
         type: "repeatable",
         label: "Ảnh đặc trưng",
-        default: [],
+        default: [
+          { imgUrl: "", alt: "" },
+          { imgUrl: "", alt: "" },
+          { imgUrl: "", alt: "" },
+          { imgUrl: "", alt: "" }
+        ],
         itemSchema: {
-          imgUrl: { type: "image", label: "Ảnh", default: "" }
+          imgUrl: { type: "image", label: "Ảnh", default: "" },
+          alt: { type: "text", label: "Mô tả ảnh (alt text - SEO)", default: "", helpText: "Bắt buộc cho SEO + accessibility" }
         },
         aliasGroups: [
           { imgUrl: "intro_feat_1_img_url" },
@@ -187,14 +195,15 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         type: "repeatable",
         label: "Các đặc trưng",
         default: [
-          { title: "Mộc Mạc", desc: "Không trang điểm bóng bẩy. Giữ trọn texture tự nhiên của đất nung Bát Tràng và lớp vân men độc bản." },
-          { title: "Chân Thành", desc: "Mỗi sản phẩm đi kèm một câu chuyện thật, một thông điệp chân thành gửi gắm sự kết nối tình thân." },
-          { title: "Bền Bỉ", desc: "Gốm nung ở nhiệt độ cao trên 1250°C, đảm bảo độ bền cơ học cao, an toàn tuyệt đối khi sử dụng." },
-          { title: "Chỉn Chu", desc: "Từ khâu vuốt gốm, bọc gói bao bì kraft đến thiệp viết tay chân thành trao gửi khách hàng." }
+          { title: "Mộc Mạc", desc: "Không trang điểm bóng bẩy. Giữ trọn texture tự nhiên của đất nung Bát Tràng và lớp vân men độc bản.", icon: "Sparkles" },
+          { title: "Chân Thành", desc: "Mỗi sản phẩm đi kèm một câu chuyện thật, một thông điệp chân thành gửi gắm sự kết nối tình thân.", icon: "Heart" },
+          { title: "Bền Bỉ", desc: "Gốm nung ở nhiệt độ cao trên 1250°C, đảm bảo độ bền cơ học cao, an toàn tuyệt đối khi sử dụng.", icon: "Shield" },
+          { title: "Chỉn Chu", desc: "Từ khâu vuốt gốm, bọc gói bao bì kraft đến thiệp viết tay chân thành trao gửi khách hàng.", icon: "Star" }
         ],
         itemSchema: {
           title: { type: "text", label: "Tiêu đề", default: "" },
-          desc: { type: "textarea", label: "Mô tả", default: "" }
+          desc: { type: "textarea", label: "Mô tả", default: "" },
+          icon: { type: "icon-picker", label: "Icon", default: "Sparkles" }
         },
         aliasGroups: [
           { title: "value_1_title", desc: "value_1_desc" },
@@ -315,9 +324,34 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
   social: {
     label: "Mạng xã hội",
     fields: {
-      facebook: { type: "url", label: "Facebook", default: "", aliases: ["contact_facebook"] },
-      instagram: { type: "url", label: "Instagram", default: "", aliases: ["contact_instagram"] },
-      zalo: { type: "url", label: "Zalo", default: "", aliases: ["contact_zalo"] }
+      links: {
+        type: "repeatable",
+        label: "Liên kết mạng xã hội",
+        default: [
+          { platform: "facebook", url: "", visible: true },
+          { platform: "instagram", url: "", visible: true },
+          { platform: "zalo", url: "", visible: true }
+        ],
+        itemSchema: {
+          platform: {
+            type: "select",
+            label: "Nền tảng",
+            default: "facebook",
+            options: [
+              { value: "facebook", label: "Facebook" },
+              { value: "instagram", label: "Instagram" },
+              { value: "tiktok", label: "TikTok" },
+              { value: "youtube", label: "YouTube" },
+              { value: "zalo", label: "Zalo" },
+              { value: "shopee", label: "Shopee" },
+              { value: "lazada", label: "Lazada" },
+              { value: "threads", label: "Threads" }
+            ]
+          },
+          url: { type: "url", label: "URL", default: "" },
+          visible: { type: "boolean", label: "Hiển thị", default: true }
+        }
+      }
     }
   },
   seo: {

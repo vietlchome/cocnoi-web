@@ -40,28 +40,28 @@ export default function StorySection({ config }: StorySectionProps) {
         <div className="lg:col-span-6 grid grid-cols-2 gap-4">
           <div className="bg-subtle rounded-4 border border-border flex items-center justify-center text-center aspect-square overflow-hidden relative">
             {config.features?.[0]?.imgUrl ? (
-              <img src={config.features[0].imgUrl} alt="Đặc trưng 1" className="w-full h-full object-cover" />
+              <img src={config.features[0].imgUrl} alt={config.features[0].alt} className="w-full h-full object-cover" />
             ) : (
               <div className="text-secondary/50 font-bvp text-xs">Ảnh đặc trưng 1</div>
             )}
           </div>
           <div className="bg-canvas rounded-4 border border-border flex items-center justify-center text-center aspect-square mt-6 overflow-hidden relative">
             {config.features?.[1]?.imgUrl ? (
-              <img src={config.features[1].imgUrl} alt="Đặc trưng 2" className="w-full h-full object-cover" />
+              <img src={config.features[1].imgUrl} alt={config.features[1].alt} className="w-full h-full object-cover" />
             ) : (
               <div className="text-secondary/50 font-bvp text-xs">Ảnh đặc trưng 2</div>
             )}
           </div>
           <div className="bg-canvas rounded-4 border border-border flex items-center justify-center text-center aspect-square -mt-6 overflow-hidden relative">
             {config.features?.[2]?.imgUrl ? (
-              <img src={config.features[2].imgUrl} alt="Đặc trưng 3" className="w-full h-full object-cover" />
+              <img src={config.features[2].imgUrl} alt={config.features[2].alt} className="w-full h-full object-cover" />
             ) : (
               <div className="text-secondary/50 font-bvp text-xs">Ảnh đặc trưng 3</div>
             )}
           </div>
           <div className="bg-subtle rounded-4 border border-border flex items-center justify-center text-center aspect-square overflow-hidden relative">
             {config.features?.[3]?.imgUrl ? (
-              <img src={config.features[3].imgUrl} alt="Đặc trưng 4" className="w-full h-full object-cover" />
+              <img src={config.features[3].imgUrl} alt={config.features[3].alt} className="w-full h-full object-cover" />
             ) : (
               <div className="text-secondary/50 font-bvp text-xs">Ảnh đặc trưng 4</div>
             )}

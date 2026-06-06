@@ -8,6 +8,16 @@ interface FaqSectionProps {
 }
 
 export default function FaqSection({ config, faqs, faqsB2b }: FaqSectionProps) {
+  const links = config.social?.links || [];
+  const getUrl = (platform: string, fallback: string) => {
+    const item = links.find((l: any) => l.platform === platform);
+    return item && item.visible ? (item.url || fallback) : fallback;
+  };
+
+  const zaloUrl = getUrl("zalo", "https://zalo.me/");
+  const facebookUrl = getUrl("facebook", "https://facebook.com/");
+  const instagramUrl = getUrl("instagram", "https://instagram.com/");
+
   return (
     <section className="py-20 md:py-28 max-w-[1280px] mx-auto px-4 md:px-8">
       
@@ -102,7 +112,7 @@ export default function FaqSection({ config, faqs, faqsB2b }: FaqSectionProps) {
 
           {/* 2. Nút Zalo */}
           <a 
-            href={config.social?.zalo || "https://zalo.me/"} 
+            href={zaloUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#0068FF] text-white font-bvp font-medium text-xs px-6 py-3.5 rounded-pill hover:opacity-90 transition-colors shadow-sm cursor-pointer"
@@ -117,7 +127,7 @@ export default function FaqSection({ config, faqs, faqsB2b }: FaqSectionProps) {
 
           {/* 3. Nút Facebook */}
           <a 
-            href={config.social?.facebook || "https://facebook.com/"} 
+            href={facebookUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#1877F2] text-white font-bvp font-medium text-xs px-6 py-3.5 rounded-pill hover:opacity-90 transition-colors shadow-sm cursor-pointer"
@@ -131,7 +141,7 @@ export default function FaqSection({ config, faqs, faqsB2b }: FaqSectionProps) {
 
           {/* 4. Nút Instagram */}
           <a 
-            href={config.social?.instagram || "https://instagram.com/"} 
+            href={instagramUrl} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white font-bvp font-medium text-xs px-6 py-3.5 rounded-pill hover:opacity-90 transition-colors shadow-sm cursor-pointer"

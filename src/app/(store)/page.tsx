@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
-import { Sparkles, Heart, Shield, Award } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { getSiteConfig } from "@/lib/site-config";
 import { SettingsService } from "@/lib/services/settings.service";
 import { ReviewService } from "@/lib/services/review.service";
@@ -137,17 +137,14 @@ export default async function StoreHome() {
   const faqsB2b = config.faq.itemsB2b || [];
 
   // 5. Giá trị cốt lõi Cốc Nối
-  const brandValueIcons = [
-    <Sparkles className="w-6 h-6 text-accent" key="sparkles" />,
-    <Heart className="w-6 h-6 text-accent" key="heart" />,
-    <Shield className="w-6 h-6 text-accent" key="shield" />,
-    <Award className="w-6 h-6 text-accent" key="award" />,
-  ];
-  const brandValues = (config.values.items || []).map((item: any, idx: number) => ({
-    icon: brandValueIcons[idx % brandValueIcons.length],
-    title: item.title,
-    desc: item.desc
-  }));
+  const brandValues = (config.values.items || []).map((item: any, idx: number) => {
+    const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Sparkles;
+    return {
+      icon: <IconComponent className="w-6 h-6 text-accent" />,
+      title: item.title,
+      desc: item.desc
+    };
+  });
 
   // 6. Sắp xếp và hiển thị các section theo cấu hình
   const visibleSections = (config.homepage?.sections || [])

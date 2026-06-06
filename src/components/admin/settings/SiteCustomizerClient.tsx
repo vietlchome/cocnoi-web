@@ -27,11 +27,22 @@ interface Props {
   initialConfig: SiteConfig;
 }
 
+function regroupErrors(flat: Record<string, string> | null): Record<string, Record<string, string>> | null {
+  if (!flat) return null;
+  const grouped: Record<string, Record<string, string>> = {};
+  for (const [path, msg] of Object.entries(flat)) {
+    const [section, ...rest] = path.split(".");
+    if (!grouped[section]) grouped[section] = {};
+    grouped[section][rest.join(".")] = msg;
+  }
+  return grouped;
+}
+
 export default function SiteCustomizerClient({ initialConfig }: Props) {
   const [config, setConfig] = useState<SiteConfig>(initialConfig);
   const [openSection, setOpenSection] = useState<string | null>("header");
   const [isPending, startTransition] = useTransition();
-  const [fieldErrors, setFieldErrors] = useState<Record<string, any> | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string> | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
   const handleSave = () => {
@@ -55,6 +66,8 @@ export default function SiteCustomizerClient({ initialConfig }: Props) {
     });
   };
 
+  const groupedErrors = regroupErrors(fieldErrors);
+
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full relative">
       {/* Sticky Header */}
@@ -74,6 +87,20 @@ export default function SiteCustomizerClient({ initialConfig }: Props) {
           </button>
         </div>
       </div>
+
+      {/* Validation Errors Panel */}
+      {fieldErrors && Object.keys(fieldErrors).length > 0 && (
+        <div className="border border-rose-200 bg-rose-50 p-4 rounded-4 text-sm shadow-sm">
+          <p className="font-semibold text-rose-700 mb-2">Vui lòng sửa các lỗi sau để lưu dữ liệu:</p>
+          <ul className="list-disc pl-5 space-y-1 text-rose-600">
+            {Object.entries(fieldErrors).map(([path, msg]) => (
+              <li key={path}>
+                <span className="font-mono font-semibold">{path}</span>: {msg}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Sections Accordions */}
       <div className="flex flex-col gap-3">
@@ -102,7 +129,7 @@ export default function SiteCustomizerClient({ initialConfig }: Props) {
                     value={config[key as keyof SiteConfig]}
                     onChange={(val) => setConfig(prev => ({ ...prev, [key]: val }))}
                     path={key}
-                    errors={fieldErrors?.[key]}
+                    errors={groupedErrors?.[key]}
                     disabled={isPending}
                   />
                 </div>

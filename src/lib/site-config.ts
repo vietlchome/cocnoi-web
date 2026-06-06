@@ -161,6 +161,23 @@ export async function getSiteConfig(): Promise<SiteConfig> {
     for (const [fieldKey, fieldDef] of Object.entries(sectionDef.fields)) {
       config[sectionName][fieldKey] = resolveField(fieldKey, fieldDef, dbSettings, sectionBlob);
     }
+
+    // Custom backward compatibility for social legacy keys
+    if (sectionName === 'social' && (!sectionBlob || !sectionBlob.links)) {
+      const legacySocial = [];
+      if (dbSettings.contact_facebook) {
+        legacySocial.push({ platform: "facebook", url: dbSettings.contact_facebook, visible: true });
+      }
+      if (dbSettings.contact_instagram) {
+        legacySocial.push({ platform: "instagram", url: dbSettings.contact_instagram, visible: true });
+      }
+      if (dbSettings.contact_zalo) {
+        legacySocial.push({ platform: "zalo", url: dbSettings.contact_zalo, visible: true });
+      }
+      if (legacySocial.length > 0) {
+        config.social = { links: legacySocial };
+      }
+    }
   }
 
   return config as SiteConfig;
