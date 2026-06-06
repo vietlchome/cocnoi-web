@@ -28,7 +28,7 @@ export default async function Header({ config }: HeaderProps) {
     navLinks = [
       { title: "SHOP", link: "/shop" },
       { title: "KHÁM PHÁ", link: "/discover" },
-      { title: "CỘNG ĐỒNG", link: "/nguoi-noi" },
+      { title: "CỘNG ĐỒNG", link: "/community/nguoi-noi" },
       { title: "ĐỐI TÁC", link: "/partners" },
       { title: "HÀNH TRÌNH", link: "/journal" },
     ];

@@ -423,5 +423,85 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         helpText: "Bỏ tick 'Hiển thị' = ẩn section. Dùng ↑/↓ để đổi thứ tự. Section không có trong danh sách = ẩn hoàn toàn."
       }
     }
+  },
+  our_values: {
+    label: "Trang Giá trị (/discover/our-values)",
+    fields: {
+      heroTagline: { 
+        type: "text", 
+        label: "Tagline hero", 
+        default: "Core Principles" 
+      },
+      heroTitle: { 
+        type: "text", 
+        label: "Tiêu đề hero", 
+        default: "Giá trị Cốc Nối" 
+      },
+      heroSubtitle: { 
+        type: "textarea", 
+        label: "Mô tả hero", 
+        default: "Bốn pillar định hình mọi quyết định của Cốc Nối. Một cốt, ba chiều." 
+      },
+      pillars: {
+        type: "repeatable",
+        label: "4 Brand Pillar (1 cốt, 3 chiều)",
+        min: 4,
+        max: 4,
+        default: [
+          {
+            name: "KẾT NỐI",
+            role: "Cốt lõi",
+            question: "Cốc Nối tồn tại để làm gì?",
+            body: "Cốc Nối tồn tại để khơi mở những kết nối thực giữa người với người. Bạn bè, người yêu, gia đình, đồng nghiệp, người lạ, mọi mối quan hệ đều có một điểm chạm là khoảnh khắc 2 người ngồi cùng. Cốc Nối làm ra hiện vật cho khoảnh khắc đó.\n\nKết nối ở đây bao hàm cả văn hoá, di sản, con người, không chỉ giữa 2 người uống cùng nhau, mà còn giữa truyền thống và hiện tại, giữa Việt Nam và thế giới, giữa nghề thủ công và đời sống đương đại.",
+            image: ""
+          },
+          {
+            name: "CHÂN THÀNH",
+            role: "Chiều sâu của Kết nối",
+            question: "Kết nối ấy có thực chất không?",
+            body: "Kết nối chưa đủ, kết nối phải là thực chất. Chân thành là chiều sâu khiến mối quan hệ bền vững. Trong brand, điều này thể hiện ở cách Cốc Nối kể chuyện không tô vẽ, không tâng bốc, không phóng đại, ở cách Cốc Nối thừa nhận lỗi sản phẩm và lứa nung không hoàn hảo, ở cách Cốc Nối từ chối hô hào marketing rỗng.\n\nMỗi cá nhân, từ người làm sản phẩm, đối tác, đến khách hàng, là một chấm trên hành trình kết nối, và luôn được trân trọng.",
+            image: ""
+          },
+          {
+            name: "CHỈN CHU",
+            role: "Phẩm chất của Kết nối",
+            question: "Kết nối ấy có kỷ luật không?",
+            body: "Kết nối chân thành vẫn cần kỷ luật. Cốc Nối chọn làm kỹ hơn là làm nhanh, chất lượng hơn là sản lượng. Mỗi quyết định (từ chọn đất, pha men, vẽ tay từng hoạ tiết, đến cách kể chuyện trên mạng xã hội) đều mang chủ đích.\n\nCốc Nối không tìm sự hoàn hảo, nhưng không xuề xòa tùy tiện. Sự chỉn chu thể hiện trong từng đường vẽ, từng lần nung, từng dòng caption.",
+            image: ""
+          },
+          {
+            name: "CỞI MỞ",
+            role: "Phạm vi của Kết nối",
+            question: "Kết nối ấy mở đến đâu?",
+            body: "Cốc Nối mở lòng đón nhận những con người, vùng đất, và góc nhìn khác biệt. Sản phẩm được thiết kế để đem lại cảm giác quen thuộc và giàu ý nghĩa, dù ở bất kỳ nền văn hoá hay bối cảnh nào. Bằng cách cân bằng giữa truyền thống và đổi mới, giữa tối giản và bản sắc riêng, Cốc Nối hướng tới những giá trị cởi mở, chân thật và đậm tính người.\n\nHiện thân vật lý của Cởi mở: Đôi cốc Cốc Nối gồm 2 chiếc có tương quan về màu sắc và thiết kế, nhưng vẫn có điểm khác nhau ở vị trí đặt hoạ tiết và cách hoàn thiện. Một đôi không phải là 2 bản sao, mà là 2 cá thể có chung tinh thần.",
+            image: ""
+          }
+        ],
+        itemSchema: {
+          name: { type: "text", label: "Tên pillar (uppercase)", default: "" },
+          role: { type: "text", label: "Vai trò (cốt / chiều sâu / phẩm chất / phạm vi)", default: "" },
+          question: { type: "text", label: "Câu hỏi pillar trả lời", default: "" },
+          body: { type: "textarea", label: "Nội dung dài", default: "" },
+          image: { 
+            type: "image", 
+            label: "Ảnh minh họa", 
+            default: "", 
+            aspectRatio: 1.7777, // 16/9 = 1.7777...
+            folder: "theme/pillars",
+            helpText: "Tỷ lệ 16:9. Ảnh minh hoạ cho pillar."
+          }
+        }
+      },
+      closingTitle: {
+        type: "text",
+        label: "Tiêu đề closing section",
+        default: "1 cốt - 3 chiều"
+      },
+      closingBody: {
+        type: "textarea",
+        label: "Nội dung closing",
+        default: "KẾT NỐI là cốt lõi, là lý do Cốc Nối tồn tại. CHÂN THÀNH, CHỈN CHU, CỞI MỞ là ba chiều bổ sung quanh cốt. Mỗi pillar trả lời một câu hỏi về phẩm chất của sự kết nối mà Cốc Nối hướng tới."
+      }
+    }
   }
 };

@@ -37,7 +37,7 @@ export default function HeroSection({ config, quickChips }: HeroSectionProps) {
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link 
-              href={config.ctaSecondary?.url || "/nguoi-noi"}
+              href={config.ctaSecondary?.url || "/community/nguoi-noi"}
               className="inline-flex items-center justify-center bg-transparent border border-border text-primary font-bvp font-medium text-sm md:text-base px-8 py-4 rounded-2 hover:bg-canvas hover:border-accent transition-all duration-300 w-full sm:w-auto text-center"
             >
               {config.ctaSecondary?.text || "Chiến dịch 'Người Nối'"}
