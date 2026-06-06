@@ -10,33 +10,28 @@ import { revalidatePath } from 'next/cache';
  * Note: Phase 3b only flattens 2 levels (sectionName -> fieldKey).
  * Deeper nested validation errors (e.g., repeatable array items) are not fully mapped and will be addressed in Phase 4.
  */
-function flattenZodErrors(formatted: any): Record<string, Record<string, string>> {
-  const result: Record<string, Record<string, string>> = {};
-
+function flattenZodErrors(formatted: any, prefix = ""): Record<string, string> {
+  const flat: Record<string, string> = {};
+  
   if (!formatted || typeof formatted !== "object") {
-    return result;
+    return flat;
   }
 
-  for (const [sectionName, sectionErrors] of Object.entries(formatted)) {
-    if (sectionName === "_errors") continue;
-
-    if (sectionErrors && typeof sectionErrors === "object") {
-      result[sectionName] = {};
-
-      for (const [fieldKey, fieldVal] of Object.entries(sectionErrors)) {
-        if (fieldKey === "_errors") continue;
-
-        if (fieldVal && typeof fieldVal === "object" && "_errors" in fieldVal) {
-          const errorsArray = (fieldVal as any)._errors;
-          if (Array.isArray(errorsArray) && errorsArray.length > 0) {
-            result[sectionName][fieldKey] = errorsArray[0];
-          }
-        }
+  for (const [key, value] of Object.entries(formatted)) {
+    if (key === "_errors") continue;
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && "_errors" in value) {
+      const errs = (value as any)._errors;
+      if (Array.isArray(errs) && errs.length > 0) {
+        flat[path] = errs[0];
       }
+      // Recurse into sub-fields
+      const subFlat = flattenZodErrors(value, path);
+      Object.assign(flat, subFlat);
     }
   }
-
-  return result;
+  
+  return flat;
 }
 
 /**

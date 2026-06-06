@@ -6,7 +6,7 @@ import {
   Save, Eye, Plus, Trash2, ChevronDown, ChevronUp, Loader2, Layout, Type,
   Image as ImageIcon, MessageSquare, Share2, Paintbrush, LayoutGrid, HelpCircle,
   Phone, Mail, MapPin, Link, Globe, Send, Info, Star, Compass, Shield,
-  FileText, Check, AlertTriangle, Settings, User, Search
+  FileText, Check, AlertTriangle, Settings, User, Search, Sparkles, Heart
 } from "lucide-react";
 
 export interface IconPickerFieldInputProps {
@@ -18,12 +18,12 @@ export interface IconPickerFieldInputProps {
   disabled?: boolean;
 }
 
-// 30 common Lucide icons mapped for selection
+// 32 common Lucide icons mapped for selection
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   Save, Eye, Plus, Trash2, ChevronDown, ChevronUp, Loader2, Layout, Type,
   Image: ImageIcon, MessageSquare, Share2, Paintbrush, LayoutGrid, HelpCircle,
   Phone, Mail, MapPin, Link, Globe, Send, Info, Star, Compass, Shield,
-  FileText, Check, AlertTriangle, Settings, User
+  FileText, Check, AlertTriangle, Settings, User, Sparkles, Heart
 };
 
 /**

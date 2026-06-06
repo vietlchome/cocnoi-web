@@ -68,6 +68,7 @@ export const SiteConfigSchema = z.object({
     stat2Lbl: textValidator,
     features: z.array(z.object({
       imgUrl: imageValidator,
+      alt: textValidator,
     })),
   }),
   values: z.object({
@@ -77,6 +78,7 @@ export const SiteConfigSchema = z.object({
     items: z.array(z.object({
       title: textValidator,
       desc: textValidator,
+      icon: textValidator,
     })),
   }),
   faq: z.object({
@@ -112,9 +114,11 @@ export const SiteConfigSchema = z.object({
     }),
   }),
   social: z.object({
-    facebook: urlValidator,
-    instagram: urlValidator,
-    zalo: urlValidator,
+    links: z.array(z.object({
+      platform: z.enum(["facebook", "instagram", "tiktok", "youtube", "zalo", "shopee", "lazada", "threads"]),
+      url: urlValidator,
+      visible: booleanValidator,
+    })),
   }),
   seo: z.object({
     siteTitle: textValidator,

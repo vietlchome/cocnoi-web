@@ -19,6 +19,29 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
       console.warn(`Schema mismatch ${fieldKey}: expected array, got ${typeof v}. Using default.`);
       // KHÔNG return — fall through
     } else {
+      // Backward compat: fill missing sub-keys khi schema mới thêm field
+      if (fieldDef.type === 'repeatable' && isArray) {
+        const itemSchema = (fieldDef as any).itemSchema || {};
+        return v.map((item: any) => {
+          if (typeof item !== 'object' || item === null) return item;
+          const fixed = { ...item };
+          for (const [subKey, subDef] of Object.entries(itemSchema)) {
+            if (fixed[subKey] === undefined) {
+              fixed[subKey] = (subDef as any).default ?? "";
+            }
+          }
+          return fixed;
+        });
+      }
+      if (fieldDef.type === 'group' && isObject) {
+        const result: Record<string, any> = { ...v };
+        for (const [subKey, subDef] of Object.entries((fieldDef as any).fields || {})) {
+          if (result[subKey] === undefined) {
+            result[subKey] = (subDef as any).default ?? "";
+          }
+        }
+        return result;
+      }
       return v;
     }
   }
@@ -160,6 +183,23 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 
     for (const [fieldKey, fieldDef] of Object.entries(sectionDef.fields)) {
       config[sectionName][fieldKey] = resolveField(fieldKey, fieldDef, dbSettings, sectionBlob);
+    }
+
+    // Custom backward compatibility for social legacy keys
+    if (sectionName === 'social' && (!sectionBlob || !sectionBlob.links)) {
+      const legacySocial = [];
+      if (dbSettings.contact_facebook) {
+        legacySocial.push({ platform: "facebook", url: dbSettings.contact_facebook, visible: true });
+      }
+      if (dbSettings.contact_instagram) {
+        legacySocial.push({ platform: "instagram", url: dbSettings.contact_instagram, visible: true });
+      }
+      if (dbSettings.contact_zalo) {
+        legacySocial.push({ platform: "zalo", url: dbSettings.contact_zalo, visible: true });
+      }
+      if (legacySocial.length > 0) {
+        config.social = { links: legacySocial };
+      }
     }
   }
 
