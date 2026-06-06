@@ -55,8 +55,8 @@ export class AnalyticsService {
       select: { totalAmount: true },
     });
 
-    const currentRevenue = currentMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-    const lastRevenue = lastMonthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const currentRevenue = currentMonthOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
+    const lastRevenue = lastMonthOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
     const currentSalesCount = currentMonthOrders.length;
     const lastSalesCount = lastMonthOrders.length;
@@ -121,7 +121,7 @@ export class AnalyticsService {
       },
       select: { totalAmount: true },
     });
-    const lifetimeRevenue = allActiveOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const lifetimeRevenue = allActiveOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
     return {
       revenue: currentRevenue,
@@ -173,7 +173,7 @@ export class AnalyticsService {
           select: { totalAmount: true },
         });
 
-        const dayRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const dayRevenue = orders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
         
         // Định dạng nhãn VD: "25/05"
         const label = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -201,7 +201,7 @@ export class AnalyticsService {
           select: { totalAmount: true },
         });
 
-        const weekRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const weekRevenue = orders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
         const label = `Tuần ${4 - i}`;
 
         result.push({
@@ -226,7 +226,7 @@ export class AnalyticsService {
           select: { totalAmount: true },
         });
 
-        const monthRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+        const monthRevenue = orders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
         const label = `Tháng ${date.getMonth() + 1}`;
 
         result.push({
@@ -271,7 +271,7 @@ export class AnalyticsService {
       };
     } = {};
 
-    orderItems.forEach((item) => {
+    orderItems.forEach((item: any) => {
       if (!item.product) return;
 
       const pId = item.productId;
@@ -350,7 +350,7 @@ export class AnalyticsService {
       },
       select: { totalAmount: true },
     });
-    const todayRevenue = todayOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const todayRevenue = todayOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
     const startOfYesterday = new Date(startOfDay.getTime() - 24 * 60 * 60 * 1000);
     const yesterdayOrders = await prisma.order.findMany({
@@ -360,7 +360,7 @@ export class AnalyticsService {
       },
       select: { totalAmount: true },
     });
-    const yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const yesterdayRevenue = yesterdayOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
     // 2. Cảnh báo thời gian thực (Time-sensitive Alerts)
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -459,7 +459,7 @@ export class AnalyticsService {
     });
 
     const totalOrders = allOrders.length;
-    const totalRevenue = allOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const totalRevenue = allOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
 
     // ---------------------------------------------------------
     // A. CUSTOMER INSIGHTS
@@ -472,7 +472,7 @@ export class AnalyticsService {
     let newCustomers = 0;
     let returningCustomers = 0;
 
-    allOrders.forEach(o => {
+    allOrders.forEach((o: any) => {
       if (o.customerId) {
         customerOrderCounts[o.customerId] = (customerOrderCounts[o.customerId] || 0) + 1;
       }
@@ -497,7 +497,7 @@ export class AnalyticsService {
     
     // Group orders by customerId
     const ordersByCustomer: Record<string, typeof allOrders> = {};
-    allOrders.forEach(o => {
+    allOrders.forEach((o: any) => {
       if (o.customerId) {
         if (!ordersByCustomer[o.customerId]) ordersByCustomer[o.customerId] = [];
         ordersByCustomer[o.customerId].push(o);
@@ -507,7 +507,7 @@ export class AnalyticsService {
     Object.values(ordersByCustomer).forEach(customerOrders => {
       if (customerOrders.length > 1) {
         // Sort by date ascending
-        customerOrders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+        customerOrders.sort((a: any, b: any) => a.createdAt.getTime() - b.createdAt.getTime());
         for (let i = 1; i < customerOrders.length; i++) {
           const diffTime = Math.abs(customerOrders[i].createdAt.getTime() - customerOrders[i - 1].createdAt.getTime());
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -520,7 +520,7 @@ export class AnalyticsService {
     const repurchaseCycleDays = returningInstances > 0 ? Math.round(totalDaysBetweenOrders / returningInstances) : 0;
 
     // --- Tỉ trọng Gốm Custom (B2B) vs Có sẵn (Retail) ---
-    const customRevenue = allOrders.filter(o => o.orderType === 'B2B_WHOLESALE' || o.orderType === 'B2B_CONSIGNMENT' || o.orderType === 'B2B_GIFT').reduce((sum, o) => sum + o.totalAmount, 0);
+    const customRevenue = allOrders.filter((o: any) => o.orderType === 'B2B_WHOLESALE' || o.orderType === 'B2B_CONSIGNMENT' || o.orderType === 'B2B_GIFT').reduce((sum: number, o: any) => sum + o.totalAmount, 0);
     const customSplit = totalRevenue > 0 ? Math.round((customRevenue / totalRevenue) * 100) : 0;
 
     // ---------------------------------------------------------
@@ -528,11 +528,11 @@ export class AnalyticsService {
     // ---------------------------------------------------------
     // Tốc độ tiêu thụ dự kiến (Inventory Velocity) dựa trên 30 ngày qua
     const thirtyDaysAgo = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
-    const recentOrders = allOrders.filter(o => o.createdAt >= thirtyDaysAgo);
+    const recentOrders = allOrders.filter((o: any) => o.createdAt >= thirtyDaysAgo);
     
     const productSalesLast30Days: Record<string, number> = {};
-    recentOrders.forEach(o => {
-      o.items.forEach(item => {
+    recentOrders.forEach((o: any) => {
+      o.items.forEach((item: any) => {
         if (item.productId) {
           productSalesLast30Days[item.productId] = (productSalesLast30Days[item.productId] || 0) + item.quantity;
         }
@@ -545,7 +545,7 @@ export class AnalyticsService {
       select: { id: true, name: true, stockQuantity: true }
     });
 
-    const inventoryVelocity = productsInDB.map(p => {
+    const inventoryVelocity = productsInDB.map((p: any) => {
       const soldIn30Days = productSalesLast30Days[p.id];
       const dailySalesRate = soldIn30Days / 30;
       const daysUntilStockout = dailySalesRate > 0 ? Math.round(p.stockQuantity / dailySalesRate) : 999;
@@ -556,15 +556,15 @@ export class AnalyticsService {
         soldLast30Days: soldIn30Days,
         daysUntilStockout
       };
-    }).filter(p => p.daysUntilStockout > 0 && p.daysUntilStockout <= 60) // Cảnh báo nung gốm: hết hàng trong <= 60 ngày
-      .sort((a, b) => a.daysUntilStockout - b.daysUntilStockout)
+    }).filter((p: any) => p.daysUntilStockout > 0 && p.daysUntilStockout <= 60) // Cảnh báo nung gốm: hết hàng trong <= 60 ngày
+      .sort((a: any, b: any) => a.daysUntilStockout - b.daysUntilStockout)
       .slice(0, 6);
 
     // ---------------------------------------------------------
     // C. EFFICIENCY & PROMOTIONS
     // ---------------------------------------------------------
     // Tỉ lệ "Nghiện" khuyến mãi (Promotion Penetration)
-    const promotedOrders = allOrders.filter(o => (o.discount || 0) > 0).length;
+    const promotedOrders = allOrders.filter((o: any) => (o.discount || 0) > 0).length;
     const promotionPenetration = totalOrders > 0 ? Math.round((promotedOrders / totalOrders) * 100) : 0;
 
     // Tỉ lệ chuyển đổi B2B
@@ -578,7 +578,7 @@ export class AnalyticsService {
     }
 
     // --- Công nợ (Debt Ratio) ---
-    const totalDebt = allOrders.reduce((sum, o) => sum + (o.debtAmount || 0), 0);
+    const totalDebt = allOrders.reduce((sum: number, o: any) => sum + (o.debtAmount || 0), 0);
     const debtRatio = totalRevenue > 0 ? Math.round((totalDebt / totalRevenue) * 100) : 0;
 
     // --- Tỉ lệ vỡ hỏng (Breakage Rate - Giả lập từ đánh giá xấu) ---

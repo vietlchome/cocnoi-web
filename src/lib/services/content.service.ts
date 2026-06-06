@@ -236,7 +236,7 @@ export class ContentService {
     const settings = await prisma.themeSetting.findMany();
     const settingsMap: { [key: string]: any } = {};
 
-    settings.forEach((s) => {
+    settings.forEach((s: any) => {
       try {
         settingsMap[s.key] = JSON.parse(s.value);
       } catch {

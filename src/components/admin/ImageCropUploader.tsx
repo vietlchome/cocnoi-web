@@ -108,7 +108,7 @@ export default function ImageCropUploader({
 
       // 2. Chuẩn bị dữ liệu tải lên
       const formData = new FormData();
-      formData.append("file", croppedBlob, "upload.jpg");
+      formData.append("files", croppedBlob, "upload.jpg");
       if (folder) {
         formData.append("folder", folder);
       }

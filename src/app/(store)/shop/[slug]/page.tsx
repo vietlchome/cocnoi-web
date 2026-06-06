@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductDetailClient from "./ProductDetailClient";
 import { ReviewService } from "@/lib/services/review.service";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface PageProps {
   params: Promise<{
@@ -85,7 +86,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       }
     });
 
-    siblings = rawSiblings.map(sib => ({
+    siblings = rawSiblings.map((sib: any) => ({
       id: sib.id,
       name: sib.name,
       slug: sib.slug,
@@ -106,6 +107,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
   };
 
   const ratingData = await ReviewService.getProductRating(product.id);
+  const config = await getSiteConfig();
 
-  return <ProductDetailClient product={serializedProduct as any} siblings={siblings} ratingData={ratingData} />;
+  return (
+    <ProductDetailClient 
+      product={serializedProduct as any} 
+      siblings={siblings} 
+      ratingData={ratingData} 
+      paymentInfo={config.payment_info}
+    />
+  );
 }

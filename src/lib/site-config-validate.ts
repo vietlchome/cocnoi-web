@@ -152,6 +152,24 @@ export const SiteConfigSchema = z.object({
     })),
     closingTitle: textValidator,
     closingBody: textValidator,
+  }),
+  partners_meta: z.object({
+    stockistMinOrder: textValidator,
+    stockistDiscount: textValidator,
+    corporateMoq: textValidator,
+    corporateLeadTime: textValidator,
+    salesEmail: textValidator,
+    salesPhone: textValidator,
+  }),
+  payment_info: z.object({
+    showQr: booleanValidator,
+    qrImage: imageValidator,
+    bankName: textValidator,
+    accountNumber: textValidator,
+    accountHolder: textValidator,
+    transferNote: textValidator,
+    codAvailable: booleanValidator,
+    codNote: textValidator,
   })
 });
 

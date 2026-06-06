@@ -213,7 +213,7 @@ export default async function NguoiNoiCampaignPage() {
           {/* Database-sourced posts */}
           {posts.length > 0 && (
             <div className="flex flex-col gap-12">
-              {posts.map((post) => (
+              {posts.map((post: any) => (
                 <Link href={`/journal/${(post as any).slug || post.id}`} key={post.id} className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start border border-border/60 rounded-4 p-6 md:p-10 bg-canvas hover:border-accent transition-colors cursor-pointer group block">
                   <div className="lg:col-span-4 relative aspect-square md:aspect-video lg:aspect-square bg-[#EFE9DF] rounded-3 border border-border flex items-center justify-center p-8 overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(#C2703E_1px,transparent_1px)] [background-size:16px_16px] opacity-15"></div>

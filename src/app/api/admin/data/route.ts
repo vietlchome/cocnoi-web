@@ -37,7 +37,7 @@ export async function GET() {
     });
 
     // Ánh xạ sang cấu trúc giao diện Dashboard cũ để giữ nguyên khả năng hiển thị
-    const mappedInquiries = realInquiries.map((inq) => ({
+    const mappedInquiries = realInquiries.map((inq: any) => ({
       id: inq.id,
       product_id: inq.productId || '',
       customer_name: inq.customerName,
@@ -74,7 +74,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mappedProducts = products.map((p) => ({
+    const mappedProducts = products.map((p: any) => ({
       ...p,
       name_vn: p.name,
       price_pair: p.price,

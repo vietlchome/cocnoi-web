@@ -111,7 +111,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
               </Link>
 
               {/* Lọc theo danh mục */}
-              {categories.map((cat) => (
+              {categories.map((cat: any) => (
                 <Link
                   key={cat.id}
                   href={`/shop?category=${cat.slug}`}
@@ -137,7 +137,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((prod, idx) => {
+                {products.map((prod: any, idx: number) => {
                   const isOutOfStock = prod.stockQuantity === 0
                   
                   // Calculate average rating

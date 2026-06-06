@@ -37,7 +37,7 @@ export async function exportOrdersToCsv() {
       "Chi tiết sản phẩm"
     ];
 
-    const rows = orders.map(order => {
+    const rows = orders.map((order: any) => {
       let customerName = "Khách lẻ";
       let phone = "";
       let addressStr = order.shippingAddress;
@@ -52,7 +52,7 @@ export async function exportOrdersToCsv() {
       }
 
       // Xử lý chuỗi chi tiết sản phẩm
-      const productDetails = order.items.map(i => `${i.product.name} (x${i.quantity})`).join("; ");
+      const productDetails = order.items.map((i: any) => `${i.product.name} (x${i.quantity})`).join("; ");
 
       return [
         order.id,
@@ -107,9 +107,9 @@ export async function exportCustomersToCsv() {
       "Số đơn hàng"
     ];
 
-    const rows = customers.map(customer => {
+    const rows = customers.map((customer: any) => {
       const orderCount = customer.orders.length;
-      const totalSpent = customer.orders.reduce((acc, order) => acc + order.totalAmount, 0);
+      const totalSpent = customer.orders.reduce((acc: number, order: any) => acc + order.totalAmount, 0);
       
       return [
         customer.id,

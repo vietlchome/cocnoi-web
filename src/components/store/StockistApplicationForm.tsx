@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { createInquiry } from "@/lib/actions/inquiry.actions";
-import { ArrowRight, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { parseError, type FriendlyError } from "@/lib/utils/error-messages";
 import FormErrorAlert from "@/components/shared/FormErrorAlert";
 
-export default function PartnerContactForm() {
-  const [customerName, setCustomerName] = useState("");
+export default function StockistApplicationForm() {
+  const [storeName, setStoreName] = useState("");
+  const [contactName, setContactName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [quantity, setQuantity] = useState(50);
+  const [storeType, setStoreType] = useState("concept-store");
+  const [address, setAddress] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [expectedQty, setExpectedQty] = useState("10-20");
   const [note, setNote] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cod'>('bank_transfer');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<FriendlyError | null>(null);
@@ -23,7 +25,12 @@ export default function PartnerContactForm() {
     setLoading(true);
     setError(null);
 
-    if (!customerName.trim()) {
+    if (!storeName.trim()) {
+      setError({ category: "validation", message: "Tên cửa hàng hoặc thương hiệu không được trống.", showRetryButton: false, showReloadButton: false });
+      setLoading(false);
+      return;
+    }
+    if (!contactName.trim()) {
       setError({ category: "validation", message: "Họ và tên người liên hệ không được trống.", showRetryButton: false, showReloadButton: false });
       setLoading(false);
       return;
@@ -35,18 +42,23 @@ export default function PartnerContactForm() {
     }
 
     try {
-      const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD";
-      const fullNote = `Phương thức: ${methodLabel}${note ? ` | ${note}` : ''}`;
+      const fullNote = [
+        `Loại cửa hàng: ${storeType}`,
+        address.trim() && `Địa chỉ: ${address}`,
+        instagram.trim() && `Instagram/Website: ${instagram}`,
+        `SL dự kiến/tháng: ${expectedQty}`,
+        note.trim() && `Ghi chú: ${note}`
+      ].filter(Boolean).join(" | ");
 
       const response = await createInquiry({
-        customerName,
+        customerName: contactName,
         phone,
         email: email || null,
-        companyName: companyName || null,
+        companyName: storeName || null,
         productId: null,
-        quantity: Number(quantity) || 1,
-        note: fullNote || null,
-        source: "Trang Đối Tác B2B",
+        quantity: 1,
+        note: fullNote,
+        source: "Stockist Application",
       });
 
       if (response.success) {
@@ -68,23 +80,25 @@ export default function PartnerContactForm() {
         <CheckCircle2 className="w-12 h-12 text-accent mx-auto mb-3 animate-bounce" />
         <h3 className="font-playfair text-xl font-bold text-primary mb-2">Đã nhận thông tin</h3>
         <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-4">
-          Cốc Nối liên hệ xác nhận và tư vấn đối tác trong 24 giờ.
+          Cốc Nối liên hệ xác nhận và gửi catalog wholesale trong 24 giờ.
         </p>
         <button 
           onClick={() => {
             setSuccess(false);
-            setCustomerName("");
+            setStoreName("");
+            setContactName("");
             setPhone("");
             setEmail("");
-            setCompanyName("");
-            setQuantity(50);
+            setStoreType("concept-store");
+            setAddress("");
+            setInstagram("");
+            setExpectedQty("10-20");
             setNote("");
-            setPaymentMethod("bank_transfer");
             setError(null);
           }}
           className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors font-semibold"
         >
-          Gửi thêm yêu cầu hợp tác khác
+          Quay lại form đăng ký
         </button>
       </div>
     );
@@ -93,7 +107,7 @@ export default function PartnerContactForm() {
   return (
     <div className="bg-canvas border border-border/80 p-6 md:p-10 rounded-4 max-w-3xl mx-auto shadow-sm">
       <h3 className="font-playfair text-xl md:text-2xl font-bold text-primary mb-6 text-center">
-        Nhận báo giá & Đăng ký tư vấn B2B
+        Đăng ký thông tin đại lý
       </h3>
 
       {error && (
@@ -104,15 +118,30 @@ export default function PartnerContactForm() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Full Name */}
+          {/* Store Name */}
+          <div className="flex flex-col items-start gap-2">
+            <label className="font-bvp text-xs font-bold text-primary">
+              Tên cửa hàng, thương hiệu <span className="text-accent">*</span>
+            </label>
+            <input 
+              type="text" 
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              placeholder="Ví dụ: Tiệm Gốm Cốc Nối"
+              required
+              className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
+            />
+          </div>
+
+          {/* Contact Name */}
           <div className="flex flex-col items-start gap-2">
             <label className="font-bvp text-xs font-bold text-primary">
               Họ và tên người liên hệ <span className="text-accent">*</span>
             </label>
             <input 
               type="text" 
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
               placeholder="Ví dụ: Nguyễn Văn A"
               required
               className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
@@ -122,7 +151,7 @@ export default function PartnerContactForm() {
           {/* Phone */}
           <div className="flex flex-col items-start gap-2">
             <label className="font-bvp text-xs font-bold text-primary">
-              Số điện thoại <span className="text-accent">*</span>
+              Số điện thoại người liên hệ <span className="text-accent">*</span>
             </label>
             <input 
               type="tel" 
@@ -143,94 +172,85 @@ export default function PartnerContactForm() {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Ví dụ: name@company.com"
+              placeholder="Ví dụ: shop@company.com"
               className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
-          {/* Company Name */}
+          {/* Store Type */}
           <div className="flex flex-col items-start gap-2">
             <label className="font-bvp text-xs font-bold text-primary">
-              Tên doanh nghiệp / Quán Café
+              Loại hình hoạt động
             </label>
-            <input 
-              type="text" 
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="Ví dụ: Cà Phê Cốc Nối Bát Tràng"
+            <select
+              value={storeType}
+              onChange={(e) => setStoreType(e.target.value)}
               className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
-            />
+            >
+              <option value="concept-store">Concept store</option>
+              <option value="cafe">Café</option>
+              <option value="gallery">Gallery, Art space</option>
+              <option value="retail-specialty">Cửa hàng bán lẻ chuyên biệt</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+
+          {/* Expected Quantity */}
+          <div className="flex flex-col items-start gap-2">
+            <label className="font-bvp text-xs font-bold text-primary">
+              Số lượng dự kiến lấy, tháng
+            </label>
+            <select
+              value={expectedQty}
+              onChange={(e) => setExpectedQty(e.target.value)}
+              className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
+            >
+              <option value="10-20">10 - 20 đôi</option>
+              <option value="20-50">20 - 50 đôi</option>
+              <option value="50-100">50 - 100 đôi</option>
+              <option value="100+">Trên 100 đôi</option>
+            </select>
           </div>
         </div>
 
-        {/* Quantity */}
+        {/* Instagram/Website */}
         <div className="flex flex-col items-start gap-2">
           <label className="font-bvp text-xs font-bold text-primary">
-            Số lượng dự kiến: <span className="text-accent font-mono font-bold text-sm">{quantity} chiếc</span>
+            Instagram, Website của cửa hàng
           </label>
           <input 
-            type="range" 
-            min="20" 
-            max="1000" 
-            step="10"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full h-1.5 bg-[#FAF8F5] accent-accent border border-border/80 rounded-lg cursor-pointer"
+            type="text" 
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            placeholder="Ví dụ: @yourstore hoặc www.yourstore.com"
+            className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
           />
-          <div className="flex justify-between w-full font-bvp text-[9px] text-secondary mt-1">
-            <span>Tối thiểu: 20 chiếc (Đơn B2B lẻ)</span>
-            <span>Trung bình: 100 - 500 chiếc</span>
-            <span>Tối đa: 1000+ chiếc (Đại lý)</span>
-          </div>
         </div>
 
-        {/* Payment Method */}
-        <div className="flex flex-col gap-3">
+        {/* Address */}
+        <div className="flex flex-col items-start gap-2">
           <label className="font-bvp text-xs font-bold text-primary">
-            Phương thức thanh toán <span className="text-accent">*</span>
+            Địa chỉ trưng bày, cửa hàng
           </label>
-          <div className="flex flex-col gap-2 w-full">
-            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
-              <input 
-                type="radio" 
-                name="paymentMethod" 
-                value="bank_transfer" 
-                checked={paymentMethod === "bank_transfer"} 
-                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                className="mt-1 accent-accent"
-              />
-              <div className="text-left font-bvp">
-                <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
-                <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
-              </div>
-            </label>
-            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
-              <input 
-                type="radio" 
-                name="paymentMethod" 
-                value="cod" 
-                checked={paymentMethod === "cod"} 
-                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                className="mt-1 accent-accent"
-              />
-              <div className="text-left font-bvp">
-                <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
-                <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
-              </div>
-            </label>
-          </div>
+          <input 
+            type="text" 
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Số nhà, tên đường, quận, thành phố..."
+            className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors"
+          />
         </div>
 
         {/* Note */}
         <div className="flex flex-col items-start gap-2">
           <label className="font-bvp text-xs font-bold text-primary">
-            Chi tiết yêu cầu thiết kế / Ý tưởng hợp tác
+            Mô tả thêm về cửa hàng hoặc yêu cầu riêng
           </label>
           <textarea 
             rows={4}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Ví dụ: Chúng tôi cần in chìm logo 'Cốc Nối' màu men tro mộc, thời gian hoàn thành trước ngày 20/12..."
+            placeholder="Mô tả không gian cửa hàng của bạn hoặc các mong muốn hợp tác chi tiết..."
             className="w-full bg-[#FAF8F5] border border-border/80 rounded-2 p-3 font-bvp text-xs text-primary focus:outline-none focus:border-accent transition-colors resize-y"
           />
         </div>
@@ -239,6 +259,7 @@ export default function PartnerContactForm() {
           type="submit"
           disabled={loading}
           className="w-full bg-primary text-canvas font-bvp font-medium text-xs px-6 py-4 rounded-2 hover:bg-[#0E1220] transition-all duration-300 flex items-center justify-center gap-2 group shadow-sm disabled:opacity-50"
+          style={{ backgroundColor: "var(--color-deep-indigo)" }}
         >
           {loading ? (
             <>
@@ -247,7 +268,7 @@ export default function PartnerContactForm() {
             </>
           ) : (
             <>
-              <span>Gửi thông tin đối tác</span>
+              <span>Gửi đăng ký đại lý</span>
               <Send className="w-4 h-4 text-accent transition-transform group-hover:translate-x-1" />
             </>
           )}

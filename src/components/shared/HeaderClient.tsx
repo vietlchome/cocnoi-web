@@ -111,9 +111,9 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
       { name: "Giá trị", href: "/discover/our-values" },
     ],
     "ĐỐI TÁC": [
-      { name: "Quà tặng doanh nghiệp", href: "/partners#corporate" },
-      { name: "Tìm cửa hàng (Stockists)", href: "/partners#stockists" },
-      { name: "Hợp tác đại lý", href: "/partners#wholesale" },
+      { name: "Tìm cửa hàng", href: "/partners/stockists" },
+      { name: "Trở thành đại lý", href: "/partners/become-a-stockist" },
+      { name: "Quà tặng doanh nghiệp", href: "/partners/corporate-gifting" },
     ]
   };
 
@@ -270,23 +270,25 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
             </Link>
 
             {/* Shopping Cart Drawer Trigger */}
-            <button 
-              onClick={() => setCartOpen(true)}
-              className="relative text-primary hover:text-accent p-1.5 transition-colors rounded-full hover:bg-subtle cursor-pointer" 
-              title="Giỏ hàng"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {cartCount > 0 ? (
-                <span 
-                  className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white"
-                  style={{ backgroundColor: "var(--color-terracotta)" }}
-                >
-                  {cartCount}
-                </span>
-              ) : (
-                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-accent rounded-full animate-pulse border border-canvas" style={{ backgroundColor: "var(--color-terracotta)" }}></span>
-              )}
-            </button>
+            {process.env.NEXT_PUBLIC_ENABLE_CART === "true" && (
+              <button 
+                onClick={() => setCartOpen(true)}
+                className="relative text-primary hover:text-accent p-1.5 transition-colors rounded-full hover:bg-subtle cursor-pointer" 
+                title="Giỏ hàng"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {cartCount > 0 ? (
+                  <span 
+                    className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white"
+                    style={{ backgroundColor: "var(--color-terracotta)" }}
+                  >
+                    {cartCount}
+                  </span>
+                ) : (
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-accent rounded-full animate-pulse border border-canvas" style={{ backgroundColor: "var(--color-terracotta)" }}></span>
+                )}
+              </button>
+            )}
 
             {/* MOBILE NAV BUTTON */}
             <button 

@@ -6,10 +6,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { 
   Star, ShoppingBag, Check, AlertCircle, Send, 
-  ChevronDown, ChevronUp, Clock, ShieldCheck, Heart, ArrowRight
+  ChevronDown, ChevronUp, Clock, ShieldCheck, Heart, ArrowRight, X
 } from 'lucide-react'
 import { useCartStore } from '@/store/cart.store'
 import ReviewList from "@/components/store/ReviewList"
+import PaymentInstructionsBlock from '@/components/store/PaymentInstructionsBlock'
+import FormErrorAlert from '@/components/shared/FormErrorAlert'
+import { parseError, type FriendlyError } from '@/lib/utils/error-messages'
 
 interface SiblingProduct {
   id: string
@@ -48,9 +51,19 @@ interface ProductDetailClientProps {
   product: Product
   siblings: SiblingProduct[]
   ratingData?: { average: number; count: number }
+  paymentInfo: {
+    showQr: boolean;
+    qrImage: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+    transferNote: string;
+    codAvailable: boolean;
+    codNote: string;
+  };
 }
 
-export default function ProductDetailClient({ product, siblings = [], ratingData }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, siblings = [], ratingData, paymentInfo }: ProductDetailClientProps) {
   // Safely assign images
   let imgUrls: string[] = Array.isArray(product.images) ? product.images : []
 
@@ -75,9 +88,10 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
   const [address, setAddress] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [note, setNote] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cod'>('bank_transfer')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
-  const [submitError, setSubmitError] = useState('')
+  const [submitError, setSubmitError] = useState<FriendlyError | null>(null)
 
   const router = useRouter()
   const { addItem } = useCartStore()
@@ -96,20 +110,27 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
   const displayStock = product.stockQuantity
   const isOutOfStock = displayStock === 0
 
-  const handleInquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleInquirySubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!customerName || !phone) {
-      setSubmitError('Vui lòng nhập Họ tên và Số điện thoại liên hệ.')
+      setSubmitError({
+        category: "validation",
+        message: "Vui lòng nhập Họ tên và Số điện thoại liên hệ.",
+        showRetryButton: false,
+        showReloadButton: false
+      })
       return
     }
 
     setIsSubmitting(true)
-    setSubmitError('')
+    setSubmitError(null)
 
     // Ghép thông tin màu vào ghi chú để lưu lại chuẩn xác
-    const fullNote = product.colorName 
+    const colorNote = product.colorName 
       ? `[Màu đã chọn: ${product.colorName}] ${note}`.trim()
       : note
+    const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD"
+    const fullNote = `Phương thức: ${methodLabel}${colorNote ? ` | ${colorNote}` : ''}`
 
     try {
       const response = await fetch('/api/inquiry', {
@@ -130,10 +151,15 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
         setSubmitSuccess(true)
       } else {
         const errData = await response.json()
-        setSubmitError(errData.error || 'Gặp lỗi khi gửi yêu cầu tư vấn. Vui lòng thử lại.')
+        setSubmitError({
+          category: "unknown",
+          message: errData.error || "Gặp lỗi khi gửi yêu cầu tư vấn. Vui lòng thử lại.",
+          showRetryButton: true,
+          showReloadButton: false
+        })
       }
     } catch (err) {
-      setSubmitError('Lỗi kết nối máy chủ. Vui lòng kiểm tra lại mạng.')
+      setSubmitError(parseError(err))
     } finally {
       setIsSubmitting(false)
     }
@@ -164,8 +190,9 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
     setAddress('')
     setQuantity(qty) // Seed inquiry quantity from selected qty
     setNote('')
+    setPaymentMethod('bank_transfer')
     setSubmitSuccess(false)
-    setSubmitError('')
+    setSubmitError(null)
     setShowInquiryModal(true)
   }
 
@@ -351,56 +378,69 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
             {/* Primary Action Buttons */}
             <div className="flex flex-col gap-4 border-t border-border/40 pt-6">
               
-              {/* Quantity Selector & Add To Cart */}
-              <div className="flex items-center gap-3">
-                
-                {/* Quantity Control */}
-                <div className="flex items-center border border-border/60 bg-white rounded-2 h-12">
-                  <button
-                    onClick={() => setQty(Math.max(1, qty - 1))}
-                    className="px-3.5 hover:text-accent transition-colors text-secondary/40 h-full flex items-center justify-center font-bold text-base cursor-pointer"
-                  >
-                    -
-                  </button>
-                  <span className="px-2 font-bold text-sm text-primary min-w-8 text-center select-none font-mono">
-                    {qty}
-                  </span>
-                  <button
-                    onClick={() => setQty(qty + 1)}
-                    className="px-3.5 hover:text-accent transition-colors text-secondary/40 h-full flex items-center justify-center font-bold text-base cursor-pointer"
-                  >
-                    +
-                  </button>
-                </div>
+              {process.env.NEXT_PUBLIC_ENABLE_CART === "true" ? (
+                <>
+                  {/* Quantity Selector & Add To Cart */}
+                  <div className="flex items-center gap-3">
+                    
+                    {/* Quantity Control */}
+                    <div className="flex items-center border border-border/60 bg-white rounded-2 h-12">
+                      <button
+                        onClick={() => setQty(Math.max(1, qty - 1))}
+                        className="px-3.5 hover:text-accent transition-colors text-secondary/40 h-full flex items-center justify-center font-bold text-base cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="px-2 font-bold text-sm text-primary min-w-8 text-center select-none font-mono">
+                        {qty}
+                      </span>
+                      <button
+                        onClick={() => setQty(qty + 1)}
+                        className="px-3.5 hover:text-accent transition-colors text-secondary/40 h-full flex items-center justify-center font-bold text-base cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
 
-                {/* Add to Cart Button */}
+                    {/* Add to Cart Button */}
+                    <button
+                      onClick={handleAddToCart}
+                      className="flex-grow h-12 border border-accent hover:bg-accent/5 text-accent font-bold text-xs rounded-2 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider font-bvp"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Thêm vào giỏ</span>
+                    </button>
+                  </div>
+
+                  {/* Buy Now / Pre-order Main Action */}
+                  <button
+                    onClick={handleBuyNow}
+                    className={`w-full h-14 font-bold text-sm rounded-2 transition-all flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer uppercase tracking-wider ${
+                      isOutOfStock
+                        ? 'bg-mustard hover:bg-mustard/95 text-canvas shadow-sm shadow-mustard/10'
+                        : 'bg-accent hover:bg-accent-hover text-canvas shadow-sm shadow-accent/10'
+                    }`}
+                  >
+                    {isOutOfStock ? (
+                      <>
+                        <span>ĐẶT HÀNG TRƯỚC (PRE-ORDER)</span>
+                        <span className="text-[10px] font-normal opacity-85 lowercase italic tracking-normal">Chờ nung hoàn thiện từ 7-14 ngày</span>
+                      </>
+                    ) : (
+                      <span>MUA NGAY (GIAO NHANH)</span>
+                    )}
+                  </button>
+                </>
+              ) : (
                 <button
-                  onClick={handleAddToCart}
-                  className="flex-grow h-12 border border-accent hover:bg-accent/5 text-accent font-bold text-xs rounded-2 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider font-bvp"
+                  onClick={openInquiry}
+                  className="w-full h-14 bg-accent hover:bg-accent-hover text-canvas font-bold text-sm rounded-2 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider shadow-sm"
+                  style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Thêm vào giỏ</span>
+                  <Send className="w-4 h-4" />
+                  <span>Đặt đôi này</span>
                 </button>
-              </div>
-
-              {/* Buy Now / Pre-order Main Action */}
-              <button
-                onClick={handleBuyNow}
-                className={`w-full h-14 font-bold text-sm rounded-2 transition-all flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer uppercase tracking-wider ${
-                  isOutOfStock
-                    ? 'bg-mustard hover:bg-mustard/95 text-canvas shadow-sm shadow-mustard/10'
-                    : 'bg-accent hover:bg-accent-hover text-canvas shadow-sm shadow-accent/10'
-                }`}
-              >
-                {isOutOfStock ? (
-                  <>
-                    <span>ĐẶT HÀNG TRƯỚC (PRE-ORDER)</span>
-                    <span className="text-[10px] font-normal opacity-85 lowercase italic tracking-normal">Chờ nung hoàn thiện từ 7-14 ngày</span>
-                  </>
-                ) : (
-                  <span>MUA NGAY (GIAO NHANH)</span>
-                )}
-              </button>
+              )}
 
               {/* B2B / Custom Inquiry Button */}
               <button
@@ -527,75 +567,88 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
 
       {/* INQUIRY DIALOG MODAL */}
       {showInquiryModal && (
-        <div className="fixed inset-0 bg-primary/45 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-canvas border border-border/40 rounded-3 w-full max-w-[550px] shadow-2xl overflow-hidden animate-slide-up">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-canvas border border-border/40 rounded-4 w-full max-w-md max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-slide-up">
             
-            {/* Modal Header */}
-            <div className="bg-subtle/30 px-6 py-5 border-b border-border/40 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <ShoppingBag className="w-5 h-5 text-accent" />
-                <div>
-                  <h3 className="font-playfair font-bold text-base text-primary">Tư Vấn & Đặt Mua Gốm</h3>
-                  <p className="text-[11px] text-secondary/60 font-medium">Hỗ trợ chu đáo từ nghệ nhân Bát Tràng</p>
-                </div>
+            {/* Sticky Header */}
+            <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="font-playfair font-bold text-base text-primary">Tư Vấn & Đặt Mua Gốm</h3>
+                <p className="text-[11px] text-secondary">Hỗ trợ chu đáo từ nghệ nhân Bát Tràng</p>
               </div>
               <button 
-                onClick={() => setShowInquiryModal(false)} 
+                onClick={() => setShowInquiryModal(false)}
                 className="text-secondary/40 hover:text-primary font-bold text-sm bg-canvas border border-border/40 w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
               >
-                &times;
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-6">
-              {submitSuccess ? (
-                <div className="text-center py-8 flex flex-col items-center gap-4 animate-fade-in">
-                  <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center text-success">
-                    <Check className="w-8 h-8" />
+            {submitSuccess ? (
+              <>
+                {/* Scrollable Middle (Success) */}
+                <div className="flex-1 overflow-y-auto px-5 py-4">
+                  {/* Success indicator inline */}
+                  <div className="flex items-center gap-2 mb-3 text-emerald-600">
+                    <Check className="w-5 h-5 shrink-0" />
+                    <span className="font-playfair font-bold text-base text-primary">Đã nhận thông tin</span>
                   </div>
-                  <h3 className="font-playfair text-xl font-bold text-primary">Gửi thành công!</h3>
-                  <p className="text-sm text-secondary max-w-sm">
-                    Cám ơn tấm chân tình của bạn. Yêu cầu đặt mua cốc <strong>{product.name}</strong> {product.colorName && `(Màu: ${product.colorName})`} đã được gửi thành công. Đội ngũ Cốc Nối sẽ liên hệ trực tiếp cho bạn trong vòng 2 giờ.
+                  
+                  <p className="font-bvp text-sm text-secondary mb-1">
+                    Cốc Nối liên hệ xác nhận đơn trong 2 giờ.
                   </p>
+                  <p className="font-bvp text-xs text-secondary/80 mb-4 font-normal text-left">
+                    Sản phẩm: <span className="font-semibold text-primary">{product.name}</span> {product.colorName && `(${product.colorName})`}
+                  </p>
+
+                  {/* Payment block compact */}
+                  {process.env.NEXT_PUBLIC_ENABLE_CART !== "true" && paymentInfo && (
+                    <PaymentInstructionsBlock paymentInfo={paymentInfo} selectedMethod={paymentMethod} />
+                  )}
+                </div>
+
+                {/* Sticky Footer (Success) */}
+                <div className="px-5 py-3 border-t border-border/60 shrink-0">
                   <button 
-                    onClick={() => setShowInquiryModal(false)}
-                    className="bg-primary text-canvas font-bold text-xs px-6 py-3 rounded-2 hover:bg-accent transition-colors mt-4 cursor-pointer uppercase tracking-wider"
+                    onClick={() => setShowInquiryModal(false)} 
+                    className="w-full px-6 py-2.5 rounded-3 bg-primary text-canvas font-semibold text-sm hover:bg-accent transition-colors cursor-pointer uppercase tracking-wider"
                   >
                     Đóng cửa sổ
                   </button>
                 </div>
-              ) : (
-                <form onSubmit={handleInquirySubmit} className="flex flex-col gap-4">
+              </>
+            ) : (
+              <form onSubmit={handleInquirySubmit} id="inquiry-form" className="flex-grow flex flex-col overflow-hidden">
+                {/* Scrollable Middle (Form) */}
+                <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
                   
                   {/* Selected product tag */}
-                  <div className="flex items-center gap-4 bg-subtle/20 border border-border/40 p-3.5 rounded-2">
-                    <div className="w-14 h-14 rounded-2 bg-white border border-border/40 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="flex items-center gap-4 bg-subtle/20 border border-border/40 p-3 rounded-2">
+                    <div className="w-12 h-12 rounded-2 bg-white border border-border/40 flex items-center justify-center overflow-hidden shrink-0">
                       <img src={imgUrls[0]} alt={product.name} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex-grow">
-                      <span className="text-[10px] text-secondary/60 uppercase tracking-wider block">Yêu cầu sản phẩm</span>
-                      <h4 className="font-playfair font-bold text-sm text-primary">{product.name}</h4>
-                      <span className="text-xs font-bold text-accent">
-                        {displayPrice.toLocaleString('vi-VN')} đ / cốc
-                      </span>
-                      {product.colorName && (
-                        <span className="text-[10px] bg-accent/10 text-accent px-1.5 py-0.5 rounded font-bold ml-2">
-                          Màu: {product.colorName}
+                    <div className="flex-grow text-left">
+                      <span className="text-[9px] text-secondary/60 uppercase tracking-wider block">Yêu cầu sản phẩm</span>
+                      <h4 className="font-playfair font-bold text-sm text-primary leading-tight">{product.name}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs font-bold text-accent">
+                          {displayPrice.toLocaleString('vi-VN')} đ / cốc
                         </span>
-                      )}
+                        {product.colorName && (
+                          <span className="text-[9px] bg-accent/10 text-accent px-1.5 py-0.5 rounded font-bold">
+                            Màu: {product.colorName}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {submitError && (
-                    <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-2 text-xs flex items-center gap-2 font-semibold">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{submitError}</span>
-                    </div>
+                    <FormErrorAlert error={submitError} onRetry={handleInquirySubmit} />
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
+                    <div className="text-left">
                       <label className="text-xs font-bold text-secondary mb-1.5 block">Họ và tên *</label>
                       <input 
                         type="text" 
@@ -607,7 +660,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                         required
                       />
                     </div>
-                    <div>
+                    <div className="text-left">
                       <label className="text-xs font-bold text-secondary mb-1.5 block">Số điện thoại *</label>
                       <input 
                         type="tel" 
@@ -621,7 +674,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                     </div>
                   </div>
 
-                  <div>
+                  <div className="text-left">
                     <label className="text-xs font-bold text-secondary mb-1.5 block">Email liên hệ (Không bắt buộc)</label>
                     <input 
                       type="email" 
@@ -633,7 +686,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                   </div>
 
                   <div className="grid grid-cols-12 gap-4 items-end">
-                    <div className="col-span-8">
+                    <div className="col-span-8 text-left">
                       <label className="text-xs font-bold text-secondary mb-1.5 block">Địa chỉ nhận hàng (Không bắt buộc)</label>
                       <input 
                         type="text" 
@@ -643,8 +696,8 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                         className="w-full text-xs bg-canvas border border-border/80 px-3.5 py-2.5 rounded-2 text-primary focus:outline-none focus:border-accent"
                       />
                     </div>
-                    <div className="col-span-4">
-                      <label className="text-xs font-bold text-secondary mb-1.5 block">Số lượng chiếc *</label>
+                    <div className="col-span-4 text-left">
+                      <label className="text-xs font-bold text-secondary mb-1.5 block">Số lượng *</label>
                       <input 
                         type="number" 
                         min="1"
@@ -657,11 +710,45 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                   </div>
 
                   {/* Realtime price estimation */}
-                  <div className="text-right text-xs text-secondary/60 mt-1 font-medium">
+                  <div className="text-right text-xs text-secondary/60 font-medium">
                     Giá trị dự kiến: <strong className="text-primary font-bold">{(displayPrice * quantity).toLocaleString('vi-VN')} đ</strong>
                   </div>
 
-                  <div>
+                  <div className="flex flex-col gap-3 text-left">
+                    <label className="text-xs font-bold text-secondary">Phương thức thanh toán <span className="text-rose-500">*</span></label>
+                    <div className="flex flex-col gap-2">
+                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="bank_transfer" 
+                          checked={paymentMethod === "bank_transfer"} 
+                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                          className="mt-1 accent-accent"
+                        />
+                        <div className="text-left font-bvp">
+                          <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
+                          <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
+                        </div>
+                      </label>
+                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="cod" 
+                          checked={paymentMethod === "cod"} 
+                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                          className="mt-1 accent-accent"
+                        />
+                        <div className="text-left font-bvp">
+                          <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
+                          <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="text-left">
                     <label className="text-xs font-bold text-secondary mb-1.5 block">Lời nhắn gửi xưởng</label>
                     <textarea 
                       placeholder="Ghi chú đóng gói quà tặng, lời chúc thư tay hoặc màu men yêu cầu..."
@@ -671,36 +758,37 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                     />
                   </div>
 
-                  <div className="flex gap-3 justify-end border-t border-border/30 pt-4 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowInquiryModal(false)}
-                      className="text-xs font-bold px-4.5 py-2.5 border border-border/60 rounded-2 text-secondary hover:text-accent hover:bg-subtle/20 transition-colors cursor-pointer"
-                    >
-                      Hủy bỏ
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="bg-accent hover:bg-accent-hover disabled:bg-accent/40 text-canvas font-bold text-xs px-6 py-2.5 rounded-2 transition-colors flex items-center gap-1.5 cursor-pointer uppercase tracking-wider"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <span className="w-3.5 h-3.5 border-2 border-canvas border-t-transparent rounded-full animate-spin"></span>
-                          <span>Đang gửi...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-3.5 h-3.5" />
-                          <span>Gửi yêu cầu ngay</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+                </div>
 
-                </form>
-              )}
-            </div>
+                {/* Sticky Footer (Form) */}
+                <div className="px-5 py-3 border-t border-border/60 shrink-0 flex gap-3 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowInquiryModal(false)}
+                    className="text-xs font-bold px-4.5 py-2.5 border border-border/60 rounded-2 text-secondary hover:text-accent hover:bg-subtle/20 transition-colors cursor-pointer"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-accent hover:bg-accent-hover disabled:bg-accent/40 text-canvas font-bold text-xs px-6 py-2.5 rounded-2 transition-colors flex items-center gap-1.5 cursor-pointer uppercase tracking-wider"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-canvas border-t-transparent rounded-full animate-spin"></span>
+                        <span>Đang gửi...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Gửi yêu cầu ngay</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
 
           </div>
         </div>

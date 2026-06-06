@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { verifyOrderAction, submitReviewAction } from "@/lib/actions/review.actions";
 import { Star, CheckCircle2, AlertCircle, Loader2, ArrowRight, ShieldAlert, Sparkles } from "lucide-react";
+import { parseError, type FriendlyError } from "@/lib/utils/error-messages";
+import FormErrorAlert from "@/components/shared/FormErrorAlert";
 
 interface ReviewSectionProps {
   productId: string; // The active product ID on this detail page
@@ -14,7 +16,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
   const [verifying, setVerifying] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<FriendlyError | null>(null);
 
   // Verified state
   const [verifiedOrder, setVerifiedOrder] = useState<{
@@ -34,7 +36,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
     if (!orderIdInput.trim()) return;
 
     setVerifying(true);
-    setError("");
+    setError(null);
 
     try {
       const res = await verifyOrderAction(orderIdInput.trim());
@@ -49,11 +51,11 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
           setSelectedProductId(res.data.items[0].productId);
         }
       } else {
-        setError(res.error || "Không thể xác minh đơn hàng. Vui lòng kiểm tra lại mã đơn hàng.");
+        setError({ category: "validation", message: res.error || "Không thể xác minh đơn hàng. Vui lòng kiểm tra lại mã đơn hàng.", showRetryButton: false, showReloadButton: false });
       }
     } catch (err) {
       console.error(err);
-      setError("Gặp sự cố kết nối khi xác minh đơn hàng.");
+      setError(parseError(err));
     } finally {
       setVerifying(false);
     }
@@ -64,7 +66,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
     if (!verifiedOrder) return;
 
     setSubmitting(true);
-    setError("");
+    setError(null);
 
     try {
       const res = await submitReviewAction({
@@ -78,11 +80,11 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
       if (res.success) {
         setSuccess(true);
       } else {
-        setError(res.error || "Gửi đánh giá thất bại.");
+        setError({ category: "unknown", message: res.error || "Gửi đánh giá thất bại.", showRetryButton: true, showReloadButton: false });
       }
     } catch (err) {
       console.error(err);
-      setError("Gặp sự cố kết nối khi gửi đánh giá.");
+      setError(parseError(err));
     } finally {
       setSubmitting(false);
     }
@@ -103,6 +105,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
             setOrderIdInput("");
             setComment("");
             setRating(5);
+            setError(null);
           }}
           className="bg-primary text-canvas font-bvp font-medium text-xs px-6 py-3 rounded-2 hover:bg-[#0E1220] transition-colors"
         >
@@ -122,9 +125,11 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2 flex items-start gap-3 mb-6 text-xs font-bvp leading-relaxed animate-fade-in">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{error}</span>
+        <div className="mb-6">
+          <FormErrorAlert 
+            error={error} 
+            onRetry={!verifiedOrder ? () => handleVerifyOrder({ preventDefault: () => {} } as any) : () => handleSubmitReview({ preventDefault: () => {} } as any)} 
+          />
         </div>
       )}
 
@@ -255,7 +260,10 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
           <div className="flex gap-4 items-center justify-between border-t border-border/40 pt-4 mt-2">
             <button
               type="button"
-              onClick={() => setVerifiedOrder(null)}
+              onClick={() => {
+                setVerifiedOrder(null);
+                setError(null);
+              }}
               className="font-bvp font-medium text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
             >
               Quay lại xác minh

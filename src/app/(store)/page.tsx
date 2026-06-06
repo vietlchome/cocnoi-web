@@ -57,7 +57,7 @@ export default async function StoreHome() {
       const manualIds = config.products.manualProductIds || [];
       if (manualIds.length > 0) {
         sortedProducts = manualIds
-          .map(id => dbProducts.find(p => p.id === id))
+          .map(id => dbProducts.find((p: any) => p.id === id))
           .filter((p): p is typeof dbProducts[number] => !!p);
       } else {
         sortedProducts = dbProducts.slice(0, 8);

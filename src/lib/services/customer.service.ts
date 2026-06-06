@@ -280,7 +280,7 @@ export class CustomerService {
     let paidAmount = 0;
     let debtAmount = 0;
 
-    orders.forEach((o) => {
+    orders.forEach((o: any) => {
       totalAmount += o.totalAmount;
       paidAmount += o.paidAmount;
       debtAmount += o.debtAmount;

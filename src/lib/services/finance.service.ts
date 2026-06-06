@@ -95,7 +95,7 @@ export class FinanceService {
     let activeDebtOrdersCount = 0;
     let clearedDebtOrdersCount = 0;
 
-    b2bOrders.forEach((o) => {
+    b2bOrders.forEach((o: any) => {
       totalB2BAmount += o.totalAmount;
       totalB2BPaid += o.paidAmount;
       totalB2BDebt += o.debtAmount;
@@ -152,12 +152,12 @@ export class FinanceService {
     });
 
     // 2. Tính toán tổng hợp dư nợ trên từng khách hàng
-    const formattedCustomers = customersWithDebt.map((c) => {
+    const formattedCustomers = customersWithDebt.map((c: any) => {
       let totalAmount = 0;
       let paidAmount = 0;
       let debtAmount = 0;
 
-      c.orders.forEach((o) => {
+      c.orders.forEach((o: any) => {
         totalAmount += o.totalAmount;
         paidAmount += o.paidAmount;
         debtAmount += o.debtAmount;
@@ -180,7 +180,7 @@ export class FinanceService {
     });
 
     // 3. Sắp xếp khách hàng có dư nợ nhiều nhất lên đầu
-    formattedCustomers.sort((a, b) => b.debtSummary.debtAmount - a.debtSummary.debtAmount);
+    formattedCustomers.sort((a: any, b: any) => b.debtSummary.debtAmount - a.debtSummary.debtAmount);
 
     // 4. Phân trang thủ công mảng đã sắp xếp
     const paginatedData = formattedCustomers.slice(skip, skip + pageSize);
