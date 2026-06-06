@@ -9,6 +9,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/nguoi-noi",
+        destination: "/community/nguoi-noi",
+        permanent: true,
+      },
+      {
+        source: "/community",
+        destination: "/community/nguoi-noi",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

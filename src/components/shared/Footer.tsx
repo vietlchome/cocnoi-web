@@ -181,13 +181,16 @@ export default function Footer({ config }: FooterProps) {
           </h4>
           <ul className="flex flex-col gap-3 font-bvp text-sm text-secondary" style={{ color: "var(--color-dark-brown)" }}>
             <li>
-              <Link href="/discover#story" className="hover:text-accent transition-colors">Câu chuyện thương hiệu</Link>
+              <Link href="/discover/our-story" className="hover:text-accent transition-colors">Câu chuyện thương hiệu</Link>
             </li>
             <li>
-              <Link href="/nguoi-noi" className="hover:text-accent transition-colors">Chiến dịch Người Nối</Link>
+              <Link href="/community/nguoi-noi" className="hover:text-accent transition-colors">Chiến dịch Người Nối</Link>
             </li>
             <li>
-              <Link href="/discover#process" className="hover:text-accent transition-colors">Quy trình sản xuất</Link>
+              <Link href="/discover/our-craft" className="hover:text-accent transition-colors">Quy trình thủ công</Link>
+            </li>
+            <li>
+              <Link href="/discover/our-values" className="hover:text-accent transition-colors">Giá trị cốt lõi</Link>
             </li>
             <li>
               <Link href="/journal" className="hover:text-accent transition-colors">Hành trình & Blog</Link>

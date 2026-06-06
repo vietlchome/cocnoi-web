@@ -138,6 +138,20 @@ export const SiteConfigSchema = z.object({
       key: z.enum(["hero", "campaign", "products", "story", "trust_badges", "faq"]),
       visible: booleanValidator,
     })),
+  }),
+  our_values: z.object({
+    heroTagline: textValidator,
+    heroTitle: textValidator,
+    heroSubtitle: textValidator,
+    pillars: z.array(z.object({
+      name: textValidator,
+      role: textValidator,
+      question: textValidator,
+      body: textValidator,
+      image: imageValidator,
+    })),
+    closingTitle: textValidator,
+    closingBody: textValidator,
   })
 });
 

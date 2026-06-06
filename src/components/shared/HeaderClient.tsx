@@ -23,6 +23,16 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
   const pathname = usePathname();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const isLinkActive = (linkUrl: string) => {
+    if (pathname === linkUrl) return true;
+    const linkParts = linkUrl.split('/').filter(Boolean);
+    const pathParts = pathname.split('/').filter(Boolean);
+    if (linkParts.length > 0 && pathParts.length > 0) {
+      return linkParts[0] === pathParts[0];
+    }
+    return false;
+  };
+
   // Global search keyboard shortcuts
   useEffect(() => {
     const handleGlobalSearchShortcut = (e: KeyboardEvent) => {
@@ -91,14 +101,14 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
       { name: "Tất cả sản phẩm", href: "/shop" },
     ],
     "CỘNG ĐỒNG": [
-      { name: "Nhân sự Cốc Nối", href: "/nguoi-noi#team" },
-      { name: "Đối tác & Khách hàng", href: "/nguoi-noi#partners" },
-      { name: "Người Nối - Unsung heroes", href: "/nguoi-noi#unsung-heroes" },
+      { name: "Người Nối", href: "/community/nguoi-noi" },
+      { name: "#cocnoiwithyou", href: "/community/your-stories" },
     ],
     "KHÁM PHÁ": [
-      { name: "Câu chuyện Cốc Nối", href: "/discover#story" },
-      { name: "Quy trình thủ công", href: "/discover#process" },
-      { name: "Giá trị cốt lõi", href: "/discover#values" },
+      { name: "Câu chuyện", href: "/discover/our-story" },
+      { name: "Con người", href: "/discover/our-human" },
+      { name: "Quy trình thủ công", href: "/discover/our-craft" },
+      { name: "Giá trị", href: "/discover/our-values" },
     ],
     "ĐỐI TÁC": [
       { name: "Quà tặng doanh nghiệp", href: "/partners#corporate" },
@@ -152,13 +162,13 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
                   <Link 
                     href={link.link}
                     className={`font-bvp text-sm font-medium tracking-wide flex items-center gap-1 py-1 border-b-2 transition-all duration-300 ${
-                      pathname === link.link || pathname.startsWith(link.link)
+                      isLinkActive(link.link)
                         ? "border-accent text-accent animate-fade-in"
                         : "border-transparent text-primary hover:text-accent hover:border-accent/40"
                     }`}
                     style={{ 
-                      color: pathname === link.link || pathname.startsWith(link.link) ? "var(--color-terracotta)" : "var(--color-deep-indigo)",
-                      borderBottomColor: pathname === link.link || pathname.startsWith(link.link) ? "var(--color-terracotta)" : "transparent"
+                      color: isLinkActive(link.link) ? "var(--color-terracotta)" : "var(--color-deep-indigo)",
+                      borderBottomColor: isLinkActive(link.link) ? "var(--color-terracotta)" : "transparent"
                     }}
                   >
                     {link.title}
