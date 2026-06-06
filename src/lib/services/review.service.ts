@@ -64,7 +64,7 @@ export class ReviewService {
       },
     });
 
-    return orders.map((order) => {
+    return orders.map((order: any) => {
       // Tìm sản phẩm có tổng tiền cao nhất trong đơn hàng để đại diện đánh giá
       let highestValueItem = order.items[0];
       let maxTotal = -1;
@@ -90,8 +90,8 @@ export class ReviewService {
           quantity: highestValueItem.quantity,
           totalPrice: highestValueItem.priceAtPurchase * highestValueItem.quantity,
         } : null,
-        totalItemsCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
-        itemsSummary: order.items.map(i => i.product.name).join(", "),
+        totalItemsCount: order.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+        itemsSummary: order.items.map((i: any) => i.product.name).join(", "),
         customerName: (() => {
           try {
             const parsed = JSON.parse(order.shippingAddress);
@@ -157,7 +157,7 @@ export class ReviewService {
           return "Khách mua lẻ";
         }
       })() : "Khách mua lẻ",
-      items: order.items.map((item) => ({
+      items: order.items.map((item: any) => ({
         productId: item.productId,
         name: item.product.name,
         slug: item.product.slug,
@@ -177,7 +177,7 @@ export class ReviewService {
     }
 
     // Double check eligibility inside a database transaction to prevent race conditions
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
         include: { review: true, items: true },
@@ -197,7 +197,7 @@ export class ReviewService {
       }
 
       // Check if product actually belongs to the order
-      const hasProduct = order.items.some((item) => item.productId === productId);
+      const hasProduct = order.items.some((item: any) => item.productId === productId);
       if (!hasProduct) {
         throw new Error("Sản phẩm được chọn không nằm trong đơn hàng này.");
       }

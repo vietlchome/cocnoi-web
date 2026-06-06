@@ -82,7 +82,7 @@ export class InquiryService {
       throw new Error('Số điện thoại là bắt buộc để capture lead sỉ!');
     }
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       // 1. Lưu khách hàng CRM nháp (B2B_LEAD)
       const customer = await CustomerService.getOrCreateCustomer({
         name: data.customerName || 'Lead Vãng Lai',
@@ -226,7 +226,7 @@ export class InquiryService {
       throw new Error('Yêu cầu tư vấn đã chuyển thành hợp đồng thành công, không được sửa trạng thái!');
     }
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const updated = await tx.orderInquiry.update({
         where: { id },
         data: { status: status as InquiryStatus },
@@ -264,7 +264,7 @@ export class InquiryService {
     discount?: number;
     paidAmount?: number;
   }) {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       // 1. Kiểm tra tồn tại và hợp lệ của Inquiry
       const inquiry = await tx.orderInquiry.findUnique({
         where: { id: data.inquiryId },

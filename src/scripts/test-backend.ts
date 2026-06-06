@@ -96,7 +96,7 @@ async function runB2BIntegrationTest() {
     console.log(`  - CRM Tier Upgrade: ${updatedCustomer?.customerType === CustomerType.B2B_WHOLESALE ? "✓ Đạt yêu cầu (Từ Lead B2B -> B2B Wholesale)" : "✗ Lỗi nâng hạng!"}`);
     
     // b. Kiểm tra nhật ký chăm sóc tự động
-    const hasCrmNote = updatedCustomer?.notes.some(n => n.content.includes("CRM Inquiry: Đã chuyển đổi yêu cầu đặt gốm"));
+    const hasCrmNote = updatedCustomer?.notes.some((n: any) => n.content.includes("CRM Inquiry: Đã chuyển đổi yêu cầu đặt gốm"));
     console.log(`  - Tự động ghi nhật ký CRM: ${hasCrmNote ? "✓ Đạt yêu cầu (Ghi chép đầy đủ lịch sử giao dịch)" : "✗ Thiếu nhật ký!"}`);
 
     // c. Kiểm tra trừ kho
@@ -116,7 +116,7 @@ async function runB2BIntegrationTest() {
       where: { id: leadCustomer.id },
       include: { notes: true },
     });
-    console.log(`  - Dư nợ CRM hiện tại của đối tác: ${finalCustomerState?.notes.some(n => n.content.includes("CRM Finance: Thu nợ sỉ")) ? "✓ Hoàn tất ghi sổ nợ" : "✗ Thiếu nhật ký CRM thu nợ!"}`);
+    console.log(`  - Dư nợ CRM hiện tại của đối tác: ${finalCustomerState?.notes.some((n: any) => n.content.includes("CRM Finance: Thu nợ sỉ")) ? "✓ Hoàn tất ghi sổ nợ" : "✗ Thiếu nhật ký CRM thu nợ!"}`);
 
     console.log("\n=========================================================");
     console.log("🎉 CHƯƠNG TRÌNH KIỂM THỬ BACKEND B2B THÀNH CÔNG 100%!");

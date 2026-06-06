@@ -8,7 +8,7 @@ export class SettingsService {
     const settings = await prisma.themeSetting.findMany();
     const settingsMap: Record<string, string> = {};
 
-    settings.forEach((s) => {
+    settings.forEach((s: any) => {
       // ThemeSetting lưu value ở dạng string (có thể là JSON string, url, text, hex code)
       settingsMap[s.key] = s.value;
     });

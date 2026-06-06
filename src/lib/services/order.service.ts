@@ -58,7 +58,7 @@ export class OrderService {
     paymentMethod: 'COD' | 'QR';
     items: { productId: string; quantity: number }[];
   }) {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       // 1. Xác thực giá phía Server (Anti-Spoofing)
       const { verifiedItems, subtotal } = await this.verifyPrices(data.items, tx);
       const shippingFee = this.calculateShippingFee(subtotal);
@@ -141,7 +141,7 @@ export class OrderService {
       originalPrice: number;
     }[];
   }) {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       // 1. Tính toán giá trị đơn hàng B2B
       let subtotal = 0;
       data.items.forEach((item) => {
@@ -317,7 +317,7 @@ export class OrderService {
    * Hủy đơn hàng và hoàn trả lại số lượng tồn kho tự động
    */
   static async cancelOrder(id: string) {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       const order = await tx.order.findUnique({
         where: { id },
         include: {
