@@ -19,6 +19,29 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
       console.warn(`Schema mismatch ${fieldKey}: expected array, got ${typeof v}. Using default.`);
       // KHÔNG return — fall through
     } else {
+      // Backward compat: fill missing sub-keys khi schema mới thêm field
+      if (fieldDef.type === 'repeatable' && isArray) {
+        const itemSchema = (fieldDef as any).itemSchema || {};
+        return v.map((item: any) => {
+          if (typeof item !== 'object' || item === null) return item;
+          const fixed = { ...item };
+          for (const [subKey, subDef] of Object.entries(itemSchema)) {
+            if (fixed[subKey] === undefined) {
+              fixed[subKey] = (subDef as any).default ?? "";
+            }
+          }
+          return fixed;
+        });
+      }
+      if (fieldDef.type === 'group' && isObject) {
+        const result: Record<string, any> = { ...v };
+        for (const [subKey, subDef] of Object.entries((fieldDef as any).fields || {})) {
+          if (result[subKey] === undefined) {
+            result[subKey] = (subDef as any).default ?? "";
+          }
+        }
+        return result;
+      }
       return v;
     }
   }
