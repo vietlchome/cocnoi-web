@@ -4,11 +4,13 @@ import { useState } from "react";
 import { getOrdersByContactAction, submitReviewAction } from "@/lib/actions/review.actions";
 import { Star, CheckCircle2, AlertCircle, Loader2, ArrowRight, PackageSearch, MessageSquare, ChevronLeft } from "lucide-react";
 import Image from "next/image";
+import { parseError, type FriendlyError } from "@/lib/utils/error-messages";
+import FormErrorAlert from "@/components/shared/FormErrorAlert";
 
 export default function OrderTrackingClient() {
   const [contactInput, setContactInput] = useState("");
   const [verifying, setVerifying] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<FriendlyError | null>(null);
   const [orders, setOrders] = useState<any[] | null>(null);
 
   // Review Flow State
@@ -20,14 +22,14 @@ export default function OrderTrackingClient() {
   const [comment, setComment] = useState("");
 
   const handleSearchOrders = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!contactInput.trim() || contactInput.trim().length < 3) {
-      setError("Vui lòng nhập chính xác số điện thoại hoặc email.");
+      setError({ category: "validation", message: "Vui lòng nhập chính xác số điện thoại hoặc email.", showRetryButton: false, showReloadButton: false });
       return;
     }
 
     setVerifying(true);
-    setError("");
+    setError(null);
     setReviewOrder(null);
     setSuccess(false);
 
@@ -36,14 +38,14 @@ export default function OrderTrackingClient() {
       if (res.success && res.data) {
         setOrders(res.data);
         if (res.data.length === 0) {
-          setError("Không tìm thấy đơn hàng nào khớp với thông tin bạn cung cấp.");
+          setError({ category: "validation", message: "Không tìm thấy đơn hàng nào khớp với thông tin bạn cung cấp.", showRetryButton: false, showReloadButton: false });
         }
       } else {
-        setError(res.error || "Gặp sự cố khi tra cứu đơn hàng.");
+        setError({ category: "unknown", message: res.error || "Gặp sự cố khi tra cứu đơn hàng.", showRetryButton: true, showReloadButton: false });
       }
     } catch (err) {
       console.error(err);
-      setError("Gặp sự cố kết nối.");
+      setError(parseError(err));
     } finally {
       setVerifying(false);
     }
@@ -58,11 +60,11 @@ export default function OrderTrackingClient() {
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!reviewOrder || !reviewOrder.highestValueItem) return;
 
     setSubmitting(true);
-    setError("");
+    setError(null);
 
     try {
       const res = await submitReviewAction({
@@ -78,11 +80,11 @@ export default function OrderTrackingClient() {
         // Cập nhật lại danh sách đơn hàng
         setOrders(prev => prev ? prev.map(o => o.orderId === reviewOrder.orderId ? { ...o, hasReview: true } : o) : null);
       } else {
-        setError(res.error || "Gửi đánh giá thất bại.");
+        setError({ category: "unknown", message: res.error || "Gửi đánh giá thất bại.", showRetryButton: true, showReloadButton: false });
       }
     } catch (err) {
       console.error(err);
-      setError("Gặp sự cố kết nối khi gửi đánh giá.");
+      setError(parseError(err));
     } finally {
       setSubmitting(false);
     }
@@ -130,9 +132,8 @@ export default function OrderTrackingClient() {
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2 flex items-start gap-3 mb-6 text-xs font-bvp leading-relaxed animate-fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="mb-6 animate-fade-in">
+            <FormErrorAlert error={error} onRetry={() => handleSubmitReview(null as any)} />
           </div>
         )}
 
@@ -247,7 +248,11 @@ export default function OrderTrackingClient() {
               {verifying ? <Loader2 className="w-4 h-4 animate-spin text-accent" /> : <span>Tìm đơn</span>}
             </button>
           </div>
-          {error && <span className="font-bvp text-xs text-error font-medium">{error}</span>}
+          {error && (
+            <div className="mt-4">
+              <FormErrorAlert error={error} onRetry={() => handleSearchOrders(null as any)} />
+            </div>
+          )}
         </form>
       </div>
 

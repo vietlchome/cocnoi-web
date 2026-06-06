@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { parseError, type FriendlyError } from "@/lib/utils/error-messages";
+import FormErrorAlert from "@/components/shared/FormErrorAlert";
 
 export default function ContactPage() {
   const [themeConfig, setThemeConfig] = useState<any>(null);
@@ -31,17 +33,17 @@ export default function ContactPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<FriendlyError | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!name || !email || !message) {
-      setError("Vui lòng điền đầy đủ các trường bắt buộc.");
+      setError({ category: "validation", message: "Vui lòng điền đầy đủ các trường bắt buộc.", showRetryButton: false, showReloadButton: false });
       return;
     }
 
     setSubmitting(true);
-    setError("");
+    setError(null);
 
     try {
       const res = await fetch("/api/contact", {
@@ -58,10 +60,10 @@ export default function ContactPage() {
         setMessage("");
       } else {
         const err = await res.json();
-        setError(err.error || "Gửi liên hệ thất bại. Vui lòng thử lại.");
+        setError({ category: "unknown", message: err.error || "Gửi liên hệ thất bại. Vui lòng thử lại.", showRetryButton: true, showReloadButton: false });
       }
     } catch (err) {
-      setError("Lỗi kết nối. Vui lòng kiểm tra lại mạng.");
+      setError(parseError(err));
     } finally {
       setSubmitting(false);
     }
@@ -153,9 +155,8 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="flex flex-col gap-5 font-bvp">
                 
                 {error && (
-                  <div className="bg-brick/10 border border-brick/30 text-brick p-3.5 rounded-2 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{error}</span>
+                  <div className="mb-6">
+                    <FormErrorAlert error={error} onRetry={() => handleSubmit(null as any)} />
                   </div>
                 )}
 

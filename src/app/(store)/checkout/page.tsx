@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { ShoppingBag, ArrowLeft, Check, AlertCircle, Sparkles, CreditCard, Truck, Clock } from 'lucide-react'
 import { useCartStore } from '@/store/cart.store'
 import { createRetailOrder } from '@/lib/actions/order.actions'
+import { parseError, type FriendlyError } from '@/lib/utils/error-messages'
+import FormErrorAlert from '@/components/shared/FormErrorAlert'
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCartStore()
@@ -21,7 +23,7 @@ export default function CheckoutPage() {
   
   // UI states
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<FriendlyError | null>(null)
   const [successOrder, setSuccessOrder] = useState<any>(null)
 
   useEffect(() => {
@@ -36,26 +38,52 @@ export default function CheckoutPage() {
     )
   }
 
+  if (process.env.NEXT_PUBLIC_ENABLE_CART !== "true") {
+    return (
+      <div className="w-full min-h-screen bg-canvas py-20 font-bvp text-secondary flex items-center justify-center select-none">
+        <div className="max-w-[650px] w-full mx-auto px-4 text-center">
+          <div className="bg-white border border-border/40 rounded-3 shadow-md p-8 md:p-12 flex flex-col items-center gap-6 relative">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-accent" style={{ backgroundColor: "var(--color-terracotta)" }} />
+            <div className="w-16 h-16 rounded-full bg-accent/5 flex items-center justify-center text-accent" style={{ color: "var(--color-terracotta)" }}>
+              <ShoppingBag className="w-8 h-8" />
+            </div>
+            <h1 className="font-playfair font-bold text-2xl md:text-3xl text-primary">Đặt hàng qua tư vấn</h1>
+            <p className="text-xs md:text-sm text-secondary/70 leading-relaxed max-w-md mx-auto">
+              Cốc Nối hiện nhận đơn hàng thông qua hình thức tư vấn để hỗ trợ chu đáo nhất. Vui lòng chọn sản phẩm trong cửa hàng và nhấn Đặt hàng để gửi yêu cầu.
+            </p>
+            <Link
+              href="/shop"
+              style={{ backgroundColor: "var(--color-deep-indigo)" }}
+              className="bg-primary hover:bg-opacity-90 text-canvas text-xs font-bold px-8 py-4 rounded-2 shadow-md uppercase tracking-wider transition-colors"
+            >
+              Vào cửa hàng
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Cart math
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   const shippingFee = subtotal >= 1000000 ? 0 : 30000
   const totalAmount = subtotal + shippingFee
   const hasPreOrder = items.some((item) => item.isPreOrder)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!customerName || !phone || !address) {
-      setError('Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ nhận hàng.')
+      setError({ category: "validation", message: "Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ nhận hàng.", showRetryButton: false, showReloadButton: false })
       return
     }
 
     if (items.length === 0) {
-      setError('Giỏ hàng của bạn đang trống. Vui lòng quay lại cửa hàng để chọn sản phẩm.')
+      setError({ category: "validation", message: "Giỏ hàng của bạn đang trống. Vui lòng quay lại cửa hàng để chọn sản phẩm.", showRetryButton: false, showReloadButton: false })
       return
     }
 
     setIsSubmitting(true)
-    setError('')
+    setError(null)
 
     try {
       const formattedItems = items.map(item => ({
@@ -77,10 +105,10 @@ export default function CheckoutPage() {
         setSuccessOrder(result.data)
         clearCart()
       } else {
-        setError(result.error || 'Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.')
+        setError({ category: "unknown", message: result.error || 'Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.', showRetryButton: true, showReloadButton: false })
       }
     } catch (err: any) {
-      setError('Lỗi kết nối máy chủ. Vui lòng kiểm tra lại mạng.')
+      setError(parseError(err))
     } finally {
       setIsSubmitting(false)
     }
@@ -286,9 +314,8 @@ export default function CheckoutPage() {
               </h2>
 
               {error && (
-                <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-2 text-xs flex items-center gap-2 font-semibold">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{error}</span>
+                <div className="mb-6">
+                  <FormErrorAlert error={error} onRetry={handleSubmit} />
                 </div>
               )}
 

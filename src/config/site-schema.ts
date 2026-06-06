@@ -540,5 +540,53 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         helpText: "Để trống = dùng contact.phone mặc định"
       }
     }
+  },
+  payment_info: {
+    label: "Hướng dẫn thanh toán (Inquiry Success)",
+    fields: {
+      showQr: { 
+        type: "boolean", 
+        label: "Hiển thị QR chuyển khoản", 
+        default: true 
+      },
+      qrImage: { 
+        type: "image", 
+        label: "Ảnh QR chuyển khoản", 
+        default: "", 
+        aspectRatio: 1,
+        folder: "theme/payment",
+        helpText: "Ảnh QR ngân hàng (VietQR sinh từ ngân hàng Vietcombank/Techcombank/MB...)"
+      },
+      bankName: { 
+        type: "text", 
+        label: "Tên ngân hàng", 
+        default: "Vietcombank (VCB)" 
+      },
+      accountNumber: { 
+        type: "text", 
+        label: "Số tài khoản", 
+        default: "1234567890" 
+      },
+      accountHolder: { 
+        type: "text", 
+        label: "Tên chủ tài khoản", 
+        default: "NGUYEN VAN A" 
+      },
+      transferNote: { 
+        type: "text", 
+        label: "Nội dung CK gợi ý", 
+        default: "COC NOI [Tên khách] [SĐT]" 
+      },
+      codAvailable: { 
+        type: "boolean", 
+        label: "Có hỗ trợ COD", 
+        default: true 
+      },
+      codNote: { 
+        type: "textarea", 
+        label: "Ghi chú COD", 
+        default: "COD miễn phí Hà Nội. Tỉnh khác phụ phí theo cước vận chuyển." 
+      }
+    }
   }
 };

@@ -121,10 +121,10 @@ export async function getFilteredPromotionOptions(categoryIds: string[], collect
     return {
       success: true,
       data: {
-        categoryIds: Array.from(new Set(products.map(p => p.categoryId).filter(Boolean))),
-        collectionIds: Array.from(new Set(products.map(p => p.productGroupId).filter(Boolean))),
-        sizeIds: Array.from(new Set(products.map(p => p.sizeId).filter(Boolean))),
-        colorIds: Array.from(new Set(products.map(p => p.colorId).filter(Boolean))),
+        categoryIds: Array.from(new Set(products.map((p: any) => p.categoryId).filter(Boolean))),
+        collectionIds: Array.from(new Set(products.map((p: any) => p.productGroupId).filter(Boolean))),
+        sizeIds: Array.from(new Set(products.map((p: any) => p.sizeId).filter(Boolean))),
+        colorIds: Array.from(new Set(products.map((p: any) => p.colorId).filter(Boolean))),
       }
     };
   } catch (error) {

@@ -29,7 +29,7 @@ export default async function JournalPage() {
     tag: string;
   }
 
-  const dbArticles: Article[] = posts.map((p) => ({
+  const dbArticles: Article[] = posts.map((p: any) => ({
     id: p.id,
     slug: p.slug,
     title: p.title,

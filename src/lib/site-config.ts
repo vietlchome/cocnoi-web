@@ -116,7 +116,7 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
     const groupValue: Record<string, any> = { ...(fieldDef.default ?? {}) };
     for (const [subKey, subDef] of Object.entries(fieldDef.fields)) {
       // Nếu sub-field có aliases, đọc từ flat key cũ (ghi đè default nếu có cấu hình thực tế)
-      let foundAliasVal = undefined;
+      let foundAliasVal: any = undefined;
       if ((subDef as any).aliases) {
         for (const alias of (subDef as any).aliases) {
           if (dbSettings[alias] !== undefined && dbSettings[alias] !== '') {
@@ -152,7 +152,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   for (const [sectionName, sectionDef] of Object.entries(SITE_SCHEMA)) {
     config[sectionName] = {};
     
-    let sectionBlob = null;
+    let sectionBlob: any = null;
     const blobKey = `section.${sectionName}`;
     if (dbSettings[blobKey]) {
       try {
@@ -202,7 +202,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 
     // Custom backward compatibility for social legacy keys
     if (sectionName === 'social' && (!sectionBlob || !sectionBlob.links)) {
-      const legacySocial = [];
+      const legacySocial: any[] = [];
       if (dbSettings.contact_facebook) {
         legacySocial.push({ platform: "facebook", url: dbSettings.contact_facebook, visible: true });
       }

@@ -17,7 +17,7 @@ export class OrderService {
    */
   static async verifyPrices(items: { productId: string; quantity: number }[], tx?: any) {
     const client = tx || prisma;
-    const verifiedItems = [];
+    const verifiedItems: any[] = [];
     let subtotal = 0;
 
     for (const item of items) {

@@ -41,7 +41,7 @@ export default async function AdminCustomersPage() {
   })
 
   // Đảm bảo kiểu dữ liệu an toàn
-  const products = dbProducts.map((p) => ({
+  const products = dbProducts.map((p: any) => ({
     id: p.id,
     sku: p.sku || null,
     name: p.name,

@@ -40,7 +40,7 @@ export default async function Header({ config }: HeaderProps) {
     const groups = await prisma.productGroup.findMany({
       select: { name: true }
     });
-    dbCollections = groups.map((g) => g.name);
+    dbCollections = groups.map((g: any) => g.name);
   } catch (e) {
     console.error("Loi khi lay collections tu DB cho Header:", e);
   }

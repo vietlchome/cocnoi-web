@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { createInquiry } from "@/lib/actions/inquiry.actions";
 import { ArrowRight, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { parseError, type FriendlyError } from "@/lib/utils/error-messages";
+import FormErrorAlert from "@/components/shared/FormErrorAlert";
 
 export default function PartnerContactForm() {
   const [customerName, setCustomerName] = useState("");
@@ -13,20 +15,20 @@ export default function PartnerContactForm() {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<FriendlyError | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
-    setError("");
+    setError(null);
 
     if (!customerName.trim()) {
-      setError("Họ và tên người liên hệ không được trống.");
+      setError({ category: "validation", message: "Họ và tên người liên hệ không được trống.", showRetryButton: false, showReloadButton: false });
       setLoading(false);
       return;
     }
     if (phone.trim().length < 8) {
-      setError("Số điện thoại không hợp lệ (tối thiểu 8 ký tự).");
+      setError({ category: "validation", message: "Số điện thoại không hợp lệ (tối thiểu 8 ký tự).", showRetryButton: false, showReloadButton: false });
       setLoading(false);
       return;
     }
@@ -46,11 +48,11 @@ export default function PartnerContactForm() {
       if (response.success) {
         setSuccess(true);
       } else {
-        setError(response.error || "Gặp sự cố khi gửi thông tin.");
+        setError({ category: "unknown", message: response.error || "Gặp sự cố khi gửi thông tin.", showRetryButton: true, showReloadButton: false });
       }
     } catch (err) {
       console.error(err);
-      setError("Gặp lỗi kết nối máy chủ. Xin vui lòng thử lại.");
+      setError(parseError(err));
     } finally {
       setLoading(false);
     }
@@ -73,6 +75,7 @@ export default function PartnerContactForm() {
             setCompanyName("");
             setQuantity(50);
             setNote("");
+            setError(null);
           }}
           className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors"
         >
@@ -89,9 +92,8 @@ export default function PartnerContactForm() {
       </h3>
 
       {error && (
-        <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2 flex items-start gap-3 mb-6 text-xs font-bvp leading-relaxed">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{error}</span>
+        <div className="mb-6">
+          <FormErrorAlert error={error} onRetry={handleSubmit} />
         </div>
       )}
 
