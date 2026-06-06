@@ -18,15 +18,23 @@
 - **[x] Phase 4c - CTA URLs**: Added header `topBarLink`, converted hero `ctaPrimary` & `ctaSecondary` to group fields (`{text, url}`), added campaign `cta` group field. Handled nested sub-field aliases in group resolver.
 - **[x] Phase 4c - Section Visibility & Order**: Added section layout configuration under `homepage.sections` (repeatable list of sections with `key` and `visible` properties). Refactored storefront `page.tsx` using Option A (sub-components) to dynamically map and render homepage sections.
 - **[ ] Differentiate Data Omission**: Distinguish between "no data" and "user deleted intentionally" (currently using `!== ''` logic, which is too loose).
-- **[ ] Public Endpoint Separation**: Create a public endpoint `/api/site-config` (or rename `/api/admin/settings` GET) to clearly separate admin-only configuration operations from public config consumption.
+- **[x] Public Endpoint Separation**: Created a public endpoint `/api/site-config` to separate admin-only settings endpoints from public storefront consumption.
 - **[x] Phase 4d - Advanced Customizer Controls & Repeatable Upgrades**: Added repeatable upgrades (story image alts for SEO, values Lucide icon picker, social repeatable platform links). Implemented smooth drag-reorder via `@dnd-kit` in `RepeatableEditor` and `ProductPickerFieldInput` (replacing old ↑/↓ buttons). Flattened Zod validation errors to arbitrary depth, displayed flat error panel at customize screen top, and regrouped for section level inline validation display.
 
 ---
 
-## TODO Future — Phase 5
+## CLOSED — Phase 5 (Public endpoint + Server props + Schema homepage fix)
 
-- **[ ] Draft/Preview/Publish states**: Implement settings staging, allowing admins to edit config in draft mode and preview before publishing to live storefront.
-- **[ ] Server-Side Config (props injection)**: Convert client-side customizer dependent components (`Header`/`Footer`/`FloatingActions`) from client-side API fetching to Server Components that receive resolved `config` via props. This will eliminate client-side fetching delay and prevent Flash of Unstyled Content (FOUC).
+- **[x] Server-Side Config (props injection)**: Converted client-side customizer dependent components (`Header`/`Footer`/`FloatingActions`) to Server Components that receive resolved `config` via props. This completely eliminates client-side fetching delay and FOUC.
+- **[x] Schema Homepage Fix**: Replaced old outdated values section with `trust_badges` on the homepage schema, validation, reader, and components.
+- **[x] Public Endpoint**: Added public `/api/site-config` API route with a 5-minute cache.
+- **[x] HTML Language**: Changed root lang to `"vi"`.
+
+---
+
+## TODO Future — Phase 6 & 7
+
+- [ ] Draft/Preview/Publish states: Implement settings staging, allowing admins to edit config in draft mode and preview before publishing to live storefront.
 
 ---
 

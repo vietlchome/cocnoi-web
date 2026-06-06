@@ -14,13 +14,13 @@ export default async function StoreLayout({
 
   return (
     <>
-      <Header />
+      <Header config={config} />
       <main className="flex-grow flex flex-col">
         {children}
       </main>
       <CartDrawer />
-      <FloatingActions />
-      <Footer />
+      <FloatingActions config={config} />
+      <Footer config={config} />
 
       {/* Analytics & Pixel Tracking */}
       {config.analytics?.googleAnalyticsId && (

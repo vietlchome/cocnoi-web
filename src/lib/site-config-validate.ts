@@ -71,14 +71,14 @@ export const SiteConfigSchema = z.object({
       alt: textValidator,
     })),
   }),
-  values: z.object({
+  trust_badges: z.object({
     tagline: textValidator,
     title: textValidator,
     desc: textValidator,
     items: z.array(z.object({
       title: textValidator,
       desc: textValidator,
-      icon: textValidator,
+      iconImage: imageValidator,
     })),
   }),
   faq: z.object({
@@ -135,7 +135,7 @@ export const SiteConfigSchema = z.object({
   }),
   homepage: z.object({
     sections: z.array(z.object({
-      key: z.enum(["hero", "campaign", "products", "story", "values", "faq"]),
+      key: z.enum(["hero", "campaign", "products", "story", "trust_badges", "faq"]),
       visible: booleanValidator,
     })),
   })

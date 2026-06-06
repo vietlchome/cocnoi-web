@@ -185,32 +185,49 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       }
     }
   },
-  values: {
-    label: "Giá trị cốt lõi",
+  trust_badges: {
+    label: "Trust Badges (Homepage)",
     fields: {
-      tagline: { type: "text", label: "Tagline", default: "Core Principles", aliases: ["values_tagline"] },
-      title: { type: "text", label: "Tiêu đề", default: "Giá trị Cốc Nối", aliases: ["values_title"] },
-      desc: { type: "textarea", label: "Mô tả chung", default: "Chúng tôi gìn giữ những giá trị nguyên bản nhất của gốm thủ công để mang đến trải nghiệm chạm tinh tế nhất cho khách hàng.", aliases: ["values_desc"] },
+      tagline: { type: "text", label: "Tagline ngắn", default: "Why Cốc Nối", aliases: ["values_tagline"] },
+      title: { type: "text", label: "Tiêu đề", default: "Vì sao chọn Cốc Nối", aliases: ["values_title"] },
+      desc: { type: "textarea", label: "Mô tả chung", default: "", aliases: ["values_desc"] },
       items: {
         type: "repeatable",
-        label: "Các đặc trưng",
+        label: "Các badge",
         default: [
-          { title: "Mộc Mạc", desc: "Không trang điểm bóng bẩy. Giữ trọn texture tự nhiên của đất nung Bát Tràng và lớp vân men độc bản.", icon: "Sparkles" },
-          { title: "Chân Thành", desc: "Mỗi sản phẩm đi kèm một câu chuyện thật, một thông điệp chân thành gửi gắm sự kết nối tình thân.", icon: "Heart" },
-          { title: "Bền Bỉ", desc: "Gốm nung ở nhiệt độ cao trên 1250°C, đảm bảo độ bền cơ học cao, an toàn tuyệt đối khi sử dụng.", icon: "Shield" },
-          { title: "Chỉn Chu", desc: "Từ khâu vuốt gốm, bọc gói bao bì kraft đến thiệp viết tay chân thành trao gửi khách hàng.", icon: "Star" }
+          { 
+            title: "Handmade in Bát Tràng", 
+            desc: "Thủ công tại làng gốm Bát Tràng 700 năm.",
+            iconImage: ""
+          },
+          { 
+            title: "Earth-friendly", 
+            desc: "Đất nung tự nhiên, men an toàn, packaging giấy kraft.",
+            iconImage: ""
+          },
+          { 
+            title: "Contemporary design", 
+            desc: "Thiết kế đương đại, phù hợp bàn làm việc + bàn cà phê hiện đại.",
+            iconImage: ""
+          },
+          { 
+            title: "Ethical & sustainable", 
+            desc: "Kinh doanh có đạo đức, đối xử công bằng với nghệ nhân.",
+            iconImage: ""
+          }
         ],
         itemSchema: {
-          title: { type: "text", label: "Tiêu đề", default: "" },
-          desc: { type: "textarea", label: "Mô tả", default: "" },
-          icon: { type: "icon-picker", label: "Icon", default: "Sparkles" }
-        },
-        aliasGroups: [
-          { title: "value_1_title", desc: "value_1_desc" },
-          { title: "value_2_title", desc: "value_2_desc" },
-          { title: "value_3_title", desc: "value_3_desc" },
-          { title: "value_4_title", desc: "value_4_desc" }
-        ]
+          title: { type: "text", label: "Tên badge", default: "" },
+          desc: { type: "textarea", label: "Mô tả ngắn", default: "" },
+          iconImage: {
+            type: "image",
+            label: "Icon / Ảnh",
+            default: "",
+            aspectRatio: 1,
+            folder: "theme/trust-badges",
+            helpText: "Có thể là icon line-art minimal hoặc ảnh nhỏ. Vuông 1:1."
+          }
+        }
       }
     }
   },
@@ -384,7 +401,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           { key: "campaign", visible: true },
           { key: "products", visible: true },
           { key: "story", visible: true },
-          { key: "values", visible: true },
+          { key: "trust_badges", visible: true },
           { key: "faq", visible: true }
         ],
         itemSchema: {
@@ -397,7 +414,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
               { value: "campaign", label: "Chiến dịch" },
               { value: "products", label: "Sản phẩm nổi bật" },
               { value: "story", label: "Câu chuyện" },
-              { value: "values", label: "Giá trị cốt lõi" },
+              { value: "trust_badges", label: "Trust Badges (Homepage)" },
               { value: "faq", label: "FAQ" }
             ]
           },
