@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
-import * as LucideIcons from "lucide-react";
 import { getSiteConfig } from "@/lib/site-config";
 import { SettingsService } from "@/lib/services/settings.service";
 import { ReviewService } from "@/lib/services/review.service";
@@ -9,7 +8,7 @@ import HeroSection from "@/components/store/HomepageSections/HeroSection";
 import CampaignSection from "@/components/store/HomepageSections/CampaignSection";
 import ProductsSection from "@/components/store/HomepageSections/ProductsSection";
 import StorySection from "@/components/store/HomepageSections/StorySection";
-import ValuesSection from "@/components/store/HomepageSections/ValuesSection";
+import TrustBadgesSection from "@/components/store/HomepageSections/TrustBadgesSection";
 import FaqSection from "@/components/store/HomepageSections/FaqSection";
 
 export const revalidate = 0; // Đọc live settings từ database SQLite lập tức
@@ -136,15 +135,7 @@ export default async function StoreHome() {
   const faqs = config.faq.itemsRetail || [];
   const faqsB2b = config.faq.itemsB2b || [];
 
-  // 5. Giá trị cốt lõi Cốc Nối
-  const brandValues = (config.values.items || []).map((item: any, idx: number) => {
-    const IconComponent = (LucideIcons as any)[item.icon] || LucideIcons.Sparkles;
-    return {
-      icon: <IconComponent className="w-6 h-6 text-accent" />,
-      title: item.title,
-      desc: item.desc
-    };
-  });
+
 
   // 6. Sắp xếp và hiển thị các section theo cấu hình
   const visibleSections = (config.homepage?.sections || [])
@@ -156,7 +147,7 @@ export default async function StoreHome() {
     campaign: <CampaignSection config={config.campaign} />,
     products: <ProductsSection config={config.products} products={featuredProducts} />,
     story: <StorySection config={config.story} />,
-    values: <ValuesSection config={config.values} brandValues={brandValues} />,
+    trust_badges: <TrustBadgesSection config={config.trust_badges} />,
     faq: <FaqSection config={config.faq} faqs={faqs} faqsB2b={faqsB2b} />
   };
 
@@ -165,12 +156,12 @@ export default async function StoreHome() {
       {visibleSections.map((key: string) => (
         <React.Fragment key={key}>
           {sectionComponents[key]}
-          {/* Render Testimonials ngay sau Values nếu Values hiển thị */}
-          {key === "values" && <TestimonialSection reviews={featuredReviews as any} />}
+          {/* Render Testimonials ngay sau trust_badges nếu trust_badges hiển thị */}
+          {key === "trust_badges" && <TestimonialSection reviews={featuredReviews as any} />}
         </React.Fragment>
       ))}
-      {/* Fallback nếu không có Values trong list hiển thị thì render Testimonials ở dưới cùng */}
-      {!visibleSections.includes("values") && (
+      {/* Fallback nếu không có trust_badges trong list hiển thị thì render Testimonials ở dưới cùng */}
+      {!visibleSections.includes("trust_badges") && (
         <TestimonialSection reviews={featuredReviews as any} />
       )}
     </div>

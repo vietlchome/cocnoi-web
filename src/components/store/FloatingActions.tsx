@@ -1,32 +1,16 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { PackageSearch } from "lucide-react";
+import type { SiteConfig } from "@/lib/site-config-validate";
 
-export default function FloatingActions() {
-  const [themeConfig, setThemeConfig] = useState<any>(null);
+interface FloatingActionsProps {
+  config: SiteConfig;
+}
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await fetch("/api/admin/settings");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            setThemeConfig(data.config);
-          }
-        }
-      } catch (e) {
-        console.error("Lỗi khi nạp cấu hình FloatingActions:", e);
-      }
-    };
-    fetchSettings();
-  }, []);
-
-  const links = themeConfig?.social?.links;
+export default function FloatingActions({ config }: FloatingActionsProps) {
+  const links = config?.social?.links;
   const getPlatformUrl = (platform: string, fallback: string) => {
-    if (!themeConfig) return fallback;
+    if (!config) return fallback;
     const item = links?.find((l: any) => l.platform === platform);
     return item && item.visible ? (item.url || "") : "";
   };
@@ -36,7 +20,7 @@ export default function FloatingActions() {
   const socialZalo = getPlatformUrl("zalo", "https://zalo.me/");
 
   return (
-    <div className="fixed right-4 bottom-24 md:bottom-32 z-50 flex flex-col gap-3">
+    <div className="fixed right-4 bottom-24 md:bottom-32 z-40 flex flex-col gap-3">
       
       {/* Instagram */}
       {socialInstagram !== "" && (
@@ -84,7 +68,7 @@ export default function FloatingActions() {
         </a>
       )}
 
-      {/* Đơn hàng */}
+      {/* Don hang */}
       <Link
         href="/don-hang"
         style={{ backgroundColor: "var(--color-terracotta)" }}

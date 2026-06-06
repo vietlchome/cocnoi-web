@@ -162,6 +162,21 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       }
     }
 
+    // Backward compat: section.values blob cũ -> trust_badges (Phase 5 rename)
+    if (sectionName === 'trust_badges' && !sectionBlob && dbSettings['section.values']) {
+      try {
+        const oldValues = JSON.parse(dbSettings['section.values']);
+        sectionBlob = {
+          tagline: oldValues.tagline ?? SITE_SCHEMA.trust_badges.fields.tagline.default,
+          title: oldValues.title ?? SITE_SCHEMA.trust_badges.fields.title.default,
+          desc: oldValues.desc ?? SITE_SCHEMA.trust_badges.fields.desc.default,
+          items: SITE_SCHEMA.trust_badges.fields.items.default // Force default trust badges
+        };
+      } catch (e) {
+        console.warn(`Failed to parse old values for trust_badges fallback`);
+      }
+    }
+
     // Fallback đọc từ section.footer cũ cho contact section nếu chưa tồn tại section.contact
     if (sectionName === 'contact' && !sectionBlob) {
       const footerBlobStr = dbSettings['section.footer'];
@@ -201,6 +216,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
         config.social = { links: legacySocial };
       }
     }
+  }
+
+  // Layer B backward compat: homepage.sections key "values" -> "trust_badges"
+  if (config.homepage?.sections) {
+    config.homepage.sections = config.homepage.sections.map((s: any) => ({
+      ...s,
+      key: s.key === 'values' ? 'trust_badges' : s.key
+    }));
   }
 
   return config as SiteConfig;

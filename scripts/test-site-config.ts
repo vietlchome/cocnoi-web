@@ -10,6 +10,7 @@ async function main() {
   let passedAssertions = 0;
   const failures: string[] = [];
   let exitCode = 0;
+  const sectionBackups: Array<{ key: string; value: string }> = [];
 
   function assertEq(fieldName: string, expected: any, actual: any, contextInfo: string) {
     totalAssertions++;
@@ -47,6 +48,25 @@ async function main() {
       console.log(`  - Upserted: ${key} = "${value}"`);
     }
     console.log("Mock data inserted successfully.\n");
+
+    // Backup va tam thoi xoa cac setting section.* de kiem tra trong moi truong sach
+    console.log("--- BACKUP VÀ TẠM THỜI XÓA CÁC SETTING SECTION.* ---");
+    const dbSettingsForBackup = await SettingsService.getAllSettings();
+    for (const [key, value] of Object.entries(dbSettingsForBackup)) {
+      if (key.startsWith("section.")) {
+        sectionBackups.push({ key, value });
+      }
+    }
+    if (sectionBackups.length > 0) {
+      await prisma.themeSetting.deleteMany({
+        where: {
+          key: {
+            startsWith: "section."
+          }
+        }
+      });
+      console.log(`  - Da backup va tam thoi xoa ${sectionBackups.length} settings dang section.*`);
+    }
 
     const rawDbSettings = await SettingsService.getAllSettings();
     const config = await getSiteConfig();
@@ -120,7 +140,7 @@ async function main() {
             let expected: any = dbValue;
             if (fieldDef.type === 'boolean') {
               expected = (dbValue === 'true');
-            } else if (fieldDef.type === 'json') {
+            } else if (fieldDef.type === 'json' || fieldDef.type === 'repeatable' || fieldDef.type === 'product-picker') {
               try {
                 expected = JSON.parse(dbValue);
               } catch {
@@ -147,10 +167,10 @@ async function main() {
     // 3. faq.itemsRetail === [{"q":"Q1","a":"A1"}] (alias: faq_items, parsed json)
     assertEq("Explicit: faq.itemsRetail", [{"q":"Q1","a":"A1"}], config.faq.itemsRetail, "phải parse thành JSON array");
     
-    // 4. values.items[0].title === "V1", values.items[1].title === "V2"
-    assertEq("Explicit: values.items.length", 2, config.values.items.length, "phải có 2 items");
-    assertEq("Explicit: values.items[0].title", "V1", config.values.items[0]?.title, "item 1 title");
-    assertEq("Explicit: values.items[1].title", "V2", config.values.items[1]?.title, "item 2 title");
+    // 4. trust_badges.items length should be 4 (forced default)
+    assertEq("Explicit: trust_badges.items.length", 4, config.trust_badges.items.length, "phải có 4 items");
+    assertEq("Explicit: trust_badges.items[0].title", "Handmade in Bát Tràng", config.trust_badges.items[0]?.title, "item 1 title");
+    assertEq("Explicit: trust_badges.items[1].title", "Earth-friendly", config.trust_badges.items[1]?.title, "item 2 title");
     
     // 5. story.features.length === 2 (intro_feat_1_img_url, intro_feat_3_img_url)
     assertEq("Explicit: story.features.length", 2, config.story.features.length, "phải có 2 features");
@@ -184,8 +204,22 @@ async function main() {
         }
       });
       console.log(`Đã xóa ${deleteResult.count} test keys khỏi DB.`);
+
+      // Khoi phuc cac settings da backup
+      if (sectionBackups.length > 0) {
+        console.log("--- KHÔI PHỤC CÁC SETTING SECTION.* ---");
+        for (const item of sectionBackups) {
+          await prisma.themeSetting.create({
+            data: {
+              key: item.key,
+              value: item.value
+            }
+          });
+        }
+        console.log(`Đã khôi phục ${sectionBackups.length} settings dang section.*`);
+      }
     } catch (cleanError) {
-      console.error("Lỗi khi dọn dẹp mock data:", cleanError);
+      console.error("Lỗi khi dọn dẹp hoac khoi phuc mock data:", cleanError);
     }
   }
 
