@@ -2,7 +2,10 @@ import { z } from "zod";
 
 // Các base validator
 const textValidator = z.string();
-const urlValidator = z.string().url().or(z.literal(""));
+const urlValidator = z.string().regex(
+  /^(https?:\/\/.+|\/[^\/].*|)$/,
+  "Phải là URL hợp lệ (https://...), đường dẫn nội bộ (/path), hoặc để trống"
+);
 const imageValidator = z.string().regex(
   /^(https?:\/\/.+|\/[^\/].*|)$/,
   "Image phải là URL hợp lệ, đường dẫn tuyệt đối (/path), hoặc để trống"
