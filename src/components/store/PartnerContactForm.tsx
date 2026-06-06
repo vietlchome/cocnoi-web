@@ -13,6 +13,7 @@ export default function PartnerContactForm() {
   const [companyName, setCompanyName] = useState("");
   const [quantity, setQuantity] = useState(50);
   const [note, setNote] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cod'>('bank_transfer');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<FriendlyError | null>(null);
@@ -34,6 +35,9 @@ export default function PartnerContactForm() {
     }
 
     try {
+      const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD";
+      const fullNote = `Phương thức: ${methodLabel}${note ? ` | ${note}` : ''}`;
+
       const response = await createInquiry({
         customerName,
         phone,
@@ -41,7 +45,7 @@ export default function PartnerContactForm() {
         companyName: companyName || null,
         productId: null,
         quantity: Number(quantity) || 1,
-        note: note || null,
+        note: fullNote || null,
         source: "Trang Đối Tác B2B",
       });
 
@@ -60,11 +64,11 @@ export default function PartnerContactForm() {
 
   if (success) {
     return (
-      <div className="bg-canvas border border-accent/40 p-8 md:p-12 rounded-4 text-center max-w-2xl mx-auto shadow-md animate-fade-in">
-        <CheckCircle2 className="w-16 h-16 text-accent mx-auto mb-4 animate-bounce" />
-        <h3 className="font-playfair text-2xl font-bold text-primary mb-3">Gửi yêu cầu thành công</h3>
-        <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-6">
-          Cảm ơn bạn đã tin tưởng Cốc Nối. Đại diện phát triển B2B của chúng tôi sẽ xem xét đề xuất của quý đối tác và chủ động liên hệ tư vấn trong vòng 24 giờ.
+      <div className="bg-canvas border border-accent/40 p-6 md:p-10 rounded-4 text-center max-w-2xl mx-auto shadow-md animate-fade-in font-bvp">
+        <CheckCircle2 className="w-12 h-12 text-accent mx-auto mb-3 animate-bounce" />
+        <h3 className="font-playfair text-xl font-bold text-primary mb-2">Đã nhận thông tin</h3>
+        <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-4">
+          Cốc Nối liên hệ xác nhận và tư vấn đối tác trong 24 giờ.
         </p>
         <button 
           onClick={() => {
@@ -75,9 +79,10 @@ export default function PartnerContactForm() {
             setCompanyName("");
             setQuantity(50);
             setNote("");
+            setPaymentMethod("bank_transfer");
             setError(null);
           }}
-          className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors"
+          className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors font-semibold"
         >
           Gửi thêm yêu cầu hợp tác khác
         </button>
@@ -176,6 +181,43 @@ export default function PartnerContactForm() {
             <span>Tối thiểu: 20 chiếc (Đơn B2B lẻ)</span>
             <span>Trung bình: 100 - 500 chiếc</span>
             <span>Tối đa: 1000+ chiếc (Đại lý)</span>
+          </div>
+        </div>
+
+        {/* Payment Method */}
+        <div className="flex flex-col gap-3">
+          <label className="font-bvp text-xs font-bold text-primary">
+            Phương thức thanh toán <span className="text-accent">*</span>
+          </label>
+          <div className="flex flex-col gap-2 w-full">
+            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
+              <input 
+                type="radio" 
+                name="paymentMethod" 
+                value="bank_transfer" 
+                checked={paymentMethod === "bank_transfer"} 
+                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                className="mt-1 accent-accent"
+              />
+              <div className="text-left font-bvp">
+                <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
+                <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
+              </div>
+            </label>
+            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
+              <input 
+                type="radio" 
+                name="paymentMethod" 
+                value="cod" 
+                checked={paymentMethod === "cod"} 
+                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                className="mt-1 accent-accent"
+              />
+              <div className="text-left font-bvp">
+                <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
+                <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
+              </div>
+            </label>
           </div>
         </div>
 

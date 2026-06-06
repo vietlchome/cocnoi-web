@@ -585,7 +585,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       codNote: { 
         type: "textarea", 
         label: "Ghi chú COD", 
-        default: "COD miễn phí Hà Nội. Tỉnh khác phụ phí theo cước vận chuyển." 
+        default: "COD miễn phí Hà Nội nội thành. Tỉnh khác phụ phí ship theo cước vận chuyển. Đội ngũ Cốc Nối liên hệ xác nhận trong 2 giờ." 
       }
     }
   }

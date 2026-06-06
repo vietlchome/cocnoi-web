@@ -76,11 +76,11 @@ export default function StockistApplicationForm() {
 
   if (success) {
     return (
-      <div className="bg-canvas border border-accent/40 p-8 md:p-12 rounded-4 text-center max-w-2xl mx-auto shadow-md animate-fade-in">
-        <CheckCircle2 className="w-16 h-16 text-accent mx-auto mb-4 animate-bounce" />
-        <h3 className="font-playfair text-2xl font-bold text-primary mb-3">Gửi yêu cầu thành công</h3>
-        <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-6">
-          Cảm ơn bạn đã quan tâm hợp tác bán lẻ Cốc Nối. Chúng tôi sẽ xem xét thông tin và chủ động liên hệ gửi catalog wholesale trong vòng 24 giờ.
+      <div className="bg-canvas border border-accent/40 p-6 md:p-10 rounded-4 text-center max-w-2xl mx-auto shadow-md animate-fade-in font-bvp">
+        <CheckCircle2 className="w-12 h-12 text-accent mx-auto mb-3 animate-bounce" />
+        <h3 className="font-playfair text-xl font-bold text-primary mb-2">Đã nhận thông tin</h3>
+        <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-4">
+          Cốc Nối liên hệ xác nhận và gửi catalog wholesale trong 24 giờ.
         </p>
         <button 
           onClick={() => {
@@ -96,9 +96,9 @@ export default function StockistApplicationForm() {
             setNote("");
             setError(null);
           }}
-          className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors"
+          className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors font-semibold"
         >
-          Gửi thêm đăng ký đại lý khác
+          Quay lại form đăng ký
         </button>
       </div>
     );

@@ -88,6 +88,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
   const [address, setAddress] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [note, setNote] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cod'>('bank_transfer')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<FriendlyError | null>(null)
@@ -125,9 +126,11 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
     setSubmitError(null)
 
     // Ghép thông tin màu vào ghi chú để lưu lại chuẩn xác
-    const fullNote = product.colorName 
+    const colorNote = product.colorName 
       ? `[Màu đã chọn: ${product.colorName}] ${note}`.trim()
       : note
+    const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD"
+    const fullNote = `Phương thức: ${methodLabel}${colorNote ? ` | ${colorNote}` : ''}`
 
     try {
       const response = await fetch('/api/inquiry', {
@@ -187,6 +190,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
     setAddress('')
     setQuantity(qty) // Seed inquiry quantity from selected qty
     setNote('')
+    setPaymentMethod('bank_transfer')
     setSubmitSuccess(false)
     setSubmitError(null)
     setShowInquiryModal(true)
@@ -586,24 +590,27 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
             {/* Modal Content */}
             <div className="p-6">
               {submitSuccess ? (
-                <div className="text-center py-6 flex flex-col items-center gap-4 animate-fade-in max-h-[80vh] overflow-y-auto pr-1">
-                  <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center text-success shrink-0 animate-bounce">
-                    <Check className="w-8 h-8" />
+                <div className="text-center py-4 flex flex-col items-center gap-3 animate-fade-in max-h-[80vh] overflow-y-auto pr-1">
+                  <div className="w-12 h-12 rounded-full bg-success/15 flex items-center justify-center text-success shrink-0 animate-bounce">
+                    <Check className="w-6 h-6" />
                   </div>
-                  <h3 className="font-playfair text-xl font-bold text-primary">Gửi thành công!</h3>
-                  <p className="text-xs md:text-sm text-secondary max-w-sm leading-relaxed">
-                    Cám ơn tấm chân tình của bạn. Yêu cầu đặt mua cốc <strong>{product.name}</strong> {product.colorName && `(Màu: ${product.colorName})`} đã được gửi thành công. Đội ngũ Cốc Nối sẽ liên hệ trực tiếp cho bạn trong vòng 2 giờ.
+                  <h3 className="font-playfair text-lg font-bold text-primary">Đã nhận thông tin</h3>
+                  <p className="text-xs text-secondary leading-relaxed">
+                    Cốc Nối liên hệ xác nhận đơn trong 2 giờ.
+                  </p>
+                  <p className="text-[10px] text-secondary/60">
+                    Sản phẩm: <strong>{product.name}</strong> {product.colorName && `(Màu: ${product.colorName})`}
                   </p>
                   
                   {process.env.NEXT_PUBLIC_ENABLE_CART !== "true" && paymentInfo && (
-                    <div className="w-full mt-2 text-left">
-                      <PaymentInstructionsBlock paymentInfo={paymentInfo} />
+                    <div className="w-full mt-1 text-left">
+                      <PaymentInstructionsBlock paymentInfo={paymentInfo} selectedMethod={paymentMethod} />
                     </div>
                   )}
 
                   <button 
                     onClick={() => setShowInquiryModal(false)}
-                    className="bg-primary text-canvas font-bold text-xs px-6 py-3 rounded-2 hover:bg-accent transition-colors mt-4 cursor-pointer uppercase tracking-wider shrink-0"
+                    className="bg-primary text-canvas font-bold text-xs px-6 py-2.5 rounded-2 hover:bg-accent transition-colors mt-2 cursor-pointer uppercase tracking-wider shrink-0"
                   >
                     Đóng cửa sổ
                   </button>
@@ -699,6 +706,40 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                   {/* Realtime price estimation */}
                   <div className="text-right text-xs text-secondary/60 mt-1 font-medium">
                     Giá trị dự kiến: <strong className="text-primary font-bold">{(displayPrice * quantity).toLocaleString('vi-VN')} đ</strong>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <label className="text-xs font-bold text-secondary">Phương thức thanh toán <span className="text-rose-500">*</span></label>
+                    <div className="flex flex-col gap-2">
+                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="bank_transfer" 
+                          checked={paymentMethod === "bank_transfer"} 
+                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                          className="mt-1 accent-accent"
+                        />
+                        <div>
+                          <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
+                          <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
+                        </div>
+                      </label>
+                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="cod" 
+                          checked={paymentMethod === "cod"} 
+                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                          className="mt-1 accent-accent"
+                        />
+                        <div>
+                          <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
+                          <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
+                        </div>
+                      </label>
+                    </div>
                   </div>
 
                   <div>
