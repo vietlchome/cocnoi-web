@@ -71,6 +71,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       logoText: { type: "text", label: "Tên thương hiệu", default: "CỐC NỐI", aliases: ["logo_text"] },
       showTopBar: { type: "boolean", label: "Hiển thị Top Bar", default: true, aliases: ["show_top_bar"] },
       topBarText: { type: "text", label: "Nội dung Top Bar", default: "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ", aliases: ["top_bar_text"] },
+      topBarLink: { type: "url", label: "Top Bar link đích", default: "", aliases: ["top_bar_link"], helpText: "Để trống = top bar không click được" },
       stickyHeader: { type: "boolean", label: "Header dính khi cuộn", default: true, aliases: ["sticky_header"] }
     }
   },
@@ -80,8 +81,24 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       badge: { type: "text", label: "Badge Text", default: "Crafted in Bát Tràng since 1994", aliases: ["hero_badge_text"] },
       title: { type: "text", label: "Tiêu đề", default: "Kết tình thân, Nối tinh thần.", aliases: ["hero_title"] },
       subtitle: { type: "textarea", label: "Mô tả", default: "Mỗi chiếc cốc gốm thủ công Cốc Nối chứa đựng tâm huyết của những nghệ nhân Bát Tràng và khát vọng gắn kết những tâm hồn đồng điệu.", aliases: ["hero_subtitle"] },
-      ctaPrimary: { type: "text", label: "CTA Chính", default: "Khám phá Cửa Hàng", aliases: ["hero_cta_text"] },
-      ctaSecondary: { type: "text", label: "CTA Phụ", default: "Chiến dịch 'Người Nối'", aliases: ["hero_cta_secondary"] },
+      ctaPrimary: {
+        type: "group",
+        label: "CTA Chính",
+        default: { text: "Khám phá Cửa Hàng", url: "/shop" },
+        fields: {
+          text: { type: "text", label: "Nhãn nút", default: "Khám phá Cửa Hàng", aliases: ["hero_cta_text"] },
+          url: { type: "url", label: "Link đích", default: "/shop" }
+        }
+      },
+      ctaSecondary: {
+        type: "group",
+        label: "CTA Phụ",
+        default: { text: "Chiến dịch 'Người Nối'", url: "/campaign" },
+        fields: {
+          text: { type: "text", label: "Nhãn nút", default: "Chiến dịch 'Người Nối'", aliases: ["hero_cta_secondary"] },
+          url: { type: "url", label: "Link đích", default: "/campaign" }
+        }
+      },
       floatingLabel: { type: "text", label: "Nhãn nổi trang trí", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
       imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] }
     }
@@ -94,7 +111,16 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       desc: { type: "textarea", label: "Mô tả", default: "Lấy cảm hứng từ những cống hiến âm thầm của cộng đồng, Người Nối là chiến dịch trọng tâm của Cốc Nối nhằm tôn vinh những người lao động nghệ thuật, những người kết nối sợi dây tình cảm trong gia đình và xã hội.", aliases: ["campaign_desc"] },
       heroImageUrl: { type: "image", label: "Ảnh Nhân vật", default: "", aliases: ["campaign_hero_image_url"] },
       heroName: { type: "text", label: "Tên nhân vật", default: "Bác Cường Lò Bầu", aliases: ["campaign_hero_name"] },
-      heroQuote: { type: "text", label: "Câu trích dẫn", default: "Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó.", aliases: ["campaign_hero_quote"] }
+      heroQuote: { type: "text", label: "Câu trích dẫn", default: "Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó.", aliases: ["campaign_hero_quote"] },
+      cta: {
+        type: "group",
+        label: "Nút CTA chiến dịch",
+        default: { text: "Tìm hiểu thêm", url: "/campaign" },
+        fields: {
+          text: { type: "text", label: "Nhãn nút", default: "Tìm hiểu thêm" },
+          url: { type: "url", label: "Link đích", default: "/campaign", helpText: "Để trống = không hiện nút" }
+        }
+      }
     }
   },
   products: {
@@ -311,6 +337,40 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       googleAnalyticsId: { type: "text", label: "Google Analytics 4 ID", default: "", helpText: "G-XXXXXXXXXX" },
       facebookPixelId: { type: "text", label: "Facebook Pixel ID", default: "", helpText: "Chuỗi 15-16 chữ số" },
       tiktokPixelId: { type: "text", label: "TikTok Pixel ID", default: "", helpText: "Chuỗi alphanumeric" }
+    }
+  },
+  homepage: {
+    label: "Bố cục trang chủ",
+    fields: {
+      sections: {
+        type: "repeatable",
+        label: "Section hiển thị (kéo để đổi thứ tự)",
+        default: [
+          { key: "hero", visible: true },
+          { key: "campaign", visible: true },
+          { key: "products", visible: true },
+          { key: "story", visible: true },
+          { key: "values", visible: true },
+          { key: "faq", visible: true }
+        ],
+        itemSchema: {
+          key: {
+            type: "select",
+            label: "Section",
+            default: "hero",
+            options: [
+              { value: "hero", label: "Hero" },
+              { value: "campaign", label: "Chiến dịch" },
+              { value: "products", label: "Sản phẩm nổi bật" },
+              { value: "story", label: "Câu chuyện" },
+              { value: "values", label: "Giá trị cốt lõi" },
+              { value: "faq", label: "FAQ" }
+            ]
+          },
+          visible: { type: "boolean", label: "Hiển thị", default: true }
+        },
+        helpText: "Bỏ tick 'Hiển thị' = ẩn section. Dùng ↑/↓ để đổi thứ tự. Section không có trong danh sách = ẩn hoàn toàn."
+      }
     }
   }
 };

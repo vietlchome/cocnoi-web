@@ -5,7 +5,22 @@ import { SiteConfig } from '@/lib/site-config-validate';
 function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Record<string, string>, sectionBlob: any) {
   // Ưu tiên đọc từ JSON blob của section trước (dữ liệu mới)
   if (sectionBlob && sectionBlob[fieldKey] !== undefined) {
-    return sectionBlob[fieldKey];
+    const v = sectionBlob[fieldKey];
+    // Defensive: detect schema-version mismatch
+    const expectsObject = fieldDef.type === 'group';
+    const expectsArray = fieldDef.type === 'repeatable' || fieldDef.type === 'product-picker';
+    const isObject = typeof v === 'object' && v !== null && !Array.isArray(v);
+    const isArray = Array.isArray(v);
+    
+    if (expectsObject && !isObject) {
+      console.warn(`Schema mismatch ${fieldKey}: expected object, got ${typeof v}. Rebuilding from default+aliases.`);
+      // KHÔNG return — fall through để group handler rebuild từ default + sub-field aliases
+    } else if (expectsArray && !isArray) {
+      console.warn(`Schema mismatch ${fieldKey}: expected array, got ${typeof v}. Using default.`);
+      // KHÔNG return — fall through
+    } else {
+      return v;
+    }
   }
 
   // Nếu là repeatable field và có aliases, kiểm tra xem có alias nào lưu trữ JSON string của một mảng không
@@ -75,14 +90,25 @@ function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Recor
   }
 
   if (fieldDef.type === 'group') {
-    // Build nested object from sub-field defaults if no value
-    const groupDefault: Record<string, any> = fieldDef.default ?? {};
+    const groupValue: Record<string, any> = { ...(fieldDef.default ?? {}) };
     for (const [subKey, subDef] of Object.entries(fieldDef.fields)) {
-      if (groupDefault[subKey] === undefined) {
-        groupDefault[subKey] = (subDef as any).default ?? "";
+      // Nếu sub-field có aliases, đọc từ flat key cũ (ghi đè default nếu có cấu hình thực tế)
+      let foundAliasVal = undefined;
+      if ((subDef as any).aliases) {
+        for (const alias of (subDef as any).aliases) {
+          if (dbSettings[alias] !== undefined && dbSettings[alias] !== '') {
+            foundAliasVal = dbSettings[alias];
+            break;
+          }
+        }
+      }
+      if (foundAliasVal !== undefined) {
+        groupValue[subKey] = foundAliasVal;
+      } else if (groupValue[subKey] === undefined) {
+        groupValue[subKey] = (subDef as any).default ?? "";
       }
     }
-    return groupDefault;
+    return groupValue;
   }
 
   // Mặc định trả về giá trị default trong schema
