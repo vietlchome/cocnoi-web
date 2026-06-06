@@ -503,5 +503,42 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         default: "KẾT NỐI là cốt lõi, là lý do Cốc Nối tồn tại. CHÂN THÀNH, CHỈN CHU, CỞI MỞ là ba chiều bổ sung quanh cốt. Mỗi pillar trả lời một câu hỏi về phẩm chất của sự kết nối mà Cốc Nối hướng tới."
       }
     }
+  },
+  partners_meta: {
+    label: "Thông tin Đối Tác (Partners pages)",
+    fields: {
+      stockistMinOrder: { 
+        type: "text", 
+        label: "Đơn hàng tối thiểu cho đại lý (mô tả)", 
+        default: "10 đôi cốc cho đơn đầu tiên" 
+      },
+      stockistDiscount: { 
+        type: "text", 
+        label: "Mô tả chiết khấu đại lý", 
+        default: "Chiết khấu 30-40% theo bậc số lượng" 
+      },
+      corporateMoq: { 
+        type: "text", 
+        label: "MOQ tối thiểu cho quà doanh nghiệp", 
+        default: "20 đôi cho đơn cá nhân hoá logo" 
+      },
+      corporateLeadTime: { 
+        type: "text", 
+        label: "Thời gian sản xuất quà doanh nghiệp", 
+        default: "2-4 tuần tuỳ số lượng và mức độ tuỳ chỉnh" 
+      },
+      salesEmail: { 
+        type: "text", 
+        label: "Email liên hệ B2B", 
+        default: "",
+        helpText: "Để trống = dùng contact.email mặc định"
+      },
+      salesPhone: { 
+        type: "text", 
+        label: "Hotline B2B", 
+        default: "",
+        helpText: "Để trống = dùng contact.phone mặc định"
+      }
+    }
   }
 };

@@ -111,9 +111,9 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
       { name: "Giá trị", href: "/discover/our-values" },
     ],
     "ĐỐI TÁC": [
-      { name: "Quà tặng doanh nghiệp", href: "/partners#corporate" },
-      { name: "Tìm cửa hàng (Stockists)", href: "/partners#stockists" },
-      { name: "Hợp tác đại lý", href: "/partners#wholesale" },
+      { name: "Tìm cửa hàng", href: "/partners/stockists" },
+      { name: "Trở thành đại lý", href: "/partners/become-a-stockist" },
+      { name: "Quà tặng doanh nghiệp", href: "/partners/corporate-gifting" },
     ]
   };
 
