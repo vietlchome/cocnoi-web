@@ -5,7 +5,22 @@ import { SiteConfig } from '@/lib/site-config-validate';
 function resolveField(fieldKey: string, fieldDef: SchemaField, dbSettings: Record<string, string>, sectionBlob: any) {
   // Ưu tiên đọc từ JSON blob của section trước (dữ liệu mới)
   if (sectionBlob && sectionBlob[fieldKey] !== undefined) {
-    return sectionBlob[fieldKey];
+    const v = sectionBlob[fieldKey];
+    // Defensive: detect schema-version mismatch
+    const expectsObject = fieldDef.type === 'group';
+    const expectsArray = fieldDef.type === 'repeatable' || fieldDef.type === 'product-picker';
+    const isObject = typeof v === 'object' && v !== null && !Array.isArray(v);
+    const isArray = Array.isArray(v);
+    
+    if (expectsObject && !isObject) {
+      console.warn(`Schema mismatch ${fieldKey}: expected object, got ${typeof v}. Rebuilding from default+aliases.`);
+      // KHÔNG return — fall through để group handler rebuild từ default + sub-field aliases
+    } else if (expectsArray && !isArray) {
+      console.warn(`Schema mismatch ${fieldKey}: expected array, got ${typeof v}. Using default.`);
+      // KHÔNG return — fall through
+    } else {
+      return v;
+    }
   }
 
   // Nếu là repeatable field và có aliases, kiểm tra xem có alias nào lưu trữ JSON string của một mảng không
