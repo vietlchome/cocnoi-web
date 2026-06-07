@@ -121,6 +121,7 @@ export async function convertInquiryToOrder(data: z.infer<typeof ConvertToOrderS
       })),
       discount: validated.discount,
       paidAmount: validated.paidAmount,
+      note: validated.note,
     });
 
     revalidatePath('/admin/inquiries');

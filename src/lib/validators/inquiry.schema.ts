@@ -20,4 +20,5 @@ export const ConvertToOrderSchema = z.object({
   items: z.array(B2BOrderItemSchema).min(1, 'Hợp đồng phải có ít nhất 1 sản phẩm'),
   discount: z.number().int().nonnegative('Số tiền chiết khấu phải là số không âm').default(0),
   paidAmount: z.number().int().nonnegative('Số tiền đã thanh toán phải là số không âm').default(0),
+  note: z.string().nullable().optional(),
 });

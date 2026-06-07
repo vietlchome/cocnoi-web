@@ -89,6 +89,8 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
   // Paid Amount in convert B2B
   const [paidAmount, setPaidAmount] = useState<number>(0)
   const [paymentStatus, setPaymentStatus] = useState<boolean>(false)
+  const [paymentTerms, setPaymentTerms] = useState<string>('UPFRONT_TRANSFER')
+  const [paymentNote, setPaymentNote] = useState<string>('')
 
   // Quick Create Product State
   const [quickProductName, setQuickProductName] = useState('')
@@ -158,6 +160,8 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
     setDiscount(0)
     setPaidAmount(0)
     setPaymentStatus(false)
+    setPaymentTerms('UPFRONT_TRANSFER')
+    setPaymentNote('')
     setConvertTab('existing')
     
     // Khởi tạo mặt hàng mặc định dựa trên sản phẩm khách tư vấn
@@ -322,6 +326,14 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
   }
 
   // 4. Submit chuyển thành đơn hàng B2B chính thức
+  const TERMS_LABELS: Record<string, string> = {
+    UPFRONT_TRANSFER: "Chuyển khoản trước toàn bộ",
+    COD: "COD toàn bộ",
+    DEPOSIT_COD: "Cọc trước + COD phần còn lại",
+    NET_30: "Trả sau 30 ngày (Net 30)",
+    INSTALLMENT: "Thanh toán nhiều đợt",
+  };
+
   const handleConvertToOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!activeInquiry) return
@@ -335,12 +347,16 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
     }
 
     startConvertTransition(async () => {
+      const termsLabel = TERMS_LABELS[paymentTerms] || paymentTerms
+      const constructedNote = `Thanh toán: ${termsLabel}${paymentNote.trim() ? ` | ${paymentNote.trim()}` : ''}`
+
       const res = await convertInquiryToOrder({
         inquiryId: activeInquiry.id,
         shippingAddress,
         discount,
         items: orderItems,
-        paidAmount
+        paidAmount,
+        note: constructedNote,
       })
 
       if (res.success) {
@@ -965,6 +981,32 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
                           />
                           <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">VNĐ</span>
                         </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Điều khoản thanh toán B2B</label>
+                        <select
+                          value={paymentTerms}
+                          onChange={(e) => setPaymentTerms(e.target.value)}
+                          className="w-full text-xs border border-gray-200 p-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent bg-white font-bold text-primary cursor-pointer"
+                        >
+                          <option value="UPFRONT_TRANSFER">Chuyển khoản trước toàn bộ</option>
+                          <option value="COD">COD toàn bộ</option>
+                          <option value="DEPOSIT_COD">Cọc trước + COD phần còn lại</option>
+                          <option value="NET_30">Trả sau 30 ngày (Net 30)</option>
+                          <option value="INSTALLMENT">Thanh toán nhiều đợt</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Ghi chú thanh toán chi tiết</label>
+                        <textarea
+                          rows={2}
+                          value={paymentNote}
+                          onChange={(e) => setPaymentNote(e.target.value)}
+                          placeholder="Ví dụ: Cọc trước 50%, 50% còn lại thanh toán COD khi giao hàng..."
+                          className="w-full text-xs border border-gray-200 p-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none text-primary"
+                        />
                       </div>
 
                       <div className="flex items-center gap-2">

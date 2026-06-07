@@ -13,7 +13,6 @@ export default function PartnerContactForm() {
   const [companyName, setCompanyName] = useState("");
   const [quantity, setQuantity] = useState(50);
   const [note, setNote] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cod'>('bank_transfer');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<FriendlyError | null>(null);
@@ -35,9 +34,6 @@ export default function PartnerContactForm() {
     }
 
     try {
-      const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD";
-      const fullNote = `Phương thức: ${methodLabel}${note ? ` | ${note}` : ''}`;
-
       const response = await createInquiry({
         customerName,
         phone,
@@ -45,7 +41,7 @@ export default function PartnerContactForm() {
         companyName: companyName || null,
         productId: null,
         quantity: Number(quantity) || 1,
-        note: fullNote || null,
+        note: note.trim() || null,
         source: "Trang Đối Tác B2B",
       });
 
@@ -68,7 +64,7 @@ export default function PartnerContactForm() {
         <CheckCircle2 className="w-12 h-12 text-accent mx-auto mb-3 animate-bounce" />
         <h3 className="font-playfair text-xl font-bold text-primary mb-2">Đã nhận thông tin</h3>
         <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-4">
-          Cốc Nối liên hệ xác nhận và tư vấn đối tác trong 24 giờ.
+          Đội ngũ Cốc Nối liên hệ trong 24h để tư vấn báo giá và phương thức thanh toán phù hợp.
         </p>
         <button 
           onClick={() => {
@@ -79,7 +75,6 @@ export default function PartnerContactForm() {
             setCompanyName("");
             setQuantity(50);
             setNote("");
-            setPaymentMethod("bank_transfer");
             setError(null);
           }}
           className="font-bvp font-medium text-xs text-accent hover:text-[#A75426] underline transition-colors font-semibold"
@@ -184,42 +179,7 @@ export default function PartnerContactForm() {
           </div>
         </div>
 
-        {/* Payment Method */}
-        <div className="flex flex-col gap-3">
-          <label className="font-bvp text-xs font-bold text-primary">
-            Phương thức thanh toán <span className="text-accent">*</span>
-          </label>
-          <div className="flex flex-col gap-2 w-full">
-            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
-              <input 
-                type="radio" 
-                name="paymentMethod" 
-                value="bank_transfer" 
-                checked={paymentMethod === "bank_transfer"} 
-                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                className="mt-1 accent-accent"
-              />
-              <div className="text-left font-bvp">
-                <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
-                <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
-              </div>
-            </label>
-            <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors w-full">
-              <input 
-                type="radio" 
-                name="paymentMethod" 
-                value="cod" 
-                checked={paymentMethod === "cod"} 
-                onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                className="mt-1 accent-accent"
-              />
-              <div className="text-left font-bvp">
-                <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
-                <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
-              </div>
-            </label>
-          </div>
-        </div>
+
 
         {/* Note */}
         <div className="flex flex-col items-start gap-2">

@@ -269,6 +269,7 @@ export class InquiryService {
     }[];
     discount?: number;
     paidAmount?: number;
+    note?: string | null;
   }) {
     return prisma.$transaction(async (tx: any) => {
       // 1. Kiểm tra tồn tại và hợp lệ của Inquiry
@@ -346,7 +347,7 @@ export class InquiryService {
           debtAmount,
           orderType: 'B2B_WHOLESALE',
           discount,
-          note: `Chốt hợp đồng từ đơn tư vấn sỉ #${inquiry.id}`,
+          note: data.note || `Chốt hợp đồng từ đơn tư vấn sỉ #${inquiry.id}`,
           items: {
             create: data.items.map((item) => ({
               productId: item.productId,
