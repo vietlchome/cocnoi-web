@@ -91,7 +91,7 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: "w-full min-h-[450px] p-5 focus:outline-none focus:ring-0 text-sm font-bvp text-primary leading-relaxed bg-canvas overflow-y-auto prose prose-stone max-w-none focus-within:outline-none",
+        class: "w-full min-h-[450px] p-5 focus:outline-none focus:ring-0 text-sm font-bvp text-primary leading-relaxed bg-canvas overflow-y-auto prose prose-cocnoi max-w-none focus-within:outline-none",
       },
     },
   });
