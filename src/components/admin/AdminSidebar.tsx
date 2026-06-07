@@ -39,6 +39,7 @@ const MENU_ITEMS = [
       { title: "Tất cả sản phẩm", href: "/admin/products" },
       { title: "Cấu hình sản phẩm", href: "/admin/products/settings" },
       { title: "Tồn kho", href: "/admin/products/inventory" },
+      { title: "Bulk upload", href: "/admin/products/bulk-upload" },
     ]
   },
   {
@@ -112,7 +113,7 @@ export default function AdminSidebar({ pendingRetailOrdersCount = 0, pendingB2BO
 
     // 3. Khắc phục lỗi trùng tiền tố ở các Menu có sub-menu nằm ngang hàng
     if (href === "/admin/settings" && pathname.startsWith("/admin/settings/")) return false;
-    if (href === "/admin/products" && ["/admin/products/settings", "/admin/products/pricing", "/admin/products/inventory", "/admin/products/reviews"].some(p => pathname.startsWith(p))) return false;
+    if (href === "/admin/products" && ["/admin/products/settings", "/admin/products/pricing", "/admin/products/inventory", "/admin/products/reviews", "/admin/products/bulk-upload"].some(p => pathname.startsWith(p))) return false;
     if (href === "/admin/website/pages" && pathname.startsWith("/admin/website/pages/")) return false;
 
     // 4. Các trường hợp còn lại (như vào chi tiết sản phẩm /admin/products/[id]) thì được phép highlight cha
