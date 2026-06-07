@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { customerName, phone, email, companyName, productId, quantity, note, source } = body;
+    const { customerName, phone, email, companyName, productId, quantity, note, source, inquiryType } = body;
 
     if (!phone) {
       return NextResponse.json({ error: 'Số điện thoại là bắt buộc để capture lead!' }, { status: 400 });
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
       quantity: quantity ? parseInt(quantity.toString()) : 1,
       note: note || null,
       source: source || 'Form B2B nháp',
+      inquiryType: inquiryType || undefined,
     });
 
     return NextResponse.json({ success: true, data: inquiry }, { status: 200 });

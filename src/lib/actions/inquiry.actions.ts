@@ -22,6 +22,7 @@ export async function createInquiry(data: z.infer<typeof CreateInquirySchema>) {
       quantity: validated.quantity,
       note: validated.note,
       source: validated.source,
+      inquiryType: validated.inquiryType,
     });
 
     revalidatePath('/admin/inquiries');
@@ -48,6 +49,7 @@ export async function saveDraftLead(data: z.infer<typeof CreateInquirySchema>) {
       quantity: validated.quantity,
       note: validated.note,
       source: validated.source,
+      inquiryType: validated.inquiryType,
     });
 
     revalidatePath('/admin/inquiries');

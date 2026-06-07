@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { productId, customerName, phone, email, address, quantity, note, companyName, source } = body;
+    const { productId, customerName, phone, email, address, quantity, note, companyName, source, inquiryType } = body;
 
     if (!productId || !customerName || !phone) {
       return NextResponse.json(
@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       quantity: quantity ? parseInt(quantity.toString()) : 1,
       note: combinedNote || null,
       source: sourceStr,
+      inquiryType: inquiryType || undefined,
     });
 
     // Gửi thông báo qua Telegram

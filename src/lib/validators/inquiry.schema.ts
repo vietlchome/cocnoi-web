@@ -12,6 +12,7 @@ export const CreateInquirySchema = z.object({
   quantity: z.number().int().positive('Số lượng sản phẩm phải lớn hơn 0').default(1),
   note: z.string().nullable().optional(),
   source: z.string().nullable().optional(),
+  inquiryType: z.enum(['RETAIL_B2C', 'WHOLESALE_B2B', 'CORPORATE_B2B', 'CONTACT_GENERAL']).optional(),
 });
 
 export const ConvertToOrderSchema = z.object({

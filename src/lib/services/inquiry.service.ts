@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { CustomerService } from './customer.service';
 import { OrderService } from './order.service';
 import { InventoryService } from './inventory.service';
-import { InquiryStatus, CustomerType } from '@prisma/client';
+import { InquiryStatus, CustomerType, InquiryType } from '@prisma/client';
 import { normalizePhone } from '@/lib/utils/phone';
 
 export class InquiryService {
@@ -18,6 +18,7 @@ export class InquiryService {
     quantity?: number;
     note?: string | null;
     source?: string | null;
+    inquiryType?: InquiryType;
   }, tx?: any) {
     const client = tx || prisma;
     const normalizedPhone = normalizePhone(data.phone);
@@ -44,6 +45,7 @@ export class InquiryService {
         note: data.note || null,
         source: data.source || null,
         status: InquiryStatus.PENDING,
+        inquiryType: data.inquiryType || InquiryType.RETAIL_B2C,
       },
       include: {
         customer: true,
@@ -74,6 +76,7 @@ export class InquiryService {
     quantity?: number;
     note?: string | null;
     source?: string | null;
+    inquiryType?: InquiryType;
   }) {
     const normalizedPhone = normalizePhone(data.phone);
 
@@ -113,6 +116,7 @@ export class InquiryService {
             quantity: data.quantity ?? existingPendingInquiry.quantity,
             note: data.note || existingPendingInquiry.note,
             source: data.source || existingPendingInquiry.source,
+            inquiryType: data.inquiryType || existingPendingInquiry.inquiryType,
           },
           include: {
             customer: true,
@@ -134,6 +138,7 @@ export class InquiryService {
           note: data.note || null,
           source: data.source || null,
           status: InquiryStatus.PENDING,
+          inquiryType: data.inquiryType || InquiryType.RETAIL_B2C,
         },
         include: {
           customer: true,
