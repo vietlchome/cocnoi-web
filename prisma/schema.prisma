@@ -42,6 +42,13 @@ enum InquiryStatus {
   CANCELLED
 }
 
+enum InquiryType {
+  RETAIL_B2C        // Đặt lẻ cá nhân
+  WHOLESALE_B2B     // Đăng ký đại lý / stockist
+  CORPORATE_B2B     // Quà tặng doanh nghiệp
+  CONTACT_GENERAL   // Liên hệ chung chưa có intent mua
+}
+
 enum CustomerType {
   RETAIL_LEAD
   RETAIL_BUYER
@@ -54,6 +61,7 @@ enum CustomerType {
 enum Visibility {
   PUBLIC
   B2B_ONLY
+  HIDDEN
 }
 
 // ---------------------------------------------------------
@@ -214,7 +222,9 @@ model Order {
   note            String?       // Ghi chú nội bộ cho Admin
   
   items           OrderItem[]
-  inquiry         OrderInquiry? // Liên kết về đơn tư vấn gốc (nếu được chuyển từ Inquiry)
+  sourceInquiryId   String?       @unique
+  sourceInquiry     OrderInquiry? @relation(name: "OrderSourceInquiry", fields: [sourceInquiryId], references: [id], onDelete: SetNull)
+  convertedInquiry  OrderInquiry? @relation(name: "InquiryConvertedOrder")
   review          Review?       // Đánh giá đã xác thực cho đơn hàng này
   
   createdAt       DateTime      @default(now())
@@ -257,11 +267,16 @@ model OrderInquiry {
   
   status       InquiryStatus @default(PENDING)
   
-  orderId      String?       @unique
-  order        Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  inquiryType       InquiryType   @default(RETAIL_B2C)
+  convertedOrderId  String?       @unique
+  convertedOrder    Order?        @relation(name: "InquiryConvertedOrder", fields: [convertedOrderId], references: [id], onDelete: SetNull)
+  convertedAt       DateTime?
+  sourceOrder       Order?        @relation(name: "OrderSourceInquiry")
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+
+  @@index([status, inquiryType, createdAt])
 }
 
 // ---------------------------------------------------------

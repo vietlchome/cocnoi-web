@@ -62,7 +62,7 @@ export async function saveDraftLead(data: z.infer<typeof CreateInquirySchema>) {
 // 3. LIST INQUIRIES (ADMIN ONLY)
 // =========================================================
 
-export async function getInquiries(statusFilter?: string, query?: string, page?: number, pageSize?: number) {
+export async function getInquiries(statusFilter?: string, query?: string, page?: number, pageSize?: number, inquiryType?: string) {
   await requireAdmin();
 
   try {
@@ -71,6 +71,7 @@ export async function getInquiries(statusFilter?: string, query?: string, page?:
       query,
       page,
       pageSize,
+      inquiryType,
     });
     return { success: true, data: result.data, totalCount: result.totalCount };
   } catch (error: any) {

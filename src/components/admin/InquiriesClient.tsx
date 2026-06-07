@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { updateInquiryStatus, convertInquiryToOrder } from '@/lib/actions/inquiry.actions'
+import { createProduct } from '@/lib/actions/product.actions'
+import ImageCropUploader from './ImageCropUploader'
 
 interface Product {
   id: string
@@ -38,6 +40,7 @@ interface OrderInquiry {
   quantity: number
   note?: string | null
   status: string
+  inquiryType?: string | null
   orderId?: string | null
   order?: {
     id: string
@@ -65,12 +68,15 @@ interface InquiriesClientProps {
 
 export default function InquiriesClient({ initialInquiries, products }: InquiriesClientProps) {
   const [inquiries, setInquiries] = useState<OrderInquiry[]>(initialInquiries)
+  const [localProducts, setLocalProducts] = useState<Product[]>(products)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
+  const [selectedType, setSelectedType] = useState('all')
   const [activeInquiry, setActiveInquiry] = useState<OrderInquiry | null>(null)
   
   // Convert Modal State
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
+  const [convertTab, setConvertTab] = useState<'existing' | 'quick-create'>('existing')
   const [shippingAddress, setShippingAddress] = useState('')
   const [discount, setDiscount] = useState<number>(0)
   const [orderItems, setOrderItems] = useState<{
@@ -84,9 +90,24 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
   const [paidAmount, setPaidAmount] = useState<number>(0)
   const [paymentStatus, setPaymentStatus] = useState<boolean>(false)
 
+  // Quick Create Product State
+  const [quickProductName, setQuickProductName] = useState('')
+  const [quickProductPrice, setQuickProductPrice] = useState<number>(0)
+  const [quickProductSku, setQuickProductSku] = useState('')
+  const [quickProductImage, setQuickProductImage] = useState('')
+  const [quickProductDescription, setQuickProductDescription] = useState('')
+
   const [isPending, startTransition] = useTransition()
   const [isConvertPending, startConvertTransition] = useTransition()
   const router = useRouter()
+
+  const tabs = [
+    { key: 'all', label: 'Tất cả' },
+    { key: 'RETAIL_B2C', label: 'Khách lẻ' },
+    { key: 'WHOLESALE_B2B', label: 'Đại lý' },
+    { key: 'CORPORATE_B2B', label: 'Quà tặng DN' },
+    { key: 'CONTACT_GENERAL', label: 'Liên hệ chung' },
+  ];
 
   // 1. Phân lọc đơn tư vấn
   const filteredInquiries = inquiries.filter(inq => {
@@ -96,8 +117,21 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
       (inq.companyName && inq.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const matchesStatus = selectedStatus === '' || inq.status === selectedStatus
-    return matchesSearch && matchesStatus
+    
+    const inqType = inq.inquiryType || 'RETAIL_B2C'
+    const matchesType = selectedType === 'all' || inqType === selectedType
+
+    return matchesSearch && matchesStatus && matchesType
   })
+
+  const getTabCount = (type: string) => {
+    return inquiries.filter(inq => {
+      const inqType = inq.inquiryType || 'RETAIL_B2C'
+      const matchesType = type === 'all' || inqType === type
+      const matchesStatus = selectedStatus === '' || inq.status === selectedStatus
+      return matchesType && matchesStatus
+    }).length
+  }
 
   // 2. Chuyển trạng thái đơn tư vấn nhanh
   const handleStatusChange = async (inquiryId: string, newStatus: string) => {
@@ -124,6 +158,7 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
     setDiscount(0)
     setPaidAmount(0)
     setPaymentStatus(false)
+    setConvertTab('existing')
     
     // Khởi tạo mặt hàng mặc định dựa trên sản phẩm khách tư vấn
     if (inq.product) {
@@ -144,8 +179,8 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
 
   // Thêm sản phẩm vào giỏ đơn hàng B2B trong modal
   const addProductRow = () => {
-    if (products.length === 0) return
-    const defaultProd = products[0]
+    if (localProducts.length === 0) return
+    const defaultProd = localProducts[0]
     setOrderItems(prev => [
       ...prev,
       {
@@ -170,7 +205,7 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
       const updated = { ...item, ...fields }
       // Nếu thay đổi productId thì tự động đổi originalPrice & priceAtPurchase tương ứng
       if (fields.productId) {
-        const prod = products.find(p => p.id === fields.productId)
+        const prod = localProducts.find(p => p.id === fields.productId)
         if (prod) {
           updated.originalPrice = prod.price
           updated.priceAtPurchase = prod.price
@@ -178,6 +213,85 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
       }
       return updated
     }))
+  }
+
+  // Handle subtab change in B2B convert modal
+  const handleTabChange = (tab: 'existing' | 'quick-create') => {
+    setConvertTab(tab)
+    if (tab === 'quick-create' && !quickProductSku) {
+      setQuickProductSku(`B2B-${Date.now()}`)
+    }
+  }
+
+  // Handle Quick Create Product from modal
+  const handleQuickCreateProduct = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!quickProductName.trim()) {
+      alert('Vui lòng nhập tên sản phẩm.')
+      return
+    }
+    if (quickProductPrice < 0) {
+      alert('Giá sản phẩm không được âm.')
+      return
+    }
+
+    startConvertTransition(async () => {
+      const skuToUse = quickProductSku.trim() || `B2B-${Date.now()}`
+      
+      const res = await createProduct({
+        sku: skuToUse,
+        name: quickProductName.trim(),
+        description: quickProductDescription.trim() || 'Sản phẩm custom B2B cho đơn hàng',
+        shortDescription: 'Sản phẩm B2B tùy chỉnh',
+        price: quickProductPrice,
+        stockQuantity: 9999, // default stock quantity to pass validation checks
+        weight: 0,
+        images: quickProductImage ? [quickProductImage] : ['https://images.unsplash.com/photo-1514228742587-6b1558fcca3d'],
+        isActive: true,
+        visibility: 'HIDDEN', // hidden from store front catalog
+      })
+
+      if (res.success && res.data) {
+        const newProduct = res.data
+        // Add to order items
+        setOrderItems(prev => [
+          ...prev,
+          {
+            productId: newProduct.id,
+            quantity: activeInquiry?.quantity || 1,
+            priceAtPurchase: newProduct.price,
+            originalPrice: newProduct.price
+          }
+        ])
+        
+        // Add to local products dropdown
+        setLocalProducts(prev => [
+          {
+            id: newProduct.id,
+            sku: newProduct.sku,
+            name: newProduct.name,
+            price: newProduct.price,
+            stockQuantity: newProduct.stockQuantity,
+            images: Array.isArray(newProduct.images) ? newProduct.images[0] : newProduct.images,
+            color: null,
+            size: null
+          },
+          ...prev
+        ])
+
+        alert(`Đã tạo nhanh sản phẩm ẩn B2B: ${newProduct.name} và thêm vào đơn hàng!`)
+        
+        // Reset form
+        setQuickProductName('')
+        setQuickProductPrice(0)
+        setQuickProductSku('')
+        setQuickProductImage('')
+        setQuickProductDescription('')
+        setConvertTab('existing')
+      } else {
+        alert(res.error || 'Có lỗi xảy ra khi tạo sản phẩm.')
+      }
+    })
   }
 
   // Tính tổng giá trị đơn hàng B2B tạm tính
@@ -188,6 +302,23 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
   const calculateTotalWholesale = () => {
     const sum = orderItems.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0)
     return Math.max(0, sum - discount)
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">CHỜ TƯ VẤN</span>
+      case 'CONTACTED':
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">ĐÃ LIÊN HỆ</span>
+      case 'NEGOTIATING':
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-200">THƯƠNG LƯỢNG</span>
+      case 'CONVERTED':
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">ĐÃ CHỐT ĐƠN</span>
+      case 'CANCELLED':
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">ĐÃ HỦY</span>
+      default:
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200">{status}</span>
+    }
   }
 
   // 4. Submit chuyển thành đơn hàng B2B chính thức
@@ -225,22 +356,6 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
     })
   }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">CHỜ TƯ VẤN</span>
-      case 'CONTACTED':
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">ĐÃ LIÊN HỆ</span>
-      case 'NEGOTIATING':
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-200">THƯƠNG LƯỢNG</span>
-      case 'CONVERTED':
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">ĐÃ CHỐT ĐƠN</span>
-      case 'CANCELLED':
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">ĐÃ HỦY</span>
-      default:
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200">{status}</span>
-    }
-  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 font-bvp">
@@ -248,6 +363,33 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
       {/* CỘT TRÁI: DANH SÁCH ĐƠN TƯ VẤN */}
       <div className="flex-grow flex flex-col gap-6 lg:w-2/3 min-w-0">
         
+        {/* TABS LỌC THEO INQUIRY TYPE */}
+        <div className="flex border-b border-border/60 overflow-x-auto gap-2 scrollbar-none">
+          {tabs.map((tab) => {
+            const active = selectedType === tab.key;
+            const count = getTabCount(tab.key);
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setSelectedType(tab.key)}
+                className={`py-3 px-4 border-b-2 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  active 
+                    ? 'border-accent text-accent' 
+                    : 'border-transparent text-secondary hover:text-primary'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  active ? 'bg-accent/10 text-accent font-bold' : 'bg-gray-100 text-gray-500 font-semibold'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
         {/* THANH TÌM KIẾM & BỘ LỌC */}
         <div className="bg-white border border-border/60 p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
@@ -565,8 +707,8 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
 
       {/* MODAL LÊN ĐƠN HÀNG B2B (CONVERT INQUIRY) */}
       {isConvertModalOpen && activeInquiry && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl w-full max-w-3xl border border-gray-200 shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-3xl w-full max-w-3xl border border-gray-200 shadow-2xl overflow-hidden my-8 max-h-[85vh] flex flex-col">
             
             {/* Header */}
             <div className="bg-gray-50/80 border-b border-gray-200/80 px-6 py-4.5 flex justify-between items-center shrink-0">
@@ -582,213 +724,320 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
               </button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleConvertToOrderSubmit} className="flex-grow overflow-y-auto p-6 flex flex-col gap-6">
-              
-              {/* Địa chỉ giao hàng */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-secondary uppercase tracking-wider">Địa chỉ giao hàng *</label>
-                <textarea
-                  required
-                  rows={2}
-                  placeholder="Nhập địa chỉ nhận hàng chi tiết..."
-                  value={shippingAddress}
-                  onChange={(e) => setShippingAddress(e.target.value)}
-                  className="w-full text-xs border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all leading-relaxed"
-                />
-              </div>
+            {/* Modal Subtabs for Product Selection */}
+            <div className="px-6 pt-4 flex border-b border-gray-100 shrink-0 bg-gray-50/20">
+              <button
+                type="button"
+                onClick={() => handleTabChange('existing')}
+                className={`pb-3 px-4 font-bold text-xs uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                  convertTab === 'existing' ? 'border-accent text-accent' : 'border-transparent text-gray-400 hover:text-primary'
+                }`}
+              >
+                Chọn sản phẩm có sẵn
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange('quick-create')}
+                className={`pb-3 px-4 font-bold text-xs uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                  convertTab === 'quick-create' ? 'border-accent text-accent' : 'border-transparent text-gray-400 hover:text-primary'
+                }`}
+              >
+                Tạo sản phẩm mới (Custom B2B)
+              </button>
+            </div>
 
-              {/* Chi tiết mặt hàng (Wholesale items) */}
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-secondary uppercase tracking-wider">Mặt hàng & Chiết khấu giá *</label>
+            {/* Form & Main Body */}
+            <div className="flex-grow overflow-y-auto p-6 flex flex-col gap-6">
+              {convertTab === 'quick-create' ? (
+                /* QUICK CREATE PRODUCT FORM */
+                <div className="flex flex-col gap-4 bg-gray-50/50 p-5 rounded-2xl border border-gray-100">
+                  <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Tạo sản phẩm Custom B2B ẩn</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-secondary">Tên sản phẩm *</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Đôi cốc Bát Tràng khắc logo doanh nghiệp"
+                        value={quickProductName}
+                        onChange={e => setQuickProductName(e.target.value)}
+                        className="w-full text-xs border border-gray-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-accent"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-secondary">Mã SKU *</label>
+                      <input
+                        type="text"
+                        placeholder="Mã SKU định danh"
+                        value={quickProductSku}
+                        onChange={e => setQuickProductSku(e.target.value)}
+                        className="w-full text-xs border border-gray-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-accent font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-secondary">Đơn giá bán lẻ/gốc (VNĐ) *</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={quickProductPrice || ''}
+                        onChange={e => setQuickProductPrice(parseInt(e.target.value) || 0)}
+                        className="w-full text-xs border border-gray-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-accent font-bold text-primary font-mono"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-secondary">Mô tả sản phẩm</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Đất sét trắng Bát Tràng, nung 1250 độ C"
+                        value={quickProductDescription}
+                        onChange={e => setQuickProductDescription(e.target.value)}
+                        className="w-full text-xs border border-gray-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-accent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[11px] font-bold text-secondary">Hình ảnh sản phẩm</label>
+                    <ImageCropUploader
+                      label="Tải ảnh sản phẩm lên Cloudinary"
+                      value={quickProductImage}
+                      onChange={setQuickProductImage}
+                      recommendedSize="800x800 px"
+                      folder="products"
+                    />
+                  </div>
+
                   <button
                     type="button"
-                    onClick={addProductRow}
-                    className="text-[10px] font-bold text-accent hover:text-accent-hover flex items-center gap-1 cursor-pointer transition-colors"
+                    onClick={handleQuickCreateProduct}
+                    disabled={isConvertPending}
+                    className="bg-accent hover:bg-accent-hover text-canvas font-bold text-xs py-2.5 px-4 rounded-xl cursor-pointer w-fit self-end flex items-center gap-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <Plus size={12} />
-                    <span>Thêm dòng sản phẩm</span>
+                    {isConvertPending ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" />
+                        <span>Đang tạo...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={14} />
+                        <span>Tạo & Thêm vào đơn</span>
+                      </>
+                    )}
                   </button>
                 </div>
-
-                <div className="border border-gray-200/80 rounded-xl overflow-hidden">
-                  <table className="w-full text-left text-xs whitespace-nowrap">
-                    <thead className="bg-gray-50 text-gray-400 font-bold uppercase text-[9px] tracking-wider">
-                      <tr>
-                        <th className="py-2.5 px-4">Sản phẩm</th>
-                        <th className="py-2.5 px-3 text-center">SL (Đôi)</th>
-                        <th className="py-2.5 px-3 text-right">Giá gốc</th>
-                        <th className="py-2.5 px-3 text-right">Giá B2B (Đã chiết khấu)</th>
-                        <th className="py-2.5 px-4 text-center">Xóa</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {orderItems.map((item, index) => {
-                        const prod = products.find(p => p.id === item.productId)
-                        
-                        return (
-                          <tr key={index} className="hover:bg-gray-50/30">
-                            {/* Dropdown chọn sản phẩm */}
-                            <td className="py-2 px-4 max-w-[240px]">
-                              <select
-                                value={item.productId}
-                                onChange={(e) => updateProductRow(index, { productId: e.target.value })}
-                                className="w-full text-xs bg-white border border-gray-200 p-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
-                              >
-                                {products.map(p => (
-                                  <option key={p.id} value={p.id}>
-                                    {p.name} ({p.price.toLocaleString('vi-VN')}đ)
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-
-                            {/* Số lượng */}
-                            <td className="py-2 px-3 text-center w-20">
-                              <input
-                                type="number"
-                                min={1}
-                                required
-                                value={item.quantity}
-                                onChange={(e) => updateProductRow(index, { quantity: parseInt(e.target.value) || 1 })}
-                                className="w-full text-center text-xs border border-gray-200 p-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent"
-                              />
-                            </td>
-
-                            {/* Giá gốc */}
-                            <td className="py-2 px-3 text-right font-semibold text-gray-400 font-mono">
-                              {item.originalPrice.toLocaleString('vi-VN')}đ
-                            </td>
-
-                            {/* Giá B2B đã chiết khấu */}
-                            <td className="py-2 px-3 text-right w-36">
-                              <div className="relative">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  required
-                                  value={item.priceAtPurchase}
-                                  onChange={(e) => updateProductRow(index, { priceAtPurchase: parseInt(e.target.value) || 0 })}
-                                  className="w-full text-right text-xs border border-gray-200 p-1.5 pr-6 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent font-bold text-emerald-600 font-mono"
-                                />
-                                <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] text-gray-400 font-bold">đ</span>
-                              </div>
-                            </td>
-
-                            {/* Action xóa hàng */}
-                            <td className="py-2 px-4 text-center">
-                              <button
-                                type="button"
-                                onClick={() => removeProductRow(index)}
-                                className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
-                              >
-                                <Trash2 size={12} />
-                              </button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Chiết khấu thêm, Thanh toán & Ghi chú */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                <div className="space-y-4">
+              ) : (
+                /* SELECT EXISTING PRODUCTS FLOW */
+                <div className="flex flex-col gap-6">
+                  
+                  {/* Địa chỉ giao hàng */}
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider">Chiết khấu thêm toàn đơn</label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min={0}
-                        value={discount}
-                        onChange={(e) => {
-                          const disc = parseInt(e.target.value) || 0
-                          setDiscount(disc)
-                          // Cập nhật lại số tiền thanh toán nếu check Paid full
-                          if (paymentStatus) {
-                            const subtotal = orderItems.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0)
-                            setPaidAmount(Math.max(0, subtotal - disc))
-                          }
-                        }}
-                        className="w-full text-xs border border-gray-200 p-2.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent font-bold text-accent font-mono"
-                        placeholder="Số tiền giảm thêm..."
-                      />
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">VNĐ</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="inqPaymentStatus"
-                      checked={paymentStatus}
-                      onChange={e => {
-                        const isChecked = e.target.checked
-                        setPaymentStatus(isChecked)
-                        if (isChecked) {
-                          setPaidAmount(calculateTotalWholesale())
-                        } else {
-                          setPaidAmount(0)
-                        }
-                      }}
-                      className="w-4 h-4 accent-accent"
+                    <label className="text-xs font-bold text-secondary uppercase tracking-wider">Địa chỉ giao hàng *</label>
+                    <textarea
+                      required
+                      rows={2}
+                      placeholder="Nhập địa chỉ nhận hàng chi tiết..."
+                      value={shippingAddress}
+                      onChange={(e) => setShippingAddress(e.target.value)}
+                      className="w-full text-xs border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all leading-relaxed"
                     />
-                    <label htmlFor="inqPaymentStatus" className="text-xs font-bold text-primary cursor-pointer select-none">
-                      Đã thanh toán đủ (Paid 100%)
-                    </label>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-secondary uppercase tracking-wider">Số tiền đã cọc / Trả trước</label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min={0}
-                        max={calculateTotalWholesale() + discount}
-                        value={paidAmount}
-                        onChange={e => {
-                          const val = parseInt(e.target.value) || 0
-                          setPaidAmount(val)
-                          setPaymentStatus(val >= calculateTotalWholesale())
-                        }}
-                        className="w-full text-xs border border-gray-200 p-2.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent font-bold text-primary font-mono"
-                        placeholder="Nhập số tiền đã cọc..."
-                      />
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">VNĐ</span>
+                  {/* Chi tiết mặt hàng (Wholesale items) */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-secondary uppercase tracking-wider">Mặt hàng & Chiết khấu giá *</label>
+                      <button
+                        type="button"
+                        onClick={addProductRow}
+                        className="text-[10px] font-bold text-accent hover:text-accent-hover flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Plus size={12} />
+                        <span>Thêm dòng sản phẩm</span>
+                      </button>
+                    </div>
+
+                    <div className="border border-gray-200/80 rounded-xl overflow-hidden">
+                      <table className="w-full text-left text-xs whitespace-nowrap">
+                        <thead className="bg-gray-50 text-gray-400 font-bold uppercase text-[9px] tracking-wider">
+                          <tr>
+                            <th className="py-2.5 px-4">Sản phẩm</th>
+                            <th className="py-2.5 px-3 text-center">SL (Đôi)</th>
+                            <th className="py-2.5 px-3 text-right">Giá gốc</th>
+                            <th className="py-2.5 px-3 text-right">Giá B2B (Đã chiết khấu)</th>
+                            <th className="py-2.5 px-4 text-center">Xóa</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {orderItems.map((item, index) => {
+                            return (
+                              <tr key={index} className="hover:bg-gray-50/30">
+                                {/* Dropdown chọn sản phẩm */}
+                                <td className="py-2 px-4 max-w-[240px]">
+                                  <select
+                                    value={item.productId}
+                                    onChange={(e) => updateProductRow(index, { productId: e.target.value })}
+                                    className="w-full text-xs bg-white border border-gray-200 p-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                                  >
+                                    {localProducts.map(p => (
+                                      <option key={p.id} value={p.id}>
+                                        {p.name} ({p.price.toLocaleString('vi-VN')}đ)
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+
+                                {/* Số lượng */}
+                                <td className="py-2 px-3 text-center w-20">
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    required
+                                    value={item.quantity}
+                                    onChange={(e) => updateProductRow(index, { quantity: parseInt(e.target.value) || 1 })}
+                                    className="w-full text-center text-xs border border-gray-200 p-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent"
+                                  />
+                                </td>
+
+                                {/* Giá gốc */}
+                                <td className="py-2 px-3 text-right font-semibold text-gray-400 font-mono">
+                                  {item.originalPrice.toLocaleString('vi-VN')}đ
+                                </td>
+
+                                {/* Giá B2B đã chiết khấu */}
+                                <td className="py-2 px-3 text-right w-36">
+                                  <div className="relative">
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      required
+                                      value={item.priceAtPurchase}
+                                      onChange={(e) => updateProductRow(index, { priceAtPurchase: parseInt(e.target.value) || 0 })}
+                                      className="w-full text-right text-xs border border-gray-200 p-1.5 pr-6 rounded-lg focus:outline-none focus:ring-1 focus:ring-accent font-bold text-emerald-600 font-mono"
+                                    />
+                                    <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] text-gray-400 font-bold">đ</span>
+                                  </div>
+                                </td>
+
+                                {/* Action xóa hàng */}
+                                <td className="py-2 px-4 text-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => removeProductRow(index)}
+                                    className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                </div>
 
-                <div className="bg-gray-50/80 border border-gray-100 rounded-2xl p-4.5 flex flex-col gap-2 text-xs shrink-0 self-end">
-                  <div className="flex justify-between items-center text-gray-400">
-                    <span className="font-semibold">Tổng giá bán lẻ gốc:</span>
-                    <span className="font-bold font-mono">{calculateTotalOriginal().toLocaleString('vi-VN')}đ</span>
-                  </div>
-                  <div className="flex justify-between items-center text-emerald-600">
-                    <span className="font-semibold">Giá B2B tạm tính:</span>
-                    <span className="font-bold font-mono">{orderItems.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0).toLocaleString('vi-VN')}đ</span>
-                  </div>
-                  {discount > 0 && (
-                    <div className="flex justify-between items-center text-accent">
-                      <span className="font-semibold">Giảm thêm toàn đơn:</span>
-                      <span className="font-bold font-mono">-{discount.toLocaleString('vi-VN')}đ</span>
+                  {/* Chiết khấu thêm, Thanh toán & Ghi chú */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div className="space-y-4">
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Chiết khấu thêm toàn đơn</label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min={0}
+                            value={discount}
+                            onChange={(e) => {
+                              const disc = parseInt(e.target.value) || 0
+                              setDiscount(disc)
+                              if (paymentStatus) {
+                                const subtotal = orderItems.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0)
+                                setPaidAmount(Math.max(0, subtotal - disc))
+                              }
+                            }}
+                            className="w-full text-xs border border-gray-200 p-2.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent font-bold text-accent font-mono"
+                            placeholder="Số tiền giảm thêm..."
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">VNĐ</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="inqPaymentStatus"
+                          checked={paymentStatus}
+                          onChange={e => {
+                            const isChecked = e.target.checked
+                            setPaymentStatus(isChecked)
+                            if (isChecked) {
+                              setPaidAmount(calculateTotalWholesale())
+                            } else {
+                              setPaidAmount(0)
+                            }
+                          }}
+                          className="w-4 h-4 accent-accent"
+                        />
+                        <label htmlFor="inqPaymentStatus" className="text-xs font-bold text-primary cursor-pointer select-none">
+                          Đã thanh toán đủ (Paid 100%)
+                        </label>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-secondary uppercase tracking-wider">Số tiền đã cọc / Trả trước</label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min={0}
+                            max={calculateTotalWholesale() + discount}
+                            value={paidAmount}
+                            onChange={e => {
+                              const val = parseInt(e.target.value) || 0
+                              setPaidAmount(val)
+                              setPaymentStatus(val >= calculateTotalWholesale())
+                            }}
+                            className="w-full text-xs border border-gray-200 p-2.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent font-bold text-primary font-mono"
+                            placeholder="Nhập số tiền đã cọc..."
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">VNĐ</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  <div className="border-t border-gray-200 pt-2.5 mt-1 flex justify-between items-center font-bold text-primary text-sm">
-                    <span>Tổng tiền chốt (B2B):</span>
-                    <span className="text-emerald-600 text-base font-mono">{calculateTotalWholesale().toLocaleString('vi-VN')}đ</span>
-                  </div>
-                  <div className="flex justify-between items-center text-red-500 font-bold">
-                    <span>Còn nợ lại (Công nợ):</span>
-                    <span className="font-mono">{Math.max(0, calculateTotalWholesale() - paidAmount).toLocaleString('vi-VN')}đ</span>
-                  </div>
-                </div>
-              </div>
 
-            </form>
+                    <div className="bg-gray-50/80 border border-gray-100 rounded-2xl p-4.5 flex flex-col gap-2 text-xs shrink-0 self-end">
+                      <div className="flex justify-between items-center text-gray-400">
+                        <span className="font-semibold">Tổng giá bán lẻ gốc:</span>
+                        <span className="font-bold font-mono">{calculateTotalOriginal().toLocaleString('vi-VN')}đ</span>
+                      </div>
+                      <div className="flex justify-between items-center text-emerald-600">
+                        <span className="font-semibold">Giá B2B tạm tính:</span>
+                        <span className="font-bold font-mono">{orderItems.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0).toLocaleString('vi-VN')}đ</span>
+                      </div>
+                      {discount > 0 && (
+                        <div className="flex justify-between items-center text-accent">
+                          <span className="font-semibold">Giảm thêm toàn đơn:</span>
+                          <span className="font-bold font-mono">-{discount.toLocaleString('vi-VN')}đ</span>
+                        </div>
+                      )}
+                      <div className="border-t border-gray-200 pt-2.5 mt-1 flex justify-between items-center font-bold text-primary text-sm">
+                        <span>Tổng tiền chốt (B2B):</span>
+                        <span className="text-emerald-600 text-base font-mono">{calculateTotalWholesale().toLocaleString('vi-VN')}đ</span>
+                      </div>
+                      <div className="flex justify-between items-center text-red-500 font-bold">
+                        <span>Còn nợ lại (Công nợ):</span>
+                        <span className="font-mono">{Math.max(0, calculateTotalWholesale() - paidAmount).toLocaleString('vi-VN')}đ</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+            </div>
 
             {/* Footer buttons */}
             <div className="bg-gray-50/80 border-t border-gray-200/80 px-6 py-4 flex justify-end gap-3 shrink-0">
@@ -800,24 +1049,26 @@ export default function InquiriesClient({ initialInquiries, products }: Inquirie
                 Hủy bỏ
               </button>
               
-              <button
-                type="button"
-                onClick={handleConvertToOrderSubmit}
-                disabled={isConvertPending}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-2 px-4.5 rounded-xl cursor-pointer shadow-sm shadow-emerald-500/10 flex items-center gap-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isConvertPending ? (
-                  <>
-                    <Loader2 size={12} className="animate-spin" />
-                    <span>Đang lên đơn...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag size={12} />
-                    <span>Xác nhận lên đơn B2B</span>
-                  </>
-                )}
-              </button>
+              {convertTab === 'existing' && (
+                <button
+                  type="submit"
+                  onClick={handleConvertToOrderSubmit}
+                  disabled={isConvertPending}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-2 px-4.5 rounded-xl cursor-pointer shadow-sm shadow-emerald-500/10 flex items-center gap-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isConvertPending ? (
+                    <>
+                      <Loader2 size={12} className="animate-spin" />
+                      <span>Đang lên đơn...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag size={12} />
+                      <span>Xác nhận lên đơn B2B</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
           </div>

@@ -152,7 +152,7 @@ export class InquiryService {
       include: {
         customer: true,
         product: true,
-        order: {
+        convertedOrder: {
           include: {
             items: {
               include: {
@@ -171,6 +171,7 @@ export class InquiryService {
   static async listInquiries(params: {
     status?: string;
     query?: string;
+    inquiryType?: string;
     page?: number;
     pageSize?: number;
   }) {
@@ -182,6 +183,10 @@ export class InquiryService {
 
     if (params.status) {
       where.status = params.status as InquiryStatus;
+    }
+
+    if (params.inquiryType) {
+      where.inquiryType = params.inquiryType as any;
     }
 
     if (params.query) {
@@ -201,6 +206,7 @@ export class InquiryService {
         include: {
           customer: true,
           product: true,
+          convertedOrder: true,
         },
       }),
       prisma.orderInquiry.count({ where }),
@@ -331,6 +337,7 @@ export class InquiryService {
       const order = await tx.order.create({
         data: {
           customerId: customer.id,
+          sourceInquiryId: inquiry.id,
           totalAmount,
           shippingAddress: shippingAddressJSON,
           status: 'PENDING',
@@ -351,12 +358,13 @@ export class InquiryService {
         },
       });
 
-      // 3. Cập nhật Inquiry: Đánh dấu là CONVERTED và lưu liên kết orderId
+      // 3. Cập nhật Inquiry: Đánh dấu là CONVERTED và lưu liên kết convertedOrderId
       await tx.orderInquiry.update({
         where: { id: inquiry.id },
         data: {
           status: InquiryStatus.CONVERTED,
-          orderId: order.id,
+          convertedOrderId: order.id,
+          convertedAt: new Date(),
         },
       });
 

@@ -24,7 +24,7 @@ export class ProductService {
     colorId?: string | null;
     sizeId?: string | null;
     isActive?: boolean;
-    visibility?: 'PUBLIC' | 'B2B_ONLY';
+    visibility?: Visibility;
     categoryId?: string | null;
   }) {
     // 1. Chuẩn hóa & kiểm tra tính duy nhất của SKU
@@ -98,7 +98,7 @@ export class ProductService {
       colorId: string | null;
       sizeId: string | null;
       isActive: boolean;
-      visibility: 'PUBLIC' | 'B2B_ONLY';
+      visibility: Visibility;
       categoryId: string | null;
     }>
   ) {
