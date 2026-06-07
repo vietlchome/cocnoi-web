@@ -148,16 +148,19 @@ export default function ImageCropUploader({
 
       <div className="flex items-center gap-4 p-4 border border-border/80 rounded-3 bg-canvas/30">
         {/* Preview Frame */}
-        <div className="w-20 h-20 shrink-0 rounded-2 border border-border/60 bg-subtle flex items-center justify-center overflow-hidden relative group">
+        <div className="w-20 h-20 shrink-0 rounded-2 border border-border/60 bg-subtle flex items-center justify-center overflow-hidden relative">
           {value ? (
             <>
               <img src={value} alt="Preview" className="w-full h-full object-cover" />
               <button
                 type="button"
-                onClick={() => onChange("")}
-                className="absolute inset-0 bg-brick/80 text-canvas opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer text-[10px] font-bold"
+                onClick={() => {
+                  if (confirm("Xóa ảnh này?")) onChange("");
+                }}
+                className="absolute top-1 right-1 w-5 h-5 bg-rose-500 hover:bg-rose-600 text-canvas rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
+                title="Xóa ảnh"
               >
-                Xóa ảnh
+                <X className="w-3 h-3" />
               </button>
             </>
           ) : (

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { requireAdmin } from '@/lib/auth-helpers';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: NextRequest) {
   // 1. Phân quyền: Chỉ ADMIN được tải ảnh lên
@@ -17,7 +22,6 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const files = formData.getAll('files') as File[];
-
     const folder = formData.get('folder') as string | null;
 
     if (!files || files.length === 0) {
@@ -26,19 +30,11 @@ export async function POST(req: NextRequest) {
 
     const uploadedUrls: string[] = [];
     
-    // Thư mục lưu trữ tĩnh trong Next.js
-    let uploadDir = path.join(process.cwd(), 'public', 'uploads');
     let relativeFolder = '';
     if (folder) {
       // Bảo vệ tránh directory traversal bằng cách chỉ lấy chữ cái và số
       relativeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, "");
-      if (relativeFolder) {
-        uploadDir = path.join(uploadDir, relativeFolder);
-      }
     }
-    
-    // Tạo thư mục nếu chưa tồn tại
-    await mkdir(uploadDir, { recursive: true });
 
     for (const file of files) {
       // Đảm bảo file là ảnh
@@ -52,20 +48,26 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Kích thước hình ảnh ${file.name} vượt quá 5MB.` }, { status: 400 });
       }
 
-      // Tạo tên tệp độc nhất bằng timestamp + tên ngẫu nhiên + đuôi mở rộng gốc
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      const extension = path.extname(file.name) || '.jpg';
-      const cleanFileName = `${uniqueSuffix}${extension}`;
-      
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const filePath = path.join(uploadDir, cleanFileName);
-      await writeFile(filePath, buffer);
+      // Tải lên Cloudinary
+      const result = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: relativeFolder ? `cocnoi/${relativeFolder}` : 'cocnoi/general',
+            resource_type: 'image',
+            // Tối ưu hóa tự động: format webp và chất lượng tự động
+            transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(buffer);
+      });
 
-      // Đường dẫn tĩnh truy cập từ trình duyệt
-      const fileUrl = relativeFolder ? `/uploads/${relativeFolder}/${cleanFileName}` : `/uploads/${cleanFileName}`;
-      uploadedUrls.push(fileUrl);
+      uploadedUrls.push(result.secure_url);
     }
 
     return NextResponse.json({ 

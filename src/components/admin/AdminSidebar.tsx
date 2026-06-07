@@ -30,7 +30,6 @@ const MENU_ITEMS = [
     icon: Inbox,
     submenus: [
       { title: "Yêu cầu tư vấn, báo giá", href: "/admin/inquiries" },
-      { title: "Khiếu nại", href: "/admin/complaints" },
     ]
   },
   {
@@ -39,9 +38,7 @@ const MENU_ITEMS = [
     submenus: [
       { title: "Tất cả sản phẩm", href: "/admin/products" },
       { title: "Cấu hình sản phẩm", href: "/admin/products/settings" },
-      { title: "Bảng giá", href: "/admin/products/pricing" },
       { title: "Tồn kho", href: "/admin/products/inventory" },
-      { title: "Đánh giá sản phẩm", href: "/admin/products/reviews" },
     ]
   },
   {
@@ -75,8 +72,6 @@ const SALES_CHANNELS = [
     submenus: [
       { title: "Giao diện", href: "/admin/customize", icon: Palette },
       { title: "Blogs", href: "/admin/website/blogs", icon: FileEdit },
-      { title: "Trang nội dung", href: "/admin/website/pages", icon: FileText },
-      { title: "Menu", href: "/admin/website/navigation", icon: List },
     ]
   }
 ];
@@ -86,9 +81,6 @@ const SETTINGS_MENU = {
   icon: Settings,
   submenus: [
     { title: "Cấu hình chung", href: "/admin/settings" },
-    { title: "Tài khoản ngân hàng", href: "/admin/settings/bank-account" },
-    { title: "Thông báo", href: "/admin/settings/notifications" },
-    { title: "Xuất dữ liệu", href: "/admin/settings/export" },
   ]
 };
 

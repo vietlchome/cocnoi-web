@@ -11,11 +11,11 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch("/api/admin/settings");
+        const res = await fetch("/api/site-config");
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            setThemeConfig(data.config);
+            setThemeConfig(data.data);
           }
         }
       } catch (e) {

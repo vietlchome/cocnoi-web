@@ -1,9 +1,18 @@
 import { NextResponse } from 'next/server';
 import { InquiryService } from '@/lib/services/inquiry.service';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (!checkRateLimit(ip, 5, 60_000)) {
+      return NextResponse.json(
+        { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { productId, customerName, phone, email, address, quantity, note, companyName, source } = body;
 
