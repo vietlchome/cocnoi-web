@@ -229,7 +229,7 @@ export default function ReviewSection({ productId, productName }: ReviewSectionP
               })}
             </div>
             <span className="font-bvp text-[10px] text-secondary/60">
-              {rating === 5 && "ệt vời! Rất hài lòng với sản phẩm gốm Cốc Nối."}
+              {rating === 5 && "Tuyệt vời! Rất hài lòng với sản phẩm gốm Cốc Nối."}
               {rating === 4 && "Hài lòng. Cốc cầm đầm tay, nung chín đẹp."}
               {rating === 3 && "Bình thường. Chất lượng men tro tạm ổn."}
               {rating === 2 && "Chưa hài lòng. Cần cải thiện."}

@@ -507,7 +507,7 @@ export default function OrdersClient({ initialOrders, bankSettings = {} }: Order
 
         return (
           <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-8 max-h-[85vh] flex flex-col animate-slide-up">
               
               {/* Modal Header */}
               <div className="bg-gray-50 px-6 py-5 border-b border-gray-200 flex justify-between items-center shrink-0">

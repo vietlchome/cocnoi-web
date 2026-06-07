@@ -194,7 +194,7 @@ export default function ImageCropUploader({
       {/* Modal Crop Ảnh (Chỉ hiện khi đã chọn file) */}
       {imageSrc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/80 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-canvas border border-border rounded-4 w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-canvas border border-border rounded-4 w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
             
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between bg-subtle/30">

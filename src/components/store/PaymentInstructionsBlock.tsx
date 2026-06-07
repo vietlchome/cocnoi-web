@@ -22,7 +22,13 @@ interface PaymentInstructionsBlockProps {
 export default function PaymentInstructionsBlock({ paymentInfo, selectedMethod = "bank_transfer" }: PaymentInstructionsBlockProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  if (!paymentInfo) return null;
+  if (!paymentInfo || (!paymentInfo.bankName && !paymentInfo.accountNumber)) {
+    return (
+      <div className="bg-subtle/30 border border-border rounded-4 p-4 font-bvp text-center text-xs text-secondary">
+        Chưa có thông tin chuyển khoản ngân hàng. Vui lòng liên hệ hotline để được hỗ trợ.
+      </div>
+    );
+  }
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -35,7 +41,7 @@ export default function PaymentInstructionsBlock({ paymentInfo, selectedMethod =
     return (
       <div className="bg-subtle/30 border border-border rounded-4 p-3 font-bvp">
         <h4 className="font-playfair text-sm font-semibold text-primary mb-1">Thanh toán khi nhận hàng</h4>
-        <p className="text-xs text-secondary leading-relaxed">{paymentInfo.codNote}</p>
+        <p className="text-xs text-secondary leading-relaxed">{paymentInfo.codNote || "Nhận hàng và thanh toán tiền mặt tại nhà."}</p>
       </div>
     );
   }
@@ -52,7 +58,7 @@ export default function PaymentInstructionsBlock({ paymentInfo, selectedMethod =
       )}
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-        <div>
+        <div className="col-span-2">
           <span className="text-secondary block text-[10px]">Ngân hàng</span>
           <span className="font-semibold text-primary">{paymentInfo.bankName}</span>
         </div>
@@ -78,7 +84,7 @@ export default function PaymentInstructionsBlock({ paymentInfo, selectedMethod =
           <span className="text-secondary block text-[10px]">Chủ TK</span>
           <span className="font-semibold text-primary uppercase">{paymentInfo.accountHolder}</span>
         </div>
-        <div>
+        <div className="col-span-2 mt-1 border-t border-border/20 pt-2">
           <span className="text-secondary block text-[10px]">Nội dung CK</span>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="font-mono text-xs text-accent font-semibold">{paymentInfo.transferNote}</span>
