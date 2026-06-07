@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Chế độ hoạt động không hợp lệ.' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = Buffer.from(await file.arrayBuffer()) as any;
     const workbook = new ExcelJS.Workbook();
     try {
       await workbook.xlsx.load(buffer);
@@ -72,11 +72,11 @@ export async function POST(request: Request) {
     const sizes = await prisma.sizeOption.findMany({ select: { id: true, name: true } });
     const products = await prisma.product.findMany({ select: { sku: true, name: true } });
 
-    const categorySlugs = new Set(categories.map(c => c.slug));
-    const collectionSlugs = new Set(collections.map(c => c.slug));
-    const colorNames = new Set(colors.map(c => c.name));
-    const sizeNames = new Set(sizes.map(s => s.name));
-    const dbSkus = new Set(products.map(p => p.sku).filter(Boolean) as string[]);
+    const categorySlugs = new Set<string>(categories.map((c: { id: string; slug: string; name: string }) => c.slug));
+    const collectionSlugs = new Set<string>(collections.map((c: { id: string; slug: string; name: string }) => c.slug));
+    const colorNames = new Set<string>(colors.map((c: { id: string; name: string }) => c.name));
+    const sizeNames = new Set<string>(sizes.map((s: { id: string; name: string }) => s.name));
+    const dbSkus = new Set<string>(products.map((p: { sku: string; name: string }) => p.sku).filter(Boolean) as string[]);
 
     const rows: any[] = [];
     const seenSkus = new Set<string>();

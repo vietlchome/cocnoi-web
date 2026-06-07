@@ -26,10 +26,10 @@ export async function POST(request: Request) {
     const colors = await prisma.colorOption.findMany({ select: { id: true, name: true } });
     const sizes = await prisma.sizeOption.findMany({ select: { id: true, name: true } });
 
-    const categoryMap = new Map(categories.map(c => [c.slug, c.id]));
-    const collectionMap = new Map(collections.map(c => [c.slug, c.id]));
-    const colorMap = new Map(colors.map(c => [c.name, c.id]));
-    const sizeMap = new Map(sizes.map(s => [s.name, s.id]));
+    const categoryMap = new Map<string, string>(categories.map((c: { id: string; slug: string }) => [c.slug, c.id]));
+    const collectionMap = new Map<string, string>(collections.map((c: { id: string; slug: string }) => [c.slug, c.id]));
+    const colorMap = new Map<string, string>(colors.map((c: { id: string; name: string }) => [c.name, c.id]));
+    const sizeMap = new Map<string, string>(sizes.map((s: { id: string; name: string }) => [s.name, s.id]));
 
     let created = 0;
     let updated = 0;

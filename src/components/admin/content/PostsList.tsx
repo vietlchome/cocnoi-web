@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { deletePost, publishPost, unpublishPost } from "@/lib/actions/content.actions";
-import { formatCurrency, formatDate } from "@/lib/utils/format";
-import { Edit, Trash2, Globe, EyeOff, Search, Plus, Calendar, BookOpen, Loader2 } from "lucide-react";
-import Image from "next/image";
+import { formatDate } from "@/lib/utils/format";
+import { Edit, Trash2, Globe, EyeOff, Search, Plus, Calendar, BookOpen, Loader2, Clock } from "lucide-react";
+import { PostStatus } from "@prisma/client";
 
 interface Post {
   id: string;
@@ -14,9 +14,16 @@ interface Post {
   content: string;
   coverImage: string | null;
   category: string;
-  isPublished: boolean;
-  publishedAt: Date | null;
-  createdAt: Date;
+  status: PostStatus;
+  publishedAt: Date | string | null;
+  scheduledFor: Date | string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage: string | null;
+  authorName: string | null;
+  tags: string[];
+  readingTime: number | null;
+  createdAt: Date | string;
 }
 
 interface PostsListProps {
@@ -43,10 +50,11 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
   const handleTogglePublish = async (post: Post) => {
     setLoadingId(post.id);
     try {
-      const res = post.isPublished ? await unpublishPost(post.id) : await publishPost(post.id);
+      const isPublished = post.status === PostStatus.PUBLISHED;
+      const res = isPublished ? await unpublishPost(post.id) : await publishPost(post.id);
       if (res.success && res.data) {
         setPosts((prev) =>
-          prev.map((p) => (p.id === post.id ? { ...p, isPublished: !p.isPublished, publishedAt: res.data.publishedAt } : p))
+          prev.map((p) => (p.id === post.id ? { ...p, status: res.data.status, publishedAt: res.data.publishedAt } : p))
         );
       } else {
         alert(res.error || "Có lỗi xảy ra khi đổi trạng thái bài viết.");
@@ -77,7 +85,7 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 font-bvp">
       {/* Search and Action Bar */}
       <div className="bg-canvas border border-border/40 p-5 rounded-3 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
@@ -125,23 +133,56 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+                    {/* Status Badge */}
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm backdrop-blur-md ${
-                      post.isPublished
+                      post.status === PostStatus.PUBLISHED
                         ? "bg-emerald-500/90 border-emerald-400 text-canvas"
+                        : post.status === PostStatus.SCHEDULED
+                        ? "bg-sky-500/90 border-sky-400 text-canvas"
                         : "bg-amber-500/90 border-amber-400 text-canvas"
                     }`}>
-                      {post.isPublished ? <Globe className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                      <span>{post.isPublished ? "Đã đăng" : "Bản nháp"}</span>
+                      {post.status === PostStatus.PUBLISHED ? (
+                        <Globe className="w-3 h-3" />
+                      ) : post.status === PostStatus.SCHEDULED ? (
+                        <Clock className="w-3 h-3" />
+                      ) : (
+                        <EyeOff className="w-3 h-3" />
+                      )}
+                      <span>
+                        {post.status === PostStatus.PUBLISHED
+                          ? "Đã đăng"
+                          : post.status === PostStatus.SCHEDULED
+                          ? "Hẹn giờ"
+                          : "Bản nháp"}
+                      </span>
+                    </span>
+
+                    {/* Category Tag */}
+                    <span className="inline-block px-2 py-0.5 bg-primary/80 border border-primary/60 text-canvas rounded text-[9px] font-semibold uppercase tracking-wider">
+                      {post.category === "UNSUNG_HEROES"
+                        ? "Người Nối"
+                        : post.category === "JOURNEY"
+                        ? "Hành trình"
+                        : post.category === "KNOWLEDGE"
+                        ? "Tạp chí"
+                        : "Chưa phân loại"}
                     </span>
                   </div>
                 </div>
 
                 {/* Content info */}
                 <div className="p-5 flex-grow flex flex-col gap-3">
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-secondary">
-                    <Calendar className="w-3.5 h-3.5 text-accent" />
-                    <span>{formatDate(post.createdAt)}</span>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-secondary">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-accent" />
+                      <span>{formatDate(post.createdAt)}</span>
+                    </div>
+                    {post.readingTime && (
+                      <span className="bg-subtle/50 px-1.5 py-0.5 rounded">
+                        {post.readingTime} phút đọc
+                      </span>
+                    )}
                   </div>
 
                   <h4 className="font-playfair text-base font-bold text-primary truncate-2-lines group-hover:text-accent transition-colors">
@@ -151,6 +192,30 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
                   <p className="text-xs text-secondary truncate-3-lines leading-relaxed flex-grow">
                     {post.excerpt || "Không có tóm tắt giới thiệu bài viết..."}
                   </p>
+
+                  {/* Scheduled date if available */}
+                  {post.status === PostStatus.SCHEDULED && post.scheduledFor && (
+                    <div className="text-[10px] text-sky-600 bg-sky-50 p-2 rounded-2 flex items-center gap-1.5 font-bold border border-sky-100">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Hẹn giờ đăng: {formatDate(post.scheduledFor)}</span>
+                    </div>
+                  )}
+
+                  {/* Tags Preview */}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {post.tags.slice(0, 3).map((tag, idx) => (
+                        <span key={idx} className="bg-subtle text-secondary px-1.5 py-0.5 rounded-[3px] text-[9px] font-medium">
+                          #{tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <span className="text-secondary/60 text-[9px] font-bold self-center ml-0.5">
+                          +{post.tags.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   <div className="pt-4 border-t border-border/40 flex items-center justify-between mt-auto">
                     <div className="flex gap-2">
@@ -174,16 +239,17 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
 
                     <button
                       onClick={() => handleTogglePublish(post)}
-                      disabled={loadingId === post.id}
-                      className={`px-3 py-1.5 rounded-2 font-bold text-xs border transition-all flex items-center gap-1 cursor-pointer ${
-                        post.isPublished
+                      disabled={loadingId === post.id || post.status === PostStatus.SCHEDULED}
+                      className={`px-3 py-1.5 rounded-2 font-bold text-xs border transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                        post.status === PostStatus.PUBLISHED
                           ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                           : "bg-accent/10 border-accent/20 text-accent hover:bg-accent hover:text-canvas"
                       }`}
+                      title={post.status === PostStatus.SCHEDULED ? "Không thể chuyển đổi trực tiếp trạng thái hẹn giờ từ danh sách" : ""}
                     >
                       {loadingId === post.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : post.isPublished ? (
+                      ) : post.status === PostStatus.PUBLISHED ? (
                         <>
                           <EyeOff className="w-3 h-3" />
                           <span>Hạ tải bài</span>

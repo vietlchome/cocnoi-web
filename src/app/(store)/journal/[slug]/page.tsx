@@ -2,7 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/format";
-import { embedVideos } from "@/lib/utils/video";
+import { PostStatus } from "@prisma/client";
+import { getSiteConfig } from "@/lib/site-config";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const dynamic = "force-dynamic";
 
@@ -12,32 +15,73 @@ interface PageProps {
   }>;
 }
 
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const post = await prisma.post.findFirst({
+    where: {
+      slug,
+      status: PostStatus.PUBLISHED,
+      publishedAt: {
+        lte: new Date(),
+      },
+    },
+  });
+
+  if (!post) {
+    return {};
+  }
+
+  const config = await getSiteConfig();
+
+  const title = post.metaTitle || post.title;
+  const description = post.metaDescription || post.excerpt || post.title;
+  const ogImg = post.ogImage || post.coverImage || config.seo.ogImage;
+
+  return {
+    title: `${title} | Cốc Nối`,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: ogImg ? [{ url: ogImg }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ogImg ? [ogImg] : [],
+    },
+  };
+}
+
 export default async function ArticleDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const post = await prisma.post.findUnique({
-    where: { slug, isPublished: true },
+  const post = await prisma.post.findFirst({
+    where: {
+      slug,
+      status: PostStatus.PUBLISHED,
+      publishedAt: {
+        lte: new Date(),
+      },
+    },
   });
 
   if (!post) {
     notFound();
   }
 
-  const articleData = {
-    title: post.title,
-    excerpt: post.excerpt,
-    createdAt: post.createdAt,
-    coverImage: post.coverImage,
-    tag: "Nhật ký",
-    content: post.content
-  };
+  let tag = "Nhật ký";
+  if (post.category === "UNSUNG_HEROES") tag = "Người Nối";
+  else if (post.category === "JOURNEY") tag = "Hành trình";
+  else if (post.category === "KNOWLEDGE") tag = "Tạp chí";
 
   const coverSrc =
-    articleData.coverImage ||
+    post.coverImage ||
     "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80";
 
   return (
-    <div className="bg-canvas min-h-screen font-bvp">
+    <div className="bg-[#FEFCF9] min-h-screen font-bvp">
       {/* ─── BACK NAV ─── */}
       <div className="max-w-[720px] mx-auto px-6 pt-10 md:pt-14">
         <Link
@@ -51,16 +95,22 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       {/* ─── ARTICLE HEADER ─── */}
       <header className="max-w-[720px] mx-auto px-6 pt-12 md:pt-16 pb-10 md:pb-14 text-center">
         <span className="inline-block font-quicksand text-[10px] font-bold uppercase tracking-[.22em] text-accent/80 mb-5">
-          {articleData.tag} &nbsp;·&nbsp; {formatDate(articleData.createdAt)}
+          {tag} &nbsp;·&nbsp; {formatDate(post.publishedAt || post.createdAt)}
         </span>
 
         <h1 className="font-playfair text-3xl md:text-[2.8rem] leading-[1.15] font-normal text-primary mb-6">
-          {articleData.title}
+          {post.title}
         </h1>
 
-        {articleData.excerpt && (
+        {post.authorName && (
+          <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-6">
+            Bởi {post.authorName} {post.readingTime ? `· ${post.readingTime} phút đọc` : ""}
+          </p>
+        )}
+
+        {post.excerpt && (
           <p className="font-bvp text-sm md:text-[15px] text-secondary/60 leading-relaxed max-w-lg mx-auto italic">
-            {articleData.excerpt}
+            {post.excerpt}
           </p>
         )}
       </header>
@@ -70,17 +120,29 @@ export default async function ArticleDetailPage({ params }: PageProps) {
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-subtle/10">
           <img
             src={coverSrc}
-            alt={articleData.title}
+            alt={post.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
       </div>
 
       {/* ─── ARTICLE BODY (CONSTRAINED READABILITY COLUMN) ─── */}
-      <article
-        className="prose max-w-[720px] mx-auto px-6"
-        dangerouslySetInnerHTML={{ __html: embedVideos(articleData.content) }}
-      />
+      <article className="prose max-w-[720px] mx-auto px-6 font-bvp leading-relaxed text-primary/95 prose-headings:font-playfair prose-headings:font-bold prose-headings:text-primary prose-a:text-accent hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-subtle/30 prose-blockquote:p-4 prose-blockquote:rounded-r-2 prose-blockquote:font-bvp prose-img:rounded-3 prose-img:shadow-md prose-img:mx-auto">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {post.content}
+        </ReactMarkdown>
+      </article>
+
+      {/* Tags list */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="max-w-[720px] mx-auto px-6 mt-8 flex flex-wrap gap-2">
+          {post.tags.map((t: string, idx: number) => (
+            <span key={idx} className="bg-subtle text-secondary px-3 py-1 rounded-[3px] text-xs font-medium border border-border/20">
+              #{t}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* ─── END MARK ─── */}
       <div className="max-w-[720px] mx-auto px-6 py-16 md:py-20 flex flex-col items-center gap-6">

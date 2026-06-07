@@ -1,20 +1,36 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/format";
+import { PostStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-/** Strip HTML tags → clean plaintext excerpt */
-function excerpt(html: string, max = 160): string {
-  if (!html) return "";
-  const t = html.replace(/<\/?[^>]+(>|$)/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+/** Strip HTML/Markdown tags → clean plaintext excerpt */
+function excerpt(text: string, max = 160): string {
+  if (!text) return "";
+  // Strip Markdown characters and HTML tags
+  const t = text
+    .replace(/<\/?[^>]+(>|$)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove markdown links
+    .replace(/[#*`_~]/g, "") // Remove markdown format chars
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return t.length <= max ? t : t.slice(0, max).replace(/\s+\S*$/, "") + " …";
 }
 
 export default async function JournalPage() {
+  const now = new Date();
   const posts = await prisma.post.findMany({
-    where: { isPublished: true },
-    orderBy: { createdAt: "desc" },
+    where: {
+      status: PostStatus.PUBLISHED,
+      publishedAt: {
+        lte: now,
+      },
+    },
+    orderBy: {
+      publishedAt: "desc",
+    },
   });
 
   /* ---------- data types ---------- */
@@ -29,18 +45,25 @@ export default async function JournalPage() {
     tag: string;
   }
 
-  const dbArticles: Article[] = posts.map((p: any) => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt || excerpt(p.content, 140),
-    date: formatDate(p.createdAt),
-    author: "CỐC NỐI",
-    coverImage:
-      p.coverImage ||
-      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=960&q=80",
-    tag: "Nhật ký",
-  }));
+  const dbArticles: Article[] = posts.map((p: any) => {
+    let tag = "Nhật ký";
+    if (p.category === "UNSUNG_HEROES") tag = "Người Nối";
+    else if (p.category === "JOURNEY") tag = "Hành trình";
+    else if (p.category === "KNOWLEDGE") tag = "Tạp chí";
+
+    return {
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt || excerpt(p.content, 140),
+      date: formatDate(p.publishedAt || p.createdAt),
+      author: p.authorName || "CỐC NỐI",
+      coverImage:
+        p.coverImage ||
+        "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=960&q=80",
+      tag,
+    };
+  });
 
   const articles = dbArticles;
   const heroArticle = articles.length > 0 ? articles[0] : null;
