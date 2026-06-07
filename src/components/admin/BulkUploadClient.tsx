@@ -198,6 +198,36 @@ export default function BulkUploadClient() {
         </div>
       </div>
 
+      {/* Hướng dẫn quy trình nhập hàng loạt */}
+      <div className="bg-canvas border border-border/40 rounded-3xl p-6 shadow-xs flex flex-col gap-4">
+        <h2 className="font-playfair text-base font-bold text-primary flex items-center gap-2">
+          <FileSpreadsheet className="w-5 h-5 text-accent" />
+          <span>Quy trình nhập sản phẩm hàng loạt (Excel Bulk Upload)</span>
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-xs text-secondary leading-relaxed">
+          <div className="flex flex-col gap-1.5 p-4 bg-[#FAF7F2] rounded-2xl border border-border/10">
+            <span className="font-bold text-accent uppercase tracking-widest text-[9px]">Bước 1</span>
+            <p className="font-bold text-primary">Thiết lập metadata trước</p>
+            <p>Tạo danh mục (Category), Bộ sưu tập (BST), Màu sắc và Kích thước tại mục cấu hình trước khi nhập file.</p>
+          </div>
+          <div className="flex flex-col gap-1.5 p-4 bg-[#FAF7F2] rounded-2xl border border-border/10">
+            <span className="font-bold text-accent uppercase tracking-widest text-[9px]">Bước 2</span>
+            <p className="font-bold text-primary">Tải tệp Excel mẫu</p>
+            <p>Chọn thao tác phù hợp ở dưới và bấm nút tải template để lấy file chuẩn đã tích hợp dropdown dữ liệu từ DB.</p>
+          </div>
+          <div className="flex flex-col gap-1.5 p-4 bg-[#FAF7F2] rounded-2xl border border-border/10">
+            <span className="font-bold text-accent uppercase tracking-widest text-[9px]">Bước 3</span>
+            <p className="font-bold text-primary">Điền thông tin gốm</p>
+            <p>Nhập dữ liệu vào tệp. Chỉ chọn các ô phân loại từ danh sách có sẵn. Để trống cột SKU để tự sinh mã CN0001+.</p>
+          </div>
+          <div className="flex flex-col gap-1.5 p-4 bg-[#FAF7F2] rounded-2xl border border-border/10">
+            <span className="font-bold text-accent uppercase tracking-widest text-[9px]">Bước 4</span>
+            <p className="font-bold text-primary">Upload & Lưu</p>
+            <p>Kéo thả tệp vào vùng tải lên, kiểm tra bảng xem trước để phát hiện lỗi, chọn cơ chế đè/bỏ qua trùng và commit.</p>
+          </div>
+        </div>
+      </div>
+
       {errorMsg && (
         <div className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -438,7 +468,7 @@ export default function BulkUploadClient() {
                         <td className="p-3 truncate max-w-[160px]" title={row.name}>{row.name || '-'}</td>
                         <td className="p-3 font-mono">{row.data?.price ? `${row.data.price.toLocaleString('vi-VN')} đ` : '-'}</td>
                         <td className="p-3 font-mono">{row.data?.stockQuantity ?? '-'}</td>
-                        <td className="p-3 font-mono text-secondary">{row.data?.categorySlug || '-'}</td>
+                        <td className="p-3 font-mono text-secondary">{row.data?.categoryName || '-'}</td>
                       </>
                     ) : mode === 'stock' ? (
                       <td className="p-3 font-mono font-semibold text-primary">{row.newStock ?? '-'}</td>

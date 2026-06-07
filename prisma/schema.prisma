@@ -172,6 +172,8 @@ model Product {
   compareAtPrice   Int?          // Giá so sánh / Giá gốc trước khi giảm
   stockQuantity    Int           @default(0)
   weight           Int?          @default(0) // Khối lượng sản phẩm (grams)
+  capacity         Int?          @default(0) // dung tích ml
+  dimensions       String?       // kích thước text free-form vd "Ø8.5 × H11cm"
   images           String[]      // Mảng ảnh (tối đa 6 ảnh)
   
   // Các trường phục vụ Flat Catalog (Mỗi Màu/Cỡ là 1 sản phẩm)
