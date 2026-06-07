@@ -12,6 +12,7 @@ export const CreateInquirySchema = z.object({
   quantity: z.number().int().positive('Số lượng sản phẩm phải lớn hơn 0').default(1),
   note: z.string().nullable().optional(),
   source: z.string().nullable().optional(),
+  inquiryType: z.enum(['RETAIL_B2C', 'WHOLESALE_B2B', 'CORPORATE_B2B', 'CONTACT_GENERAL']).optional(),
 });
 
 export const ConvertToOrderSchema = z.object({
@@ -20,4 +21,5 @@ export const ConvertToOrderSchema = z.object({
   items: z.array(B2BOrderItemSchema).min(1, 'Hợp đồng phải có ít nhất 1 sản phẩm'),
   discount: z.number().int().nonnegative('Số tiền chiết khấu phải là số không âm').default(0),
   paidAmount: z.number().int().nonnegative('Số tiền đã thanh toán phải là số không âm').default(0),
+  note: z.string().nullable().optional(),
 });

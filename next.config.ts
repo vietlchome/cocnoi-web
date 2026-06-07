@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
   async redirects() {
@@ -19,6 +23,11 @@ const nextConfig: NextConfig = {
       {
         source: "/community",
         destination: "/community/nguoi-noi",
+        permanent: true,
+      },
+      {
+        source: "/about",
+        destination: "/discover/our-story",
         permanent: true,
       },
     ];

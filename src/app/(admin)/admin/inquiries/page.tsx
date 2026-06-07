@@ -27,6 +27,7 @@ export default async function AdminInquiriesPage() {
   // Định dạng lại các trường cho an toàn
   const formattedInquiries = (inquiries || []).map((inq: any) => ({
     ...inq,
+    order: inq.convertedOrder || null,
     createdAt: new Date(inq.createdAt),
     updatedAt: new Date(inq.updatedAt)
   }))

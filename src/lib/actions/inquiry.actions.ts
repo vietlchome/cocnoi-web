@@ -22,6 +22,7 @@ export async function createInquiry(data: z.infer<typeof CreateInquirySchema>) {
       quantity: validated.quantity,
       note: validated.note,
       source: validated.source,
+      inquiryType: validated.inquiryType,
     });
 
     revalidatePath('/admin/inquiries');
@@ -48,6 +49,7 @@ export async function saveDraftLead(data: z.infer<typeof CreateInquirySchema>) {
       quantity: validated.quantity,
       note: validated.note,
       source: validated.source,
+      inquiryType: validated.inquiryType,
     });
 
     revalidatePath('/admin/inquiries');
@@ -62,7 +64,7 @@ export async function saveDraftLead(data: z.infer<typeof CreateInquirySchema>) {
 // 3. LIST INQUIRIES (ADMIN ONLY)
 // =========================================================
 
-export async function getInquiries(statusFilter?: string, query?: string, page?: number, pageSize?: number) {
+export async function getInquiries(statusFilter?: string, query?: string, page?: number, pageSize?: number, inquiryType?: string) {
   await requireAdmin();
 
   try {
@@ -71,6 +73,7 @@ export async function getInquiries(statusFilter?: string, query?: string, page?:
       query,
       page,
       pageSize,
+      inquiryType,
     });
     return { success: true, data: result.data, totalCount: result.totalCount };
   } catch (error: any) {
@@ -120,6 +123,7 @@ export async function convertInquiryToOrder(data: z.infer<typeof ConvertToOrderS
       })),
       discount: validated.discount,
       paidAmount: validated.paidAmount,
+      note: validated.note,
     });
 
     revalidatePath('/admin/inquiries');

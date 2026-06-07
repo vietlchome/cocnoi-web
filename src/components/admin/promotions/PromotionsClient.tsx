@@ -225,7 +225,7 @@ export default function PromotionsClient({
       {/* Modal Creating Promotion */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/20 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-4 shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-slide-up">
+          <div className="bg-white rounded-4 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden animate-slide-up">
             <div className="p-5 border-b border-border/20 flex justify-between items-center shrink-0">
               <h2 className="text-lg font-playfair font-bold text-primary">Tạo Chiến dịch Khuyến mãi</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-secondary/50 hover:text-primary cursor-pointer">

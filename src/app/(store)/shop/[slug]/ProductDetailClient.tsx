@@ -92,6 +92,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<FriendlyError | null>(null)
+  const [inquiryMode, setInquiryMode] = useState<'b2c_retail' | 'b2b_consultation'>('b2c_retail')
 
   const router = useRouter()
   const { addItem } = useCartStore()
@@ -129,8 +130,14 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
     const colorNote = product.colorName 
       ? `[Màu đã chọn: ${product.colorName}] ${note}`.trim()
       : note
-    const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD"
-    const fullNote = `Phương thức: ${methodLabel}${colorNote ? ` | ${colorNote}` : ''}`
+
+    let fullNote = ''
+    if (inquiryMode === 'b2b_consultation') {
+      fullNote = `[B2B Inquiry] ${colorNote}`.trim()
+    } else {
+      const methodLabel = paymentMethod === "bank_transfer" ? "Chuyển khoản trước" : "COD"
+      fullNote = `Phương thức: ${methodLabel}${colorNote ? ` | ${colorNote}` : ''}`
+    }
 
     try {
       const response = await fetch('/api/inquiry', {
@@ -144,6 +151,8 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
           address: address || undefined,
           quantity,
           note: fullNote || undefined,
+          source: inquiryMode === 'b2b_consultation' ? 'B2B Custom Inquiry from Product Detail' : undefined,
+          inquiryType: inquiryMode === 'b2b_consultation' ? 'WHOLESALE_B2B' : 'RETAIL_B2C',
         }),
       })
 
@@ -175,7 +184,8 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
           customerName: customerName.trim(),
           phone: phone.trim(),
           email: email || null,
-          companyName: 'B2B Lead (Nháp)'
+          companyName: inquiryMode === 'b2b_consultation' ? 'B2B Lead (Nháp)' : null,
+          inquiryType: inquiryMode === 'b2b_consultation' ? 'WHOLESALE_B2B' : 'RETAIL_B2C',
         })
       })
     } catch (err) {
@@ -183,12 +193,13 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
     }
   }
 
-  const openInquiry = () => {
+  const openInquiry = (mode: 'b2c_retail' | 'b2b_consultation') => {
+    setInquiryMode(mode)
     setCustomerName('')
     setPhone('')
     setEmail('')
     setAddress('')
-    setQuantity(qty) // Seed inquiry quantity from selected qty
+    setQuantity(mode === 'b2b_consultation' ? 50 : qty) // Seed inquiry quantity from selected qty or default to 50 for B2B
     setNote('')
     setPaymentMethod('bank_transfer')
     setSubmitSuccess(false)
@@ -433,7 +444,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                 </>
               ) : (
                 <button
-                  onClick={openInquiry}
+                  onClick={() => openInquiry('b2c_retail')}
                   className="w-full h-14 bg-accent hover:bg-accent-hover text-canvas font-bold text-sm rounded-2 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider shadow-sm"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
@@ -444,7 +455,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
 
               {/* B2B / Custom Inquiry Button */}
               <button
-                onClick={openInquiry}
+                onClick={() => openInquiry('b2b_consultation')}
                 className="w-full py-4 border border-border/80 hover:border-accent hover:text-accent bg-transparent hover:bg-subtle/10 text-secondary font-bold text-xs rounded-2 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
               >
                 <span>Tư vấn đặt hàng số lượng lớn / Đặt riêng B2B</span>
@@ -573,8 +584,12 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
             {/* Sticky Header */}
             <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between shrink-0">
               <div>
-                <h3 className="font-playfair font-bold text-base text-primary">Tư Vấn & Đặt Mua Gốm</h3>
-                <p className="text-[11px] text-secondary">Hỗ trợ chu đáo từ nghệ nhân Bát Tràng</p>
+                <h3 className="font-playfair font-bold text-base text-primary">
+                  {inquiryMode === 'b2b_consultation' ? 'Tư vấn đặt hàng số lượng lớn' : 'Tư Vấn & Đặt Mua Gốm'}
+                </h3>
+                <p className="text-[11px] text-secondary">
+                  {inquiryMode === 'b2b_consultation' ? 'Sales B2B liên hệ trong 24h' : 'Hỗ trợ chu đáo từ nghệ nhân Bát Tràng'}
+                </p>
               </div>
               <button 
                 onClick={() => setShowInquiryModal(false)}
@@ -594,15 +609,21 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                     <span className="font-playfair font-bold text-base text-primary">Đã nhận thông tin</span>
                   </div>
                   
-                  <p className="font-bvp text-sm text-secondary mb-1">
-                    Cốc Nối liên hệ xác nhận đơn trong 2 giờ.
-                  </p>
+                  {inquiryMode === 'b2b_consultation' ? (
+                    <p className="font-bvp text-sm text-secondary mb-1">
+                      Đã nhận yêu cầu B2B. Sales liên hệ trong 24h tư vấn báo giá + phương thức thanh toán phù hợp.
+                    </p>
+                  ) : (
+                    <p className="font-bvp text-sm text-secondary mb-1">
+                      Cốc Nối liên hệ xác nhận đơn trong 2 giờ.
+                    </p>
+                  )}
                   <p className="font-bvp text-xs text-secondary/80 mb-4 font-normal text-left">
                     Sản phẩm: <span className="font-semibold text-primary">{product.name}</span> {product.colorName && `(${product.colorName})`}
                   </p>
 
                   {/* Payment block compact */}
-                  {process.env.NEXT_PUBLIC_ENABLE_CART !== "true" && paymentInfo && (
+                  {inquiryMode !== 'b2b_consultation' && process.env.NEXT_PUBLIC_ENABLE_CART !== "true" && paymentInfo && (
                     <PaymentInstructionsBlock paymentInfo={paymentInfo} selectedMethod={paymentMethod} />
                   )}
                 </div>
@@ -701,8 +722,9 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                       <input 
                         type="number" 
                         min="1"
-                        value={quantity}
-                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        placeholder={inquiryMode === 'b2b_consultation' ? 'Số lượng dự kiến (≥10 đôi)' : undefined}
+                        value={quantity || ''}
+                        onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : 0)}
                         className="w-full text-xs bg-canvas border border-border/80 px-3.5 py-2.5 rounded-2 text-primary font-bold focus:outline-none focus:border-accent"
                         required
                       />
@@ -714,44 +736,48 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                     Giá trị dự kiến: <strong className="text-primary font-bold">{(displayPrice * quantity).toLocaleString('vi-VN')} đ</strong>
                   </div>
 
-                  <div className="flex flex-col gap-3 text-left">
-                    <label className="text-xs font-bold text-secondary">Phương thức thanh toán <span className="text-rose-500">*</span></label>
-                    <div className="flex flex-col gap-2">
-                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="bank_transfer" 
-                          checked={paymentMethod === "bank_transfer"} 
-                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                          className="mt-1 accent-accent"
-                        />
-                        <div className="text-left font-bvp">
-                          <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
-                          <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
-                        </div>
-                      </label>
-                      <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="cod" 
-                          checked={paymentMethod === "cod"} 
-                          onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
-                          className="mt-1 accent-accent"
-                        />
-                        <div className="text-left font-bvp">
-                          <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
-                          <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
-                        </div>
-                      </label>
+                  {inquiryMode !== 'b2b_consultation' && (
+                    <div className="flex flex-col gap-3 text-left">
+                      <label className="text-xs font-bold text-secondary">Phương thức thanh toán <span className="text-rose-500">*</span></label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="bank_transfer" 
+                            checked={paymentMethod === "bank_transfer"} 
+                            onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                            className="mt-1 accent-accent"
+                          />
+                          <div className="text-left font-bvp">
+                            <p className="font-semibold text-xs text-primary">Chuyển khoản trước</p>
+                            <p className="text-[10px] text-secondary mt-0.5">Khuyến nghị. Xác nhận đơn nhanh hơn. QR ngân hàng sẽ hiện sau khi gửi.</p>
+                          </div>
+                        </label>
+                        <label className="flex items-start gap-3 p-3 border border-border rounded-3 cursor-pointer hover:bg-subtle/30 transition-colors">
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="cod" 
+                            checked={paymentMethod === "cod"} 
+                            onChange={(e) => setPaymentMethod(e.target.value as 'bank_transfer' | 'cod')}
+                            className="mt-1 accent-accent"
+                          />
+                          <div className="text-left font-bvp">
+                            <p className="font-semibold text-xs text-primary">Thanh toán khi nhận hàng (COD)</p>
+                            <p className="text-[10px] text-secondary mt-0.5">Phù hợp Hà Nội nội thành. Tỉnh khác phụ phí ship.</p>
+                          </div>
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="text-left">
                     <label className="text-xs font-bold text-secondary mb-1.5 block">Lời nhắn gửi xưởng</label>
                     <textarea 
-                      placeholder="Ghi chú đóng gói quà tặng, lời chúc thư tay hoặc màu men yêu cầu..."
+                      placeholder={inquiryMode === 'b2b_consultation' 
+                        ? "Nhu cầu chi tiết: số lượng, in logo, packaging custom, deadline, ngân sách..."
+                        : "Ghi chú đóng gói quà tặng, lời chúc thư tay hoặc màu men yêu cầu..."}
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       className="w-full text-xs bg-canvas border border-border/80 px-3.5 py-2.5 rounded-2 text-primary focus:outline-none focus:border-accent h-16 resize-none"

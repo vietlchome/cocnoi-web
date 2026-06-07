@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 import { InquiryService } from '@/lib/services/inquiry.service';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (!checkRateLimit(ip, 5, 60_000)) {
+      return NextResponse.json(
+        { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
-    const { customerName, phone, email, companyName, productId, quantity, note, source } = body;
+    const { customerName, phone, email, companyName, productId, quantity, note, source, inquiryType } = body;
 
     if (!phone) {
       return NextResponse.json({ error: 'Số điện thoại là bắt buộc để capture lead!' }, { status: 400 });
@@ -20,6 +29,7 @@ export async function POST(request: Request) {
       quantity: quantity ? parseInt(quantity.toString()) : 1,
       note: note || null,
       source: source || 'Form B2B nháp',
+      inquiryType: inquiryType || undefined,
     });
 
     return NextResponse.json({ success: true, data: inquiry }, { status: 200 });

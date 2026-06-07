@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const VisibilitySchema = z.enum(['PUBLIC', 'B2B_ONLY']);
+export const VisibilitySchema = z.enum(['PUBLIC', 'B2B_ONLY', 'HIDDEN']);
 
 export const CreateProductSchema = z.object({
   sku: z.string().min(1, 'Mã SKU không được để trống').nullable().optional(),

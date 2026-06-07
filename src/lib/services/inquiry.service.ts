@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { CustomerService } from './customer.service';
 import { OrderService } from './order.service';
 import { InventoryService } from './inventory.service';
-import { InquiryStatus, CustomerType } from '@prisma/client';
+import { InquiryStatus, CustomerType, InquiryType } from '@prisma/client';
 import { normalizePhone } from '@/lib/utils/phone';
 
 export class InquiryService {
@@ -18,6 +18,7 @@ export class InquiryService {
     quantity?: number;
     note?: string | null;
     source?: string | null;
+    inquiryType?: InquiryType;
   }, tx?: any) {
     const client = tx || prisma;
     const normalizedPhone = normalizePhone(data.phone);
@@ -44,6 +45,7 @@ export class InquiryService {
         note: data.note || null,
         source: data.source || null,
         status: InquiryStatus.PENDING,
+        inquiryType: data.inquiryType || InquiryType.RETAIL_B2C,
       },
       include: {
         customer: true,
@@ -74,6 +76,7 @@ export class InquiryService {
     quantity?: number;
     note?: string | null;
     source?: string | null;
+    inquiryType?: InquiryType;
   }) {
     const normalizedPhone = normalizePhone(data.phone);
 
@@ -113,6 +116,7 @@ export class InquiryService {
             quantity: data.quantity ?? existingPendingInquiry.quantity,
             note: data.note || existingPendingInquiry.note,
             source: data.source || existingPendingInquiry.source,
+            inquiryType: data.inquiryType || existingPendingInquiry.inquiryType,
           },
           include: {
             customer: true,
@@ -134,6 +138,7 @@ export class InquiryService {
           note: data.note || null,
           source: data.source || null,
           status: InquiryStatus.PENDING,
+          inquiryType: data.inquiryType || InquiryType.RETAIL_B2C,
         },
         include: {
           customer: true,
@@ -152,7 +157,7 @@ export class InquiryService {
       include: {
         customer: true,
         product: true,
-        order: {
+        convertedOrder: {
           include: {
             items: {
               include: {
@@ -171,6 +176,7 @@ export class InquiryService {
   static async listInquiries(params: {
     status?: string;
     query?: string;
+    inquiryType?: string;
     page?: number;
     pageSize?: number;
   }) {
@@ -182,6 +188,10 @@ export class InquiryService {
 
     if (params.status) {
       where.status = params.status as InquiryStatus;
+    }
+
+    if (params.inquiryType) {
+      where.inquiryType = params.inquiryType as any;
     }
 
     if (params.query) {
@@ -201,6 +211,7 @@ export class InquiryService {
         include: {
           customer: true,
           product: true,
+          convertedOrder: true,
         },
       }),
       prisma.orderInquiry.count({ where }),
@@ -263,6 +274,7 @@ export class InquiryService {
     }[];
     discount?: number;
     paidAmount?: number;
+    note?: string | null;
   }) {
     return prisma.$transaction(async (tx: any) => {
       // 1. Kiểm tra tồn tại và hợp lệ của Inquiry
@@ -331,6 +343,7 @@ export class InquiryService {
       const order = await tx.order.create({
         data: {
           customerId: customer.id,
+          sourceInquiryId: inquiry.id,
           totalAmount,
           shippingAddress: shippingAddressJSON,
           status: 'PENDING',
@@ -339,7 +352,7 @@ export class InquiryService {
           debtAmount,
           orderType: 'B2B_WHOLESALE',
           discount,
-          note: `Chốt hợp đồng từ đơn tư vấn sỉ #${inquiry.id}`,
+          note: data.note || `Chốt hợp đồng từ đơn tư vấn sỉ #${inquiry.id}`,
           items: {
             create: data.items.map((item) => ({
               productId: item.productId,
@@ -351,12 +364,13 @@ export class InquiryService {
         },
       });
 
-      // 3. Cập nhật Inquiry: Đánh dấu là CONVERTED và lưu liên kết orderId
+      // 3. Cập nhật Inquiry: Đánh dấu là CONVERTED và lưu liên kết convertedOrderId
       await tx.orderInquiry.update({
         where: { id: inquiry.id },
         data: {
           status: InquiryStatus.CONVERTED,
-          orderId: order.id,
+          convertedOrderId: order.id,
+          convertedAt: new Date(),
         },
       });
 
