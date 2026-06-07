@@ -6,7 +6,17 @@ export const CreatePostSchema = z.object({
   content: z.string().min(1, 'Nội dung bài viết không được để trống'),
   coverImage: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
   category: z.string().default('UNCATEGORIZED'),
-  isPublished: z.boolean().default(false),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'SCHEDULED']).default('DRAFT'),
+  scheduledFor: z.preprocess((val) => (val === '' || val === null ? undefined : val), z.coerce.date().optional()),
+  metaTitle: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
+  metaDescription: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
+  ogImage: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
+  authorName: z.string().nullable().optional().default('Cốc Nối'),
+  tags: z.union([z.array(z.string()), z.string()]).optional().transform((val) => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    return val.split(',').map(t => t.trim()).filter(Boolean);
+  }),
 });
 
 export const UpdatePostSchema = CreatePostSchema.partial();

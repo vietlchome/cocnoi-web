@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils/slug';
+import { PostStatus } from '@prisma/client';
 
 export class ContentService {
   // ---------------------------------------------------------
@@ -14,7 +15,14 @@ export class ContentService {
     excerpt?: string | null;
     content: string;
     coverImage?: string | null;
-    isPublished?: boolean;
+    category?: string;
+    status?: PostStatus;
+    scheduledFor?: Date | null;
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: string | null;
+    authorName?: string | null;
+    tags?: string[];
   }) {
     let baseSlug = slugify(data.title);
     let slug = baseSlug;
@@ -31,8 +39,9 @@ export class ContentService {
       counter++;
     }
 
-    const isPublished = data.isPublished ?? false;
-    const publishedAt = isPublished ? new Date() : null;
+    const status = data.status || PostStatus.DRAFT;
+    const publishedAt = status === PostStatus.PUBLISHED ? new Date() : null;
+    const readingTime = Math.ceil(data.content.split(/\s+/).filter(Boolean).length / 200);
 
     return prisma.post.create({
       data: {
@@ -41,8 +50,16 @@ export class ContentService {
         excerpt: data.excerpt || null,
         content: data.content,
         coverImage: data.coverImage || null,
-        isPublished,
+        category: data.category || 'UNCATEGORIZED',
+        status,
         publishedAt,
+        scheduledFor: data.scheduledFor || null,
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
+        ogImage: data.ogImage || null,
+        authorName: data.authorName || 'Cốc Nối',
+        tags: data.tags || [],
+        readingTime,
       },
     });
   }
@@ -57,23 +74,42 @@ export class ContentService {
       excerpt: string | null;
       content: string;
       coverImage: string | null;
-      isPublished: boolean;
+      category: string;
+      status: PostStatus;
+      scheduledFor: Date | null;
+      metaTitle: string | null;
+      metaDescription: string | null;
+      ogImage: string | null;
+      authorName: string | null;
+      tags: string[];
     }>
   ) {
     const post = await prisma.post.findUnique({
       where: { id },
-      select: { title: true, slug: true, isPublished: true, publishedAt: true },
+      select: { title: true, slug: true, status: true, publishedAt: true },
     });
 
     if (!post) {
-      throw new Error('Không tìm thấy bài viết blog cần cập nhật!');
+      throw new Error('Không tìm thấy bài viết cần cập nhật!');
     }
 
     const updateData: any = {};
 
     if (data.excerpt !== undefined) updateData.excerpt = data.excerpt;
-    if (data.content !== undefined) updateData.content = data.content;
     if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.metaTitle !== undefined) updateData.metaTitle = data.metaTitle;
+    if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
+    if (data.ogImage !== undefined) updateData.ogImage = data.ogImage;
+    if (data.authorName !== undefined) updateData.authorName = data.authorName;
+    if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.scheduledFor !== undefined) updateData.scheduledFor = data.scheduledFor;
+
+    if (data.content !== undefined) {
+      updateData.content = data.content;
+      // Re-calculate reading time
+      updateData.readingTime = Math.ceil(data.content.split(/\s+/).filter(Boolean).length / 200);
+    }
 
     // Nếu đổi tiêu đề, sinh lại slug mới
     if (data.title !== undefined && data.title !== post.title) {
@@ -86,7 +122,6 @@ export class ContentService {
           where: { slug },
           select: { id: true },
         });
-        // Bỏ qua chính bài viết đang update
         if (!existing || existing.id === id) break;
         slug = `${baseSlug}-${counter}`;
         counter++;
@@ -96,11 +131,13 @@ export class ContentService {
     }
 
     // Nếu thay đổi trạng thái xuất bản
-    if (data.isPublished !== undefined && data.isPublished !== post.isPublished) {
-      updateData.isPublished = data.isPublished;
-      updateData.publishedAt = data.isPublished
-        ? (post.publishedAt || new Date())
-        : null;
+    if (data.status !== undefined && data.status !== post.status) {
+      updateData.status = data.status;
+      if (data.status === PostStatus.PUBLISHED) {
+        updateData.publishedAt = post.publishedAt || new Date();
+      } else {
+        updateData.publishedAt = null;
+      }
     }
 
     return prisma.post.update({
@@ -133,8 +170,10 @@ export class ContentService {
   static async listPosts(params: {
     page?: number;
     pageSize?: number;
+    status?: string;
     isPublished?: boolean;
     search?: string;
+    category?: string;
   } = {}) {
     const page = params.page || 1;
     const pageSize = params.pageSize || 10;
@@ -142,8 +181,19 @@ export class ContentService {
 
     const where: any = {};
 
-    if (params.isPublished !== undefined) {
-      where.isPublished = params.isPublished;
+    if (params.status) {
+      where.status = params.status as PostStatus;
+    } else if (params.isPublished !== undefined) {
+      if (params.isPublished) {
+        where.status = PostStatus.PUBLISHED;
+        where.publishedAt = { lte: new Date() };
+      } else {
+        where.status = { in: [PostStatus.DRAFT, PostStatus.SCHEDULED] };
+      }
+    }
+
+    if (params.category) {
+      where.category = params.category;
     }
 
     if (params.search) {
@@ -173,7 +223,7 @@ export class ContentService {
     return prisma.post.update({
       where: { id },
       data: {
-        isPublished: true,
+        status: PostStatus.PUBLISHED,
         publishedAt: new Date(),
       },
     });
@@ -186,7 +236,7 @@ export class ContentService {
     return prisma.post.update({
       where: { id },
       data: {
-        isPublished: false,
+        status: PostStatus.DRAFT,
         publishedAt: null,
       },
     });
