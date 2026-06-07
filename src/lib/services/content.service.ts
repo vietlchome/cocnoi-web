@@ -2,6 +2,13 @@ import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils/slug';
 import { PostStatus } from '@prisma/client';
 
+function calculateReadingTime(htmlContent: string): number {
+  const plainText = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!plainText) return 1;
+  const wordCount = plainText.split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / 200));
+}
+
 export class ContentService {
   // ---------------------------------------------------------
   // BLOG CMS (POSTS)
@@ -41,7 +48,7 @@ export class ContentService {
 
     const status = data.status || PostStatus.DRAFT;
     const publishedAt = status === PostStatus.PUBLISHED ? new Date() : null;
-    const readingTime = Math.ceil(data.content.split(/\s+/).filter(Boolean).length / 200);
+    const readingTime = calculateReadingTime(data.content);
 
     return prisma.post.create({
       data: {
@@ -108,7 +115,7 @@ export class ContentService {
     if (data.content !== undefined) {
       updateData.content = data.content;
       // Re-calculate reading time
-      updateData.readingTime = Math.ceil(data.content.split(/\s+/).filter(Boolean).length / 200);
+      updateData.readingTime = calculateReadingTime(data.content);
     }
 
     // Nếu đổi tiêu đề, sinh lại slug mới

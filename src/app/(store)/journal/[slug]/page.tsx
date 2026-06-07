@@ -1,11 +1,10 @@
+import React from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/format";
 import { PostStatus } from "@prisma/client";
 import { getSiteConfig } from "@/lib/site-config";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 export const dynamic = "force-dynamic";
 
@@ -47,9 +46,12 @@ export async function generateMetadata({ params }: PageProps) {
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
-      images: ogImg ? [ogImg] : [],
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt || "",
+      images: [post.ogImage || post.coverImage].filter(Boolean) as string[],
+    },
+    alternates: {
+      canonical: `https://${process.env.NEXT_PUBLIC_SITE_URL || "cocnoi.com"}/journal/${post.slug}`,
     },
   };
 }
@@ -80,8 +82,41 @@ export default async function ArticleDetailPage({ params }: PageProps) {
     post.coverImage ||
     "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80";
 
+  const jsonLdImage = post.ogImage || post.coverImage || null;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.metaDescription || post.excerpt || "",
+    "image": jsonLdImage ? [jsonLdImage] : [],
+    "datePublished": post.publishedAt ? post.publishedAt.toISOString() : post.createdAt.toISOString(),
+    "dateModified": post.updatedAt.toISOString(),
+    "author": {
+      "@type": "Person",
+      "name": post.authorName || "Cốc Nối"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Cốc Nối",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `https://${process.env.NEXT_PUBLIC_SITE_URL || "cocnoi.com"}/logo.png`
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://${process.env.NEXT_PUBLIC_SITE_URL || "cocnoi.com"}/journal/${post.slug}`
+    }
+  };
+
   return (
     <div className="bg-[#FEFCF9] min-h-screen font-bvp">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* ─── BACK NAV ─── */}
       <div className="max-w-[720px] mx-auto px-6 pt-10 md:pt-14">
         <Link
@@ -102,11 +137,15 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           {post.title}
         </h1>
 
-        {post.authorName && (
-          <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-6">
-            Bởi {post.authorName} {post.readingTime ? `· ${post.readingTime} phút đọc` : ""}
-          </p>
-        )}
+        <div className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-6 flex items-center justify-center gap-1.5 flex-wrap">
+          {post.authorName && <span>Bởi {post.authorName}</span>}
+          {post.readingTime && (
+            <>
+              <span className="opacity-45">·</span>
+              <span>📖 {post.readingTime} phút đọc</span>
+            </>
+          )}
+        </div>
 
         {post.excerpt && (
           <p className="font-bvp text-sm md:text-[15px] text-secondary/60 leading-relaxed max-w-lg mx-auto italic">
@@ -127,11 +166,11 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       </div>
 
       {/* ─── ARTICLE BODY (CONSTRAINED READABILITY COLUMN) ─── */}
-      <article className="prose max-w-[720px] mx-auto px-6 font-bvp leading-relaxed text-primary/95 prose-headings:font-playfair prose-headings:font-bold prose-headings:text-primary prose-a:text-accent hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-subtle/30 prose-blockquote:p-4 prose-blockquote:rounded-r-2 prose-blockquote:font-bvp prose-img:rounded-3 prose-img:shadow-md prose-img:mx-auto">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {post.content}
-        </ReactMarkdown>
-      </article>
+      <article
+        className="prose prose-cocnoi prose-stone prose-lg max-w-[720px] mx-auto px-6 font-bvp leading-relaxed text-primary/95"
+        style={{ "--tw-prose-headings": "var(--color-deep-indigo)" } as React.CSSProperties}
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
 
       {/* Tags list */}
       {post.tags && post.tags.length > 0 && (

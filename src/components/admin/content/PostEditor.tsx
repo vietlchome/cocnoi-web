@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, updatePost } from "@/lib/actions/content.actions";
-import MarkdownEditor from "@/components/admin/MarkdownEditor";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import ImageCropUploader from "@/components/admin/ImageCropUploader";
 import { FormField } from "@/components/ui/FormField";
 import { ArrowLeft, Save, Loader2, Sparkles, Globe, EyeOff, Calendar, Settings } from "lucide-react";
@@ -130,7 +130,7 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
               {isEdit ? `Sửa bài viết: ${post.title}` : "Soạn thảo bài viết mới"}
             </h3>
             <p className="text-xs text-secondary mt-0.5">
-              Cập nhật nội dung blog, tạp chí hoặc hành trình sáng tác gốm Cốc Nối dạng Markdown
+              Cập nhật nội dung blog, tạp chí hoặc hành trình sáng tác gốm Cốc Nối
             </p>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center mb-1">
                 <label className="text-xs font-bold text-secondary uppercase tracking-wider block">
-                  Nội dung bài viết * (Markdown)
+                  Nội dung bài viết *
                 </label>
                 {post?.readingTime && (
                   <span className="text-[10px] bg-subtle px-2 py-0.5 rounded text-secondary font-semibold">
@@ -179,10 +179,10 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
               {errors.content && (
                 <span className="text-[11px] text-rose-500 font-bold block mb-1">{errors.content}</span>
               )}
-              <MarkdownEditor
+              <RichTextEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Viết nội dung bài viết bằng Markdown (hỗ trợ kéo thả/chèn ảnh tự động, định dạng tiêu đề, liên kết, bảng biểu...)"
+                placeholder="Bắt đầu viết câu chuyện..."
               />
             </div>
 

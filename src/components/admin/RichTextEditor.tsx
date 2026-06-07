@@ -1,235 +1,384 @@
-'use client'
+"use client";
 
-import React, { useRef, useEffect } from 'react'
-import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Link, RemoveFormatting, Video } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Youtube from "@tiptap/extension-youtube";
+import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Terminal,
+  Link2,
+  ImagePlus,
+  Minus,
+  Undo2,
+  Redo2,
+  X
+} from "lucide-react";
+
+// Inline custom YouTube icon SVG to ensure compatibility without dependency issues
+const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    stroke="currentColor"
+    strokeWidth="2"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+  </svg>
+);
+import ImageCropUploader from "@/components/admin/ImageCropUploader";
 
 interface RichTextEditorProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-export default function RichTextEditor({ value, onChange, placeholder = 'Nhập mô tả chi tiết sản phẩm...' }: RichTextEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null)
-  const isUpdatingRef = useRef(false)
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder = "Bắt đầu viết câu chuyện..."
+}: RichTextEditorProps) {
+  const [showImageModal, setShowImageModal] = useState(false);
 
-  // Đồng bộ từ prop `value` vào innerHTML khi mount hoặc khi thay đổi từ bên ngoài (tránh vòng lặp re-render)
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-3 my-6 max-w-full mx-auto shadow-md block",
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        HTMLAttributes: {
+          class: "text-accent underline cursor-pointer",
+        },
+      }),
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+        HTMLAttributes: {
+          class: "aspect-video w-full my-6 rounded-3 shadow-md mx-auto max-w-[640px]",
+        },
+      }),
+      Placeholder.configure({
+        placeholder,
+      }),
+    ],
+    content: value,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: "w-full min-h-[450px] p-5 focus:outline-none focus:ring-0 text-sm font-bvp text-primary leading-relaxed bg-canvas overflow-y-auto prose prose-stone max-w-none focus-within:outline-none",
+      },
+    },
+  });
+
+  // Keep editor content in sync with external value changes
   useEffect(() => {
-    if (editorRef.current && !isUpdatingRef.current) {
-      if (editorRef.current.innerHTML !== value) {
-        editorRef.current.innerHTML = value || ''
-      }
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value);
     }
-  }, [value])
+  }, [value, editor]);
 
-  const handleInput = () => {
-    if (editorRef.current) {
-      isUpdatingRef.current = true
-      onChange(editorRef.current.innerHTML)
-      isUpdatingRef.current = false
-    }
+  if (!editor) {
+    return (
+      <div className="w-full border border-border/40 rounded-3 bg-canvas flex items-center justify-center min-h-[500px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+      </div>
+    );
   }
 
-  // Thực thi các lệnh định dạng của trình duyệt (execCommand)
-  const executeCommand = (command: string, arg: string = '') => {
-    document.execCommand(command, false, arg)
-    handleInput()
-    if (editorRef.current) {
-      editorRef.current.focus()
-    }
-  }
+  // Toolbar action helpers
+  const setLink = () => {
+    const previousUrl = editor.getAttributes("link").href;
+    const url = prompt("Nhập địa chỉ URL liên kết:", previousUrl);
 
-  const addLink = () => {
-    const url = prompt('Nhập đường dẫn liên kết (URL):', 'https://')
+    // Cancelled
+    if (url === null) {
+      return;
+    }
+
+    // Empty
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      return;
+    }
+
+    // Update link
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  };
+
+  const handleImageUploaded = (url: string) => {
+    if (!url) return;
+    const altText = prompt("Nhập mô tả hình ảnh (alt text) để tối ưu SEO:", "") || "Hình ảnh";
+    editor.chain().focus().setImage({ src: url, alt: altText }).run();
+    setShowImageModal(false);
+  };
+
+  const addYoutubeVideo = () => {
+    const url = prompt("Nhập địa chỉ URL video YouTube (ví dụ: https://www.youtube.com/watch?v=dQw4w9WgXcQ):");
     if (url) {
-      executeCommand('createLink', url)
+      editor.chain().focus().setYoutubeVideo({ src: url }).run();
     }
-  }
-
-  const getYouTubeEmbedUrl = (url: string): string | null => {
-    if (!url) return null
-    // RegExp for standard, share, embed, shorts, etc.
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/
-    const match = url.match(regExp)
-    if (match && match[2].length === 11) {
-      return `https://www.youtube.com/embed/${match[2]}`
-    }
-    return null
-  }
-
-  const addYoutubeEmbed = () => {
-    const url = prompt('Nhập đường dẫn video YouTube hoặc Shorts:', 'https://www.youtube.com/watch?v=...')
-    if (url) {
-      const embedUrl = getYouTubeEmbedUrl(url)
-      if (embedUrl) {
-        const iframeHtml = `<iframe src="${embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen class="w-full aspect-video rounded-xl my-4"></iframe><p><br></p>`
-        executeCommand('insertHTML', iframeHtml)
-      } else {
-        alert('Đường dẫn video YouTube không hợp lệ. Vui lòng nhập đúng định dạng!')
-      }
-    }
-  }
+  };
 
   return (
-    <div className="w-full border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 transition-all duration-200 bg-white dark:bg-zinc-900">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 p-2 bg-gray-50/80 dark:bg-zinc-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 select-none">
-        <button
-          type="button"
-          onClick={() => executeCommand('bold')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="In đậm"
-        >
-          <Bold size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={() => executeCommand('italic')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="In nghiêng"
-        >
-          <Italic size={16} />
-        </button>
-        <div className="w-[1px] h-6 bg-gray-200 dark:bg-zinc-700 mx-1" />
-        <button
-          type="button"
-          onClick={() => executeCommand('formatBlock', '<h1>')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Tiêu đề lớn"
-        >
-          <Heading1 size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={() => executeCommand('formatBlock', '<h2>')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Tiêu đề phụ"
-        >
-          <Heading2 size={16} />
-        </button>
-        <div className="w-[1px] h-6 bg-gray-200 dark:bg-zinc-700 mx-1" />
-        <button
-          type="button"
-          onClick={() => executeCommand('insertUnorderedList')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Danh sách dấu chấm"
-        >
-          <List size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={() => executeCommand('insertOrderedList')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Danh sách số"
-        >
-          <ListOrdered size={16} />
-        </button>
-        <div className="w-[1px] h-6 bg-gray-200 dark:bg-zinc-700 mx-1" />
-        <button
-          type="button"
-          onClick={addLink}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Thêm liên kết"
-        >
-          <Link size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={addYoutubeEmbed}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors hover:text-red-500 dark:hover:text-red-400"
-          title="Nhúng YouTube"
-        >
-          <Video size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={() => executeCommand('removeFormat')}
-          className="p-2 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors"
-          title="Xóa định dạng"
-        >
-          <RemoveFormatting size={16} />
-        </button>
+    <div className="w-full border border-border/40 rounded-3 overflow-hidden bg-canvas flex flex-col min-h-[500px] shadow-xs">
+      {/* Rich Editor Toolbar */}
+      <div className="flex flex-wrap items-center justify-between border-b border-border/40 bg-subtle/20 px-3 py-2 gap-2">
+        <div className="flex items-center gap-0.5 flex-wrap">
+          {/* Format: Bold, Italic, Underline, Strikethrough */}
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("bold") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Chữ đậm"
+          >
+            <Bold className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("italic") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Chữ nghiêng"
+          >
+            <Italic className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("underline") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Gạch chân"
+          >
+            <UnderlineIcon className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("strike") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Gạch ngang"
+          >
+            <Strikethrough className="w-4 h-4" />
+          </button>
+
+          <div className="h-4 w-px bg-border/60 mx-1.5" />
+
+          {/* Heading Dropdown */}
+          <select
+            value={
+              editor.isActive("heading", { level: 1 })
+                ? "h1"
+                : editor.isActive("heading", { level: 2 })
+                ? "h2"
+                : editor.isActive("heading", { level: 3 })
+                ? "h3"
+                : "p"
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "p") {
+                editor.chain().focus().setParagraph().run();
+              } else {
+                const level = parseInt(val.replace("h", ""), 10) as 1 | 2 | 3;
+                editor.chain().focus().toggleHeading({ level }).run();
+              }
+            }}
+            className="text-xs bg-canvas border border-border/40 px-2 py-1 rounded-2 focus:outline-none cursor-pointer font-bold text-primary mr-1"
+          >
+            <option value="p">Văn bản thường</option>
+            <option value="h1">Tiêu đề lớn (H1)</option>
+            <option value="h2">Tiêu đề vừa (H2)</option>
+            <option value="h3">Tiêu đề nhỏ (H3)</option>
+          </select>
+
+          <div className="h-4 w-px bg-border/60 mx-1.5" />
+
+          {/* Lists */}
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("bulletList") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Danh sách dấu tròn"
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("orderedList") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Danh sách số"
+          >
+            <ListOrdered className="w-4 h-4" />
+          </button>
+
+          <div className="h-4 w-px bg-border/60 mx-1.5" />
+
+          {/* Blockquote & Code */}
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("blockquote") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Trích dẫn"
+          >
+            <Quote className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("code") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Mã nguồn dòng"
+          >
+            <Code className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("codeBlock") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Khối mã nguồn"
+          >
+            <Terminal className="w-4 h-4" />
+          </button>
+
+          <div className="h-4 w-px bg-border/60 mx-1.5" />
+
+          {/* Media: Links, Images, YouTube */}
+          <button
+            type="button"
+            onClick={setLink}
+            className={`p-2 rounded hover:bg-subtle/50 transition-colors cursor-pointer ${
+              editor.isActive("link") ? "bg-subtle text-accent font-bold" : "text-secondary hover:text-primary"
+            }`}
+            title="Chèn liên kết"
+          >
+            <Link2 className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowImageModal(true)}
+            className="p-2 rounded hover:bg-subtle/50 text-accent hover:text-accent-hover transition-colors cursor-pointer flex items-center gap-1 font-bold text-xs"
+            title="Thêm hình ảnh"
+          >
+            <ImagePlus className="w-4 h-4 text-accent" />
+            <span className="hidden sm:inline">Thêm ảnh</span>
+          </button>
+          <button
+            type="button"
+            onClick={addYoutubeVideo}
+            className="p-2 rounded hover:bg-subtle/50 text-red-600 hover:text-red-700 transition-colors cursor-pointer flex items-center gap-1 font-bold text-xs"
+            title="Thêm video YouTube"
+          >
+            <YoutubeIcon className="w-4 h-4 text-red-600" />
+            <span className="hidden sm:inline">Thêm YouTube</span>
+          </button>
+
+          <div className="h-4 w-px bg-border/60 mx-1.5" />
+
+          {/* Horizontal Rule */}
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            className="p-2 rounded hover:bg-subtle/50 text-secondary hover:text-primary transition-colors cursor-pointer"
+            title="Đường phân cách ngang"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Undo/Redo */}
+        <div className="flex items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().undo().run()}
+            disabled={!editor.can().undo()}
+            className="p-2 rounded hover:bg-subtle/50 text-secondary hover:text-primary transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            title="Hoàn tác (Undo)"
+          >
+            <Undo2 className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().redo().run()}
+            disabled={!editor.can().redo()}
+            className="p-2 rounded hover:bg-subtle/50 text-secondary hover:text-primary transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            title="Làm lại (Redo)"
+          >
+            <Redo2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Editable Content Area */}
-      <div
-        ref={editorRef}
-        contentEditable
-        onInput={handleInput}
-        onBlur={handleInput}
-        className="p-4 min-h-[250px] max-h-[500px] overflow-y-auto focus:outline-none prose prose-sm dark:prose-invert max-w-none text-gray-800 dark:text-gray-200"
-        style={{ outline: 'none' }}
-        data-placeholder={placeholder}
-      />
+      {/* Editor Content Area */}
+      <div className="flex-grow flex flex-col min-h-[400px]">
+        <EditorContent editor={editor} className="flex-grow flex flex-col" />
+      </div>
 
-      {/* CSS Placeholder fallback */}
-      <style jsx global>{`
-        [contenteditable]:empty:before {
-          content: attr(data-placeholder);
-          color: #a1a1aa;
-          cursor: text;
-        }
-        .dark [contenteditable]:empty:before {
-          color: #71717a;
-        }
-        /* Custom styles for content inside editor */
-        .prose h1 {
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-        .prose h2 {
-          font-size: 1.25rem;
-          font-weight: 600;
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-        .prose ul {
-          list-style-type: disc;
-          padding-left: 1.5rem;
-          margin-bottom: 0.5rem;
-        }
-        .prose ol {
-          list-style-type: decimal;
-          padding-left: 1.5rem;
-          margin-bottom: 0.5rem;
-        }
-        .prose a {
-          color: #f97316;
-          text-decoration: underline;
-        }
-        .prose iframe {
-          width: 100%;
-          aspect-ratio: 16 / 9;
-          border-radius: 0.75rem;
-          margin-top: 1rem;
-          margin-bottom: 1rem;
-        }
-        /* Dark Mode Overrides inside editor to make text white */
-        .dark .prose {
-          color: #f4f4f5 !important;
-        }
-        .dark .prose h1,
-        .dark .prose h2,
-        .dark .prose h3,
-        .dark .prose h4,
-        .dark .prose strong {
-          color: #ffffff !important;
-        }
-        @media (prefers-color-scheme: dark) {
-          .prose {
-            color: #f4f4f5 !important;
-          }
-          .prose h1,
-          .prose h2,
-          .prose h3,
-          .prose h4,
-          .prose strong {
-            color: #ffffff !important;
-          }
-        }
-      `}</style>
+      {/* Cloudinary Image Upload Modal */}
+      {showImageModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/80 backdrop-blur-xs p-4">
+          <div className="bg-canvas border border-border rounded-4 w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+            <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between bg-subtle/30">
+              <h4 className="font-playfair font-bold text-sm text-primary">Tải ảnh lên bài viết</h4>
+              <button
+                type="button"
+                onClick={() => setShowImageModal(false)}
+                className="text-secondary hover:text-primary p-1 border border-border rounded-2 hover:bg-canvas transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5">
+              <ImageCropUploader
+                label="Chọn ảnh để chèn vào bài viết"
+                value=""
+                onChange={handleImageUploaded}
+                folder="blog"
+                recommendedSize="1200 x 675 (Khuyên dùng)"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
