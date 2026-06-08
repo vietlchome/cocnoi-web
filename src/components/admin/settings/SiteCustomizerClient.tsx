@@ -127,7 +127,7 @@ export default function SiteCustomizerClient({ initialConfig }: Props) {
                 <div className="p-6 border-t border-border flex flex-col gap-5">
                   <SectionEditor
                     schema={section.fields}
-                    value={config[key as keyof SiteConfig]}
+                    value={(config[key as keyof SiteConfig] || {}) as any}
                     onChange={(val) => setConfig(prev => ({ ...prev, [key]: val }))}
                     path={key}
                     errors={groupedErrors?.[key]}

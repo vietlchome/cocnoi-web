@@ -33,7 +33,7 @@ export default async function StockistsPage() {
     );
   }
 
-  const byCity = stockists.reduce<Record<string, typeof stockists>>((acc, s) => {
+  const byCity = (stockists || []).reduce((acc: Record<string, any[]>, s: any) => {
     if (!acc[s.city]) acc[s.city] = [];
     acc[s.city].push(s);
     return acc;
@@ -47,7 +47,7 @@ export default async function StockistsPage() {
           <section key={city} className="mb-14">
             <h2 className="font-playfair text-2xl mb-6" style={{ color: "var(--color-terracotta)" }}>{city}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {list.map(s => (
+              {(list as any[]).map((s: any) => (
                 <article key={s.id} className="border border-border rounded-xl p-6 bg-white">
                   {s.imageUrl && (
                     <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden">
