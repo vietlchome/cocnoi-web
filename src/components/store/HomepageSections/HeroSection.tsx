@@ -29,7 +29,7 @@ export default function HeroSection({ config, quickChips }: HeroSectionProps) {
           
           <div className="flex flex-wrap gap-4 w-full sm:w-auto">
             <Link 
-              href={config.ctaPrimary?.url || "/shop"}
+              href={config.ctaPrimary?.url || "/cua-hang"}
               style={{ backgroundColor: "var(--color-deep-indigo)" }}
               className="inline-flex items-center justify-center bg-primary text-canvas font-bvp font-medium text-sm md:text-base px-8 py-4 rounded-2 hover:opacity-90 transition-all duration-300 w-full sm:w-auto text-center group"
             >

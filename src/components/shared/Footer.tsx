@@ -161,16 +161,16 @@ export default function Footer({ config }: FooterProps) {
           </h4>
           <ul className="flex flex-col gap-3 font-bvp text-sm text-secondary" style={{ color: "var(--color-dark-brown)" }}>
             <li>
-              <Link href="/shop?category=Mugs" className="hover:text-accent transition-colors">Cốc có quai (Mugs)</Link>
+              <Link href="/cua-hang?category=Mugs" className="hover:text-accent transition-colors">Cốc có quai (Mugs)</Link>
             </li>
             <li>
-              <Link href="/shop?category=Beakers" className="hover:text-accent transition-colors">Cốc không quai (Beakers)</Link>
+              <Link href="/cua-hang?category=Beakers" className="hover:text-accent transition-colors">Cốc không quai (Beakers)</Link>
             </li>
             <li>
-              <Link href="/shop?category=Limited" className="hover:text-accent transition-colors">BST Giới hạn</Link>
+              <Link href="/cua-hang?category=Limited" className="hover:text-accent transition-colors">BST Giới hạn</Link>
             </li>
             <li>
-              <Link href="/shop" className="hover:text-accent transition-colors">Tất cả sản phẩm</Link>
+              <Link href="/cua-hang" className="hover:text-accent transition-colors">Tất cả sản phẩm</Link>
             </li>
           </ul>
         </div>

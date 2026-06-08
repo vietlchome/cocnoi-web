@@ -47,8 +47,8 @@ export async function submitReviewAction(data: z.infer<typeof CreateReviewSchema
     });
 
     // Revalidate paths to update ratings & review list instantly
-    revalidatePath(`/shop/${review.productId}`);
-    revalidatePath("/shop");
+    revalidatePath(`/cua-hang/${review.productId}`);
+    revalidatePath("/cua-hang");
     
     return { success: true, data: review };
   } catch (error: any) {

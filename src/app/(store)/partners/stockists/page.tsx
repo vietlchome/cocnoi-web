@@ -38,7 +38,7 @@ export default async function StockistsPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link 
-                href="/shop" 
+                href="/cua-hang" 
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2 font-bvp font-semibold text-canvas bg-primary hover:bg-[#0E1220] transition-colors text-xs"
                 style={{ backgroundColor: "var(--color-deep-indigo)" }}
               >

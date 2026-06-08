@@ -98,10 +98,10 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const getFlatItems = (): FlatResultItem[] => {
     const items: FlatResultItem[] = [];
     results.categories.forEach((c) => {
-      items.push({ type: "category", name: c.name, href: `/shop?category=${c.slug}`, id: c.id });
+      items.push({ type: "category", name: c.name, href: `/cua-hang?category=${c.slug}`, id: c.id });
     });
     results.products.forEach((p) => {
-      items.push({ type: "product", name: p.name, href: `/shop/${p.slug}`, id: p.id });
+      items.push({ type: "product", name: p.name, href: `/cua-hang/${p.slug}`, id: p.id });
     });
     results.posts.forEach((post) => {
       items.push({ type: "post", name: post.title, href: `/journal/${post.slug}`, id: post.id });
@@ -237,7 +237,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       return (
                         <Link
                           key={c.id}
-                          href={`/shop?category=${c.slug}`}
+                          href={`/cua-hang?category=${c.slug}`}
                           onClick={onClose}
                           className={`flex items-center justify-between p-3 rounded-2 border transition-all duration-200 font-bvp text-xs font-bold ${
                             isHighlighted
@@ -276,7 +276,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       return (
                         <Link
                           key={p.id}
-                          href={`/shop/${p.slug}`}
+                          href={`/cua-hang/${p.slug}`}
                           onClick={onClose}
                           className={`flex items-center gap-4 p-2.5 rounded-2 border transition-all duration-200 ${
                             isHighlighted

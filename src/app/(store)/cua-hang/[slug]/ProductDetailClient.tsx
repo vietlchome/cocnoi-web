@@ -215,12 +215,12 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
         
         {/* BREADCRUMB */}
         <nav className="flex items-center flex-wrap gap-2 text-xs text-secondary/60 mb-8 md:mb-12 font-medium tracking-wide">
-          <Link href="/shop" className="hover:text-accent transition-colors">Cửa hàng</Link>
+          <Link href="/cua-hang" className="hover:text-accent transition-colors">Cửa hàng</Link>
           <span className="opacity-50">/</span>
           {product.category && (
             <>
               <Link 
-                href={`/shop?category=${product.category.slug}`} 
+                href={`/cua-hang?category=${product.category.slug}`} 
                 className="hover:text-accent transition-colors"
               >
                 {product.category.name}
@@ -367,7 +367,7 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                     return (
                       <Link
                         key={sib.id}
-                        href={`/shop/${sib.slug}`}
+                        href={`/cua-hang/${sib.slug}`}
                         className={`text-xs font-bold px-4 py-2 rounded-2 border transition-all flex items-center gap-2 cursor-pointer ${
                           isSelected
                             ? 'bg-accent text-canvas border-accent shadow-sm shadow-accent/10'

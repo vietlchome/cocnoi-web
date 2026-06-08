@@ -22,7 +22,7 @@ export default function ProductsSection({ config, products }: ProductsSectionPro
             </h2>
           </div>
           <Link 
-            href="/shop" 
+            href="/cua-hang" 
             className="font-bvp text-sm font-semibold text-primary hover:text-accent border-b border-primary hover:border-accent transition-colors pb-1 flex items-center gap-1.5"
             style={{ borderBottomColor: "var(--color-deep-indigo)" }}
           >
@@ -57,7 +57,7 @@ export default function ProductsSection({ config, products }: ProductsSectionPro
 
                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
                   <Link 
-                    href={`/shop/${prod.slug}`}
+                    href={`/cua-hang/${prod.slug}`}
                     className="bg-canvas text-primary font-bvp font-medium text-xs px-4 py-2.5 rounded-2 border border-border shadow-xs hover:border-accent hover:text-accent transition-colors"
                   >
                     Chi tiết sản phẩm
@@ -103,7 +103,7 @@ export default function ProductsSection({ config, products }: ProductsSectionPro
                   </div>
                   
                   <Link
-                    href={`/shop/${prod.slug}`}
+                    href={`/cua-hang/${prod.slug}`}
                     style={{ backgroundColor: "var(--color-terracotta)" }}
                     className="bg-accent hover:opacity-90 text-canvas font-bvp text-xs font-semibold px-3.5 py-2 rounded-2 transition-colors flex items-center gap-1 cursor-pointer"
                   >

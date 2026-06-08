@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      { source: "/shop", destination: "/cua-hang", permanent: true },
+      { source: "/shop/:slug*", destination: "/cua-hang/:slug*", permanent: true },
       {
         source: "/nguoi-noi",
         destination: "/community/nguoi-noi",

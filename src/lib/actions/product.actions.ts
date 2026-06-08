@@ -17,7 +17,7 @@ export async function createCategory(name: string) {
   try {
     const category = await ProductService.createCategory(name);
     revalidatePath('/admin/categories');
-    revalidatePath('/shop');
+    revalidatePath('/cua-hang');
     revalidateTag('mega-menu-data', 'default');
     return { success: true, data: category };
   } catch (error: any) {
@@ -31,7 +31,7 @@ export async function updateCategory(id: string, name: string) {
   try {
     const category = await ProductService.updateCategory(id, name);
     revalidatePath('/admin/categories');
-    revalidatePath('/shop');
+    revalidatePath('/cua-hang');
     revalidateTag('mega-menu-data', 'default');
     return { success: true, data: category };
   } catch (error: any) {
@@ -45,7 +45,7 @@ export async function deleteCategory(id: string) {
   try {
     await ProductService.deleteCategory(id);
     revalidatePath('/admin/categories');
-    revalidatePath('/shop');
+    revalidatePath('/cua-hang');
     revalidateTag('mega-menu-data', 'default');
     return { success: true };
   } catch (error: any) {
@@ -66,7 +66,7 @@ export async function createProduct(productData: z.infer<typeof CreateProductSch
     
     revalidatePath('/admin/products');
     revalidatePath('/');
-    revalidatePath('/shop');
+    revalidatePath('/cua-hang');
     return { success: true, data: product };
   } catch (error: any) {
     console.error('Lỗi khi tạo sản phẩm:', error);
@@ -83,8 +83,8 @@ export async function updateProduct(id: string, productData: z.infer<typeof Upda
 
     revalidatePath('/admin/products');
     revalidatePath('/');
-    revalidatePath('/shop');
-    revalidatePath(`/shop/${product.slug}`);
+    revalidatePath('/cua-hang');
+    revalidatePath(`/cua-hang/${product.slug}`);
     return { success: true, data: product };
   } catch (error: any) {
     console.error('Lỗi khi cập nhật sản phẩm:', error);
@@ -126,8 +126,8 @@ export async function deleteProductSoft(id: string) {
     const product = await ProductService.softDeleteProduct(id);
     revalidatePath('/admin/products');
     revalidatePath('/');
-    revalidatePath('/shop');
-    revalidatePath(`/shop/${product.slug}`);
+    revalidatePath('/cua-hang');
+    revalidatePath(`/cua-hang/${product.slug}`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi xóa mềm sản phẩm.' };
@@ -141,8 +141,8 @@ export async function restoreProduct(id: string) {
     const product = await ProductService.restoreProduct(id);
     revalidatePath('/admin/products');
     revalidatePath('/');
-    revalidatePath('/shop');
-    revalidatePath(`/shop/${product.slug}`);
+    revalidatePath('/cua-hang');
+    revalidatePath(`/cua-hang/${product.slug}`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi khôi phục sản phẩm.' };

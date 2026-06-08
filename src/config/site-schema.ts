@@ -86,10 +86,10 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       ctaPrimary: {
         type: "group",
         label: "CTA Chính",
-        default: { text: "Khám phá Cửa Hàng", url: "/shop" },
+        default: { text: "Khám phá Cửa Hàng", url: "/cua-hang" },
         fields: {
           text: { type: "text", label: "Nhãn nút", default: "Khám phá Cửa Hàng", aliases: ["hero_cta_text"] },
-          url: { type: "url", label: "Link đích", default: "/shop" }
+          url: { type: "url", label: "Link đích", default: "/cua-hang" }
         }
       },
       ctaSecondary: {
@@ -596,7 +596,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         type: "repeatable",
         label: "Danh sách mục điều hướng",
         default: [
-          { label: "Sản phẩm", href: "/shop", hasMegaMenu: true, openInNewTab: false },
+          { label: "Sản phẩm", href: "/cua-hang", hasMegaMenu: true, openInNewTab: false },
           { label: "Khám phá", href: "/discover", hasMegaMenu: false, openInNewTab: false },
           { label: "Cộng đồng", href: "/community", hasMegaMenu: false, openInNewTab: false },
           { label: "Đối tác", href: "/partners", hasMegaMenu: false, openInNewTab: false },

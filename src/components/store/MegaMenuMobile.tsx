@@ -59,7 +59,7 @@ export default function MegaMenuMobile({
             {categories.map((cat) => (
               <li key={cat.id}>
                 <Link
-                  href={`/shop?category=${cat.slug}`}
+                  href={`/cua-hang?category=${cat.slug}`}
                   onClick={onClose}
                   className="block py-1 text-secondary hover:text-accent font-medium"
                 >
@@ -69,7 +69,7 @@ export default function MegaMenuMobile({
             ))}
             <li className="pt-1">
               <Link
-                href="/shop"
+                href="/cua-hang"
                 onClick={onClose}
                 className="block py-1 text-accent font-bold"
               >
@@ -99,7 +99,7 @@ export default function MegaMenuMobile({
             {productGroups.map((pg) => (
               <li key={pg.id}>
                 <Link
-                  href={`/shop?collection=${pg.slug}`}
+                  href={`/cua-hang?collection=${pg.slug}`}
                   onClick={onClose}
                   className="block py-1 text-secondary hover:text-accent font-medium"
                 >
@@ -109,7 +109,7 @@ export default function MegaMenuMobile({
             ))}
             <li className="pt-1">
               <Link
-                href="/shop?view=collections"
+                href="/cua-hang?view=collections"
                 onClick={onClose}
                 className="block py-1 text-accent font-bold"
               >
@@ -139,7 +139,7 @@ export default function MegaMenuMobile({
             {finishes.map((f) => (
               <li key={f.id}>
                 <Link
-                  href={`/shop?finish=${f.slug}`}
+                  href={`/cua-hang?finish=${f.slug}`}
                   onClick={onClose}
                   className="block py-1 text-secondary hover:text-accent font-medium"
                 >
@@ -149,7 +149,7 @@ export default function MegaMenuMobile({
             ))}
             <li className="pt-1">
               <Link
-                href="/shop?view=finishes"
+                href="/cua-hang?view=finishes"
                 onClick={onClose}
                 className="block py-1 text-accent font-bold"
               >

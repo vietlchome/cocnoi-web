@@ -52,7 +52,7 @@ export default function CheckoutPage() {
               Cốc Nối hiện nhận đơn hàng thông qua hình thức tư vấn để hỗ trợ chu đáo nhất. Vui lòng chọn sản phẩm trong cửa hàng và nhấn Đặt hàng để gửi yêu cầu.
             </p>
             <Link
-              href="/shop"
+              href="/cua-hang"
               style={{ backgroundColor: "var(--color-deep-indigo)" }}
               className="bg-primary hover:bg-opacity-90 text-canvas text-xs font-bold px-8 py-4 rounded-2 shadow-md uppercase tracking-wider transition-colors"
             >
@@ -255,7 +255,7 @@ export default function CheckoutPage() {
 
             <div className="flex gap-4 w-full mt-4 justify-center">
               <Link
-                href="/shop"
+                href="/cua-hang"
                 className="bg-primary hover:bg-accent text-canvas text-xs font-bold px-8 py-4 rounded-2 transition-all cursor-pointer shadow-md uppercase tracking-wider"
               >
                 Tiếp tục mua sắm
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
         
         {/* Navigation Breadcrumb back */}
         <Link 
-          href="/shop" 
+          href="/cua-hang" 
           className="inline-flex items-center gap-2 text-xs font-bold text-secondary/60 hover:text-accent transition-colors mb-8 uppercase tracking-wider"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -296,7 +296,7 @@ export default function CheckoutPage() {
               </p>
             </div>
             <Link
-              href="/shop"
+              href="/cua-hang"
               className="bg-accent hover:bg-accent-hover text-canvas text-xs font-bold px-8 py-3.5 rounded-2 shadow-md shadow-accent/10 transition-colors uppercase tracking-wider"
             >
               Chọn cốc ngay

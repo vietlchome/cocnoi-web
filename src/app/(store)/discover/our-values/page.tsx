@@ -83,7 +83,7 @@ export default async function OurValuesPage() {
           </p>
           <div className="mt-12 flex justify-center gap-4">
             <Link 
-              href="/shop" 
+              href="/cua-hang" 
               className="bg-accent text-white font-bvp font-medium text-xs px-6 py-3.5 rounded-2 hover:bg-[#B36030] transition-colors inline-flex items-center gap-2"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >

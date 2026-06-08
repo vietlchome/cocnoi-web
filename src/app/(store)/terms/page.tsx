@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-border/60 text-center">
-          <Link href="/shop" className="font-bvp font-medium text-xs text-accent hover:underline">
+          <Link href="/cua-hang" className="font-bvp font-medium text-xs text-accent hover:underline">
             Quay lại Cửa Hàng mua sắm
           </Link>
         </div>

@@ -74,7 +74,7 @@ export default function AboutPage() {
           </p>
           <div className="flex gap-4">
             <Link 
-              href="/shop" 
+              href="/cua-hang" 
               className="bg-primary text-canvas font-bvp font-medium text-xs px-6 py-3 rounded-2 hover:bg-[#0E1220] transition-colors inline-flex items-center gap-1.5"
             >
               <span>Mua sắm gốm mộc</span>

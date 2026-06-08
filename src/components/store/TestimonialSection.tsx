@@ -53,7 +53,7 @@ export default function TestimonialSection({ reviews }: TestimonialSectionProps)
                   <div className="flex flex-col items-center shrink-0 w-20 md:w-24">
                     {imgUrl ? (
                       <Link 
-                        href={`/shop/${review.product.slug}`} 
+                        href={`/cua-hang/${review.product.slug}`} 
                         className="block w-20 h-20 md:w-24 md:h-24 rounded-lg border border-border/40 overflow-hidden mb-3 group shadow-sm shrink-0"
                         title={review.product.name}
                       >
@@ -61,7 +61,7 @@ export default function TestimonialSection({ reviews }: TestimonialSectionProps)
                       </Link>
                     ) : (
                       <Link 
-                        href={`/shop/${review.product.slug}`} 
+                        href={`/cua-hang/${review.product.slug}`} 
                         className="block w-20 h-20 md:w-24 md:h-24 rounded-lg border border-border/40 mb-3 bg-subtle/50 flex items-center justify-center text-[10px] text-secondary/50 group hover:bg-subtle transition-colors shrink-0"
                         title={review.product.name}
                       >

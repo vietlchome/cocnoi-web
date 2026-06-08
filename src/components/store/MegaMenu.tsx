@@ -65,7 +65,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             {categories.map((cat: { id: string; name: string; slug: string }) => (
               <li key={cat.id}>
                 <Link
-                  href={`/shop?category=${cat.slug}`}
+                  href={`/cua-hang?category=${cat.slug}`}
                   className="text-secondary hover:text-accent transition-colors"
                 >
                   {cat.name}
@@ -73,7 +73,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               </li>
             ))}
             <li className="pt-2">
-              <Link href="/shop" className="text-accent hover:text-accent/80 transition-colors">
+              <Link href="/cua-hang" className="text-accent hover:text-accent/80 transition-colors">
                 {config.column1.viewAllLabel}
               </Link>
             </li>
@@ -89,7 +89,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             {productGroups.map((pg: { id: string; name: string; slug: string }) => (
               <li key={pg.id}>
                 <Link
-                  href={`/shop?collection=${pg.slug}`}
+                  href={`/cua-hang?collection=${pg.slug}`}
                   className="text-secondary hover:text-accent transition-colors"
                 >
                   {pg.name}
@@ -97,7 +97,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               </li>
             ))}
             <li className="pt-2">
-              <Link href="/shop?view=collections" className="text-accent hover:text-accent/80 transition-colors">
+              <Link href="/cua-hang?view=collections" className="text-accent hover:text-accent/80 transition-colors">
                 {config.column2.viewAllLabel}
               </Link>
             </li>
@@ -113,7 +113,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             {finishes.map((f: { id: string; name: string; slug: string }) => (
               <li key={f.id}>
                 <Link
-                  href={`/shop?finish=${f.slug}`}
+                  href={`/cua-hang?finish=${f.slug}`}
                   className="text-secondary hover:text-accent transition-colors"
                 >
                   {f.name}
@@ -121,7 +121,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               </li>
             ))}
             <li className="pt-2">
-              <Link href="/shop?view=finishes" className="text-accent hover:text-accent/80 transition-colors">
+              <Link href="/cua-hang?view=finishes" className="text-accent hover:text-accent/80 transition-colors">
                 {config.column3.viewAllLabel}
               </Link>
             </li>

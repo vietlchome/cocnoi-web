@@ -95,7 +95,7 @@ export default function OurCraftPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
-              href="/shop" 
+              href="/cua-hang" 
               className="bg-primary text-canvas font-bvp font-medium text-xs px-8 py-4 rounded-2 hover:bg-[#0E1220] transition-colors inline-flex items-center gap-2"
               style={{ backgroundColor: "var(--color-deep-indigo)" }}
             >

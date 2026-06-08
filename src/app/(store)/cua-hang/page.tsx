@@ -100,7 +100,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
             <div className="flex flex-col gap-1">
               {/* Lọc tất cả */}
               <Link
-                href="/shop"
+                href="/cua-hang"
                 className={`flex items-center justify-between px-4 py-3 rounded-2 text-xs font-bold transition-all ${
                   activeCategorySlug === 'all'
                     ? 'bg-accent text-canvas'
@@ -114,7 +114,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
               {categories.map((cat: any) => (
                 <Link
                   key={cat.id}
-                  href={`/shop?category=${cat.slug}`}
+                  href={`/cua-hang?category=${cat.slug}`}
                   className={`flex items-center justify-between px-4 py-3 rounded-2 text-xs font-bold transition-all ${
                     activeCategorySlug === cat.slug
                       ? 'bg-accent text-canvas'
@@ -160,7 +160,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                           </span>
                         )}
                         
-                        <Link href={`/shop/${prod.slug}`} className="w-full h-full relative block overflow-hidden">
+                        <Link href={`/cua-hang/${prod.slug}`} className="w-full h-full relative block overflow-hidden">
                           <Image 
                             src={getFirstImage(prod.images)} 
                             alt={prod.name} 
@@ -172,7 +172,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
 
                         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
                           <Link 
-                            href={`/shop/${prod.slug}`}
+                            href={`/cua-hang/${prod.slug}`}
                             className="bg-canvas text-primary font-bold text-xs px-4 py-2.5 rounded-2 border border-border/60 shadow-sm hover:border-accent hover:text-accent transition-colors"
                           >
                             Chi tiết sản phẩm
@@ -186,7 +186,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                           {prod.category?.name || 'Sản phẩm'}
                         </span>
                         
-                        <Link href={`/shop/${prod.slug}`} className="block">
+                        <Link href={`/cua-hang/${prod.slug}`} className="block">
                           <h3 className="font-playfair text-lg font-bold text-primary mb-2 group-hover:text-accent transition-colors line-clamp-1">
                             {prod.name}
                           </h3>
@@ -226,7 +226,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                           </div>
                           
                           <Link
-                            href={`/shop/${prod.slug}`}
+                            href={`/cua-hang/${prod.slug}`}
                             className={`font-bold text-xs px-4 py-2.5 rounded-2 transition-all flex items-center gap-1.5 cursor-pointer ${
                               isOutOfStock
                                 ? 'bg-subtle text-secondary/40 cursor-not-allowed'
@@ -250,7 +250,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                 {/* Trang trước */}
                 {currentPage > 1 ? (
                   <Link
-                    href={`/shop?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${currentPage - 1}`}
+                    href={`/cua-hang?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${currentPage - 1}`}
                     className="p-2 border border-border/60 rounded-2 hover:bg-subtle/50 text-secondary transition-colors"
                   >
                     <ChevronLeft size={16} />
@@ -269,7 +269,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                   return (
                     <Link
                       key={pageNum}
-                      href={`/shop?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${pageNum}`}
+                      href={`/cua-hang?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${pageNum}`}
                       className={`w-9 h-9 rounded-2 flex items-center justify-center text-xs font-bold transition-all ${
                         isCurrent
                           ? 'bg-accent text-canvas shadow-sm shadow-accent/10'
@@ -284,7 +284,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                 {/* Trang sau */}
                 {currentPage < totalPages ? (
                   <Link
-                    href={`/shop?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${currentPage + 1}`}
+                    href={`/cua-hang?${activeCategorySlug !== 'all' ? `category=${activeCategorySlug}&` : ''}page=${currentPage + 1}`}
                     className="p-2 border border-border/60 rounded-2 hover:bg-subtle/50 text-secondary transition-colors"
                   >
                     <ChevronRight size={16} />

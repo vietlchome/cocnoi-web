@@ -226,5 +226,8 @@ export async function getSiteConfig(): Promise<SiteConfig> {
     }));
   }
 
-  return config as SiteConfig;
+  // Backward compat: auto-replace old /shop URLs in stored config
+  const configStr = JSON.stringify(config);
+  const patched = JSON.parse(configStr.replace(/\/shop(\/|"|'|\?)/g, "/cua-hang$1"));
+  return patched as SiteConfig;
 }

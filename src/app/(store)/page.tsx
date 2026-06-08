@@ -27,10 +27,10 @@ export default async function StoreHome() {
   }
   if (!quickChips || quickChips.length === 0) {
     quickChips = [
-      { text: "Cốc có quai", url: "/shop?category=Mugs" },
-      { text: "Cốc không quai", url: "/shop?category=Beakers" },
-      { text: "BST Đặc biệt", url: "/shop?category=Limited" },
-      { text: "Quà tặng", url: "/shop?category=Gifts" }
+      { text: "Cốc có quai", url: "/cua-hang?category=Mugs" },
+      { text: "Cốc không quai", url: "/cua-hang?category=Beakers" },
+      { text: "BST Đặc biệt", url: "/cua-hang?category=Limited" },
+      { text: "Quà tặng", url: "/cua-hang?category=Gifts" }
     ];
   }
 
