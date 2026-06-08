@@ -34,6 +34,8 @@ interface Product {
   compareAtPrice?: number | null
   stockQuantity: number
   weight?: number | null
+  capacity?: number | null
+  dimensions?: string | null
   images: string // JSON string array
   isActive: boolean
   categoryId: string | null
@@ -286,15 +288,21 @@ export default function ProductDetailClient({ product, siblings = [], ratingData
                 {product.name}
               </h1>
  
-              {/* SKU & Khối lượng */}
-              {(product.sku || (product.weight && product.weight > 0)) && (
+              {/* SKU, Dung tích & Kích thước */}
+              {(product.sku || (product.capacity && product.capacity > 0) || product.dimensions) && (
                 <div className="flex flex-wrap items-center gap-4 mb-2.5 text-[10px] text-secondary/60 font-bold uppercase tracking-wider font-mono">
                   {product.sku && (
                     <span>Mã SP (SKU): <strong className="text-secondary font-semibold">{product.sku}</strong></span>
                   )}
-                  {product.sku && product.weight && product.weight > 0 && <span className="opacity-30">|</span>}
-                  {product.weight && product.weight > 0 && (
-                    <span>Khối lượng: <strong className="text-secondary font-semibold">{product.weight}g</strong></span>
+                  {product.sku && ((product.capacity && product.capacity > 0) || product.dimensions) && <span className="opacity-30">|</span>}
+                  {product.capacity && product.capacity > 0 && (
+                    <>
+                      <span>Dung tích: <strong className="text-secondary font-semibold">{product.capacity}ml</strong></span>
+                      {product.dimensions && <span className="opacity-30">|</span>}
+                    </>
+                  )}
+                  {product.dimensions && (
+                    <span>Kích thước: <strong className="text-secondary font-semibold">{product.dimensions}</strong></span>
                   )}
                 </div>
               )}

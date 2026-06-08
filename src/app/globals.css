@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   /* Primary Colors */
@@ -208,3 +209,42 @@ body {
 .animate-slide-up {
   animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Storefront and Editor prose styling matching brand */
+.prose-cocnoi {
+  --tw-prose-body: var(--color-deep-indigo);
+  --tw-prose-headings: var(--color-deep-indigo);
+  --tw-prose-lead: var(--color-deep-indigo);
+  --tw-prose-bold: var(--color-deep-indigo);
+  --tw-prose-counters: var(--color-dark-brown);
+  --tw-prose-bullets: var(--color-sand);
+  --tw-prose-hr: var(--color-sand);
+  --tw-prose-quotes: var(--color-deep-indigo);
+  --tw-prose-quote-borders: var(--color-sand);
+  --tw-prose-captions: var(--color-dark-brown);
+  --tw-prose-code: var(--color-terracotta);
+  --tw-prose-pre-bg: var(--color-cream);
+  --tw-prose-th-borders: var(--color-sand);
+  --tw-prose-td-borders: var(--color-sand);
+  color: var(--color-deep-indigo) !important;
+}
+
+.prose-cocnoi h1, .prose-cocnoi h2, .prose-cocnoi h3,
+.prose-cocnoi h4, .prose-cocnoi h5, .prose-cocnoi h6 {
+  font-family: var(--font-playfair);
+  color: var(--color-deep-indigo) !important;
+}
+
+.prose-cocnoi p, .prose-cocnoi li, .prose-cocnoi strong {
+  color: var(--color-deep-indigo) !important;
+}
+
+.prose-cocnoi a {
+  color: var(--color-terracotta) !important;
+}
+
+.prose-cocnoi blockquote {
+  border-left-color: var(--color-sand) !important;
+  color: var(--color-deep-indigo) !important;
+}
+

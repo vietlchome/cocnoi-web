@@ -3,6 +3,7 @@
 import { useState } from "react";
 import PostsList from "./PostsList";
 import PostEditor from "./PostEditor";
+import { PostStatus } from "@prisma/client";
 
 interface Post {
   id: string;
@@ -12,9 +13,16 @@ interface Post {
   content: string;
   coverImage: string | null;
   category: string;
-  isPublished: boolean;
-  publishedAt: Date | null;
-  createdAt: Date;
+  status: PostStatus;
+  publishedAt: Date | string | null;
+  scheduledFor: Date | string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage: string | null;
+  authorName: string | null;
+  tags: string[];
+  readingTime: number | null;
+  createdAt: Date | string;
 }
 
 interface AdminContentClientProps {
