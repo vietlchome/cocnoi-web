@@ -170,6 +170,35 @@ export const SiteConfigSchema = z.object({
     transferNote: textValidator,
     codAvailable: booleanValidator,
     codNote: textValidator,
+  }),
+  navigation: z.object({
+    topNavItems: z.array(z.object({
+      label: textValidator,
+      href: urlValidator,
+      hasMegaMenu: booleanValidator,
+      openInNewTab: booleanValidator,
+    })),
+    megaMenu: z.object({
+      column1: z.object({
+        title: textValidator,
+        viewAllLabel: textValidator,
+      }),
+      column2: z.object({
+        title: textValidator,
+        viewAllLabel: textValidator,
+      }),
+      column3: z.object({
+        title: textValidator,
+        viewAllLabel: textValidator,
+      }),
+      featuredCards: z.array(z.object({
+        title: textValidator,
+        subtitle: textValidator.optional().nullable(),
+        image: imageValidator,
+        href: urlValidator,
+        ctaLabel: textValidator,
+      })),
+    }),
   })
 });
 

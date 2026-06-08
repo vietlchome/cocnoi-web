@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-helpers';
 import { ProductService } from '@/lib/services/product.service';
 import { CreateProductSchema, UpdateProductSchema } from '@/lib/validators/product.schema';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
 // =========================================================
@@ -18,6 +18,7 @@ export async function createCategory(name: string) {
     const category = await ProductService.createCategory(name);
     revalidatePath('/admin/categories');
     revalidatePath('/shop');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: category };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi tạo danh mục.' };
@@ -31,6 +32,7 @@ export async function updateCategory(id: string, name: string) {
     const category = await ProductService.updateCategory(id, name);
     revalidatePath('/admin/categories');
     revalidatePath('/shop');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: category };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi cập nhật danh mục.' };
@@ -44,6 +46,7 @@ export async function deleteCategory(id: string) {
     await ProductService.deleteCategory(id);
     revalidatePath('/admin/categories');
     revalidatePath('/shop');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi xóa danh mục.' };
@@ -157,6 +160,7 @@ export async function createProductGroup(name: string) {
     const group = await ProductService.createProductGroup(name);
     revalidatePath('/admin/categories');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: group };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi tạo nhóm bộ sưu tập.' };
@@ -181,6 +185,7 @@ export async function updateProductGroup(id: string, name: string) {
     const group = await ProductService.updateProductGroup(id, name);
     revalidatePath('/admin/categories');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: group };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi cập nhật bộ sưu tập.' };
@@ -194,6 +199,7 @@ export async function deleteProductGroup(id: string) {
     await ProductService.deleteProductGroup(id);
     revalidatePath('/admin/categories');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi xóa bộ sưu tập.' };

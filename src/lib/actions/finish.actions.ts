@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-helpers';
 import { FinishService, FinishInput } from '@/lib/services/finish.service';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 /**
  * Lấy danh sách toàn bộ kỹ thuật hoàn thiện
@@ -39,6 +39,7 @@ export async function createFinish(data: FinishInput) {
     const finish = await FinishService.createFinish(data);
     revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: finish };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi tạo kỹ thuật hoàn thiện.' };
@@ -55,6 +56,7 @@ export async function updateFinish(id: string, data: FinishInput) {
     const finish = await FinishService.updateFinish(id, data);
     revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true, data: finish };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi cập nhật kỹ thuật hoàn thiện.' };
@@ -84,6 +86,7 @@ export async function deleteFinish(id: string, force = false) {
     await FinishService.deleteFinish(id);
     revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi xóa kỹ thuật hoàn thiện.' };
@@ -99,6 +102,7 @@ export async function reorderFinishes(ids: string[]) {
   try {
     await FinishService.reorderFinishes(ids);
     revalidatePath('/admin/products/settings');
+    revalidateTag('mega-menu-data', 'default');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi thay đổi thứ tự kỹ thuật hoàn thiện.' };

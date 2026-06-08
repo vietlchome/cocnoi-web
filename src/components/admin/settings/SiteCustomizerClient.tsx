@@ -7,7 +7,7 @@ import SectionEditor from "@/components/admin/customize/SectionEditor";
 import type { SiteConfig } from "@/lib/site-config-validate";
 import { 
   Save, Eye, ChevronDown, ChevronUp, Loader2, Layout, Image as ImageIcon, 
-  Sparkles, LayoutGrid, MessageSquare, HelpCircle, Share2, Paintbrush 
+  Sparkles, LayoutGrid, MessageSquare, HelpCircle, Share2, Paintbrush, Menu
 } from "lucide-react";
 
 const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
@@ -21,6 +21,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
   footer: Layout,
   social: Share2,
   seo: Paintbrush,
+  navigation: Menu,
 };
 
 interface Props {

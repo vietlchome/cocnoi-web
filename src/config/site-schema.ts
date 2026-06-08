@@ -588,5 +588,69 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         default: "COD miễn phí Hà Nội nội thành. Tỉnh khác phụ phí ship theo cước vận chuyển. Đội ngũ Cốc Nối liên hệ xác nhận trong 2 giờ." 
       }
     }
-  }
+  },
+  navigation: {
+    label: "Điều hướng (Navigation & Mega Menu)",
+    fields: {
+      topNavItems: {
+        type: "repeatable",
+        label: "Danh sách mục điều hướng",
+        default: [
+          { label: "Sản phẩm", href: "/shop", hasMegaMenu: true, openInNewTab: false },
+          { label: "Khám phá", href: "/discover", hasMegaMenu: false, openInNewTab: false },
+          { label: "Cộng đồng", href: "/community", hasMegaMenu: false, openInNewTab: false },
+          { label: "Đối tác", href: "/partners", hasMegaMenu: false, openInNewTab: false },
+        ],
+        itemSchema: {
+          label: { type: "text", label: "Nhãn hiển thị", default: "" },
+          href: { type: "url", label: "Đường dẫn", default: "/" },
+          hasMegaMenu: { type: "boolean", label: "Mở Mega Menu khi hover", default: false },
+          openInNewTab: { type: "boolean", label: "Mở tab mới", default: false },
+        }
+      },
+      megaMenu: {
+        type: "group",
+        label: "Cấu hình Mega Menu",
+        fields: {
+          column1: {
+            type: "group",
+            label: "Cột 1 - Danh mục",
+            fields: {
+              title: { type: "text", label: "Tiêu đề cột", default: "DANH MỤC" },
+              viewAllLabel: { type: "text", label: "Link xem tất cả", default: "→ Xem tất cả sản phẩm" },
+            }
+          },
+          column2: {
+            type: "group",
+            label: "Cột 2 - Bộ sưu tập",
+            fields: {
+              title: { type: "text", label: "Tiêu đề cột", default: "BỘ SƯU TẬP" },
+              viewAllLabel: { type: "text", label: "Link xem tất cả", default: "→ Xem tất cả BST" },
+            }
+          },
+          column3: {
+            type: "group",
+            label: "Cột 3 - Hoàn thiện",
+            fields: {
+              title: { type: "text", label: "Tiêu đề cột", default: "HOÀN THIỆN" },
+              viewAllLabel: { type: "text", label: "Link xem tất cả", default: "→ Xem tất cả kỹ thuật" },
+            }
+          },
+          featuredCards: {
+            type: "repeatable",
+            label: "Featured Cards (tối đa 2)",
+            max: 2,
+            default: [],
+            itemSchema: {
+              title: { type: "text", label: "Tiêu đề card", default: "" },
+              subtitle: { type: "text", label: "Phụ đề (tùy chọn)", default: "" },
+              image: { type: "image", label: "Ảnh card", default: "", aspectRatio: 1.333, folder: "theme/megamenu" },
+              href: { type: "url", label: "Đường dẫn", default: "/" },
+              ctaLabel: { type: "text", label: "Nhãn CTA", default: "Khám phá" },
+            }
+          }
+        }
+      }
+    }
+  },
 };
