@@ -26,6 +26,7 @@ export class ProductService {
     isActive?: boolean;
     visibility?: Visibility;
     categoryId?: string | null;
+    finishIds?: string[];
   }) {
     // 1. Chuẩn hóa & kiểm tra tính duy nhất của SKU
     if (data.sku) {
@@ -38,7 +39,7 @@ export class ProductService {
     }
 
     // 2. Tạo Slug tự động & đảm bảo tính duy nhất
-    let baseSlug = slugify(data.name);
+    const baseSlug = slugify(data.name);
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -69,12 +70,16 @@ export class ProductService {
         isActive: data.isActive ?? true,
         visibility: (data.visibility as Visibility) || Visibility.PUBLIC,
         categoryId: data.categoryId || null,
+        finishes: data.finishIds && data.finishIds.length > 0
+          ? { connect: data.finishIds.map(id => ({ id })) }
+          : undefined,
       },
       include: {
         category: true,
         productGroup: true,
         color: true,
         size: true,
+        finishes: true,
       },
     });
   }
@@ -100,6 +105,7 @@ export class ProductService {
       isActive: boolean;
       visibility: Visibility;
       categoryId: string | null;
+      finishIds: string[];
     }>
   ) {
     const currentProduct = await prisma.product.findUnique({ where: { id } });
@@ -124,7 +130,7 @@ export class ProductService {
 
     // 2. Kiểm tra & cập nhật Slug nếu tên thay đổi
     if (data.name !== undefined && data.name !== currentProduct.name) {
-      let baseSlug = slugify(data.name);
+      const baseSlug = slugify(data.name);
       let slug = baseSlug;
       let counter = 1;
       while (true) {
@@ -153,6 +159,12 @@ export class ProductService {
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
     if (data.visibility !== undefined) updateData.visibility = data.visibility as Visibility;
     if (data.categoryId !== undefined) updateData.categoryId = data.categoryId || null;
+    
+    if (data.finishIds !== undefined) {
+      updateData.finishes = {
+        set: data.finishIds.map(id => ({ id }))
+      };
+    }
 
     return prisma.product.update({
       where: { id },
@@ -162,6 +174,7 @@ export class ProductService {
         productGroup: true,
         color: true,
         size: true,
+        finishes: true,
       },
     });
   }
@@ -177,6 +190,7 @@ export class ProductService {
         productGroup: true,
         color: true,
         size: true,
+        finishes: true,
       },
     });
   }
@@ -193,6 +207,7 @@ export class ProductService {
         productGroup: true,
         color: true,
         size: true,
+        finishes: true,
       },
     });
 
@@ -259,6 +274,7 @@ export class ProductService {
           productGroup: true,
           color: true,
           size: true,
+          finishes: true,
         },
       }),
       prisma.product.count({ where }),
@@ -304,6 +320,7 @@ export class ProductService {
           productGroup: true,
           color: true,
           size: true,
+          finishes: true,
         },
       }),
       prisma.product.count({ where }),
@@ -337,7 +354,7 @@ export class ProductService {
   // ---------------------------------------------------------
 
   static async createCategory(name: string) {
-    let baseSlug = slugify(name);
+    const baseSlug = slugify(name);
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -353,7 +370,7 @@ export class ProductService {
   }
 
   static async updateCategory(id: string, name: string) {
-    let baseSlug = slugify(name);
+    const baseSlug = slugify(name);
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -389,7 +406,7 @@ export class ProductService {
   // ---------------------------------------------------------
 
   static async createProductGroup(name: string) {
-    let baseSlug = slugify(name);
+    const baseSlug = slugify(name);
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -405,7 +422,7 @@ export class ProductService {
   }
 
   static async updateProductGroup(id: string, name: string) {
-    let baseSlug = slugify(name);
+    const baseSlug = slugify(name);
     let slug = baseSlug;
     let counter = 1;
     while (true) {
@@ -461,40 +478,85 @@ export class ProductService {
   // SIZE OPTION OPERATIONS
   // ---------------------------------------------------------
 
-  static async createSizeOption(name: string, categoryId: string) {
+  static async createSizeOption(name: string, description?: string | null, sortOrder?: number) {
     const existing = await prisma.sizeOption.findUnique({
-      where: {
-        name_categoryId: { name, categoryId },
-      },
+      where: { name },
     });
 
     if (existing) {
-      throw new Error(`Kích cỡ "${name}" đã tồn tại trong danh mục này!`);
+      throw new Error(`Kích cỡ "${name}" đã tồn tại!`);
+    }
+
+    const baseSlug = slugify(name);
+    let slug = baseSlug;
+    let counter = 1;
+    while (true) {
+      const existingSlug = await prisma.sizeOption.findUnique({ where: { slug } });
+      if (!existingSlug) break;
+      slug = `${baseSlug}-${counter}`;
+      counter++;
     }
 
     return prisma.sizeOption.create({
-      data: { name, categoryId },
+      data: {
+        name,
+        slug,
+        description: description || null,
+        sortOrder: sortOrder ?? 0,
+      },
     });
   }
 
-  static async updateSizeOption(id: string, name: string, categoryId: string) {
+  static async updateSizeOption(id: string, name: string, description?: string | null, sortOrder?: number) {
     const existing = await prisma.sizeOption.findUnique({
-      where: {
-        name_categoryId: { name, categoryId },
-      },
+      where: { name },
     });
 
     if (existing && existing.id !== id) {
-      throw new Error(`Kích cỡ "${name}" đã bị trùng trong danh mục này!`);
+      throw new Error(`Tên kích cỡ "${name}" đã bị trùng!`);
+    }
+
+    const currentSize = await prisma.sizeOption.findUnique({ where: { id } });
+    if (!currentSize) {
+      throw new Error("Không tìm thấy kích cỡ cần cập nhật!");
+    }
+
+    let slug = currentSize.slug;
+    if (currentSize.name !== name) {
+      const baseSlug = slugify(name);
+      let slug = baseSlug;
+      let counter = 1;
+      while (true) {
+        const existingSlug = await prisma.sizeOption.findUnique({ where: { slug } });
+        if (!existingSlug || existingSlug.id === id) break;
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
     }
 
     return prisma.sizeOption.update({
       where: { id },
-      data: { name, categoryId },
+      data: {
+        name,
+        slug,
+        description: description !== undefined ? description : currentSize.description,
+        sortOrder: sortOrder !== undefined ? sortOrder : currentSize.sortOrder,
+      },
     });
   }
 
   static async deleteSizeOption(id: string) {
     return prisma.sizeOption.delete({ where: { id } });
+  }
+
+  static async reorderSizeOptions(ids: string[]) {
+    return prisma.$transaction(
+      ids.map((id, index) =>
+        prisma.sizeOption.update({
+          where: { id },
+          data: { sortOrder: index + 1 },
+        })
+      )
+    );
   }
 }

@@ -21,7 +21,14 @@ interface ColorOption {
 interface SizeOption {
   id: string
   name: string
-  categoryId: string
+  slug: string
+  description?: string | null
+}
+
+interface FinishOption {
+  id: string
+  name: string
+  slug: string
 }
 
 interface ProductGroup {
@@ -47,6 +54,7 @@ interface InitialProduct {
   colorId?: string | null
   sizeId?: string | null
   visibility?: string | null
+  finishes?: FinishOption[]
 }
 
 interface ProductFormProps {
@@ -54,6 +62,7 @@ interface ProductFormProps {
   productGroups: ProductGroup[]
   colors: ColorOption[]
   sizes: SizeOption[]
+  finishes?: FinishOption[]
   initialProduct?: InitialProduct | null // Null nếu là form Tạo mới
 }
 
@@ -62,6 +71,7 @@ export default function ProductForm({
   productGroups = [], 
   colors = [], 
   sizes = [], 
+  finishes = [],
   initialProduct = null 
 }: ProductFormProps) {
   const router = useRouter()
@@ -83,6 +93,9 @@ export default function ProductForm({
   const [productGroupId, setProductGroupId] = useState(initialProduct?.productGroupId || '')
   const [colorId, setColorId] = useState(initialProduct?.colorId || '')
   const [sizeId, setSizeId] = useState(initialProduct?.sizeId || '')
+  const [selectedFinishIds, setSelectedFinishIds] = useState<string[]>(
+    initialProduct?.finishes?.map(f => f.id) ?? []
+  )
 
   // Local lists to support dynamic inline adding
   const [localProductGroups, setLocalProductGroups] = useState<ProductGroup[]>(productGroups)
@@ -164,13 +177,9 @@ export default function ProductForm({
   const handleAddSize = async (e: React.MouseEvent) => {
     e.preventDefault()
     if (!newSizeName.trim()) return
-    if (!categoryId) {
-      alert('Vui lòng chọn danh mục trước khi thêm kích cỡ!')
-      return
-    }
     setAddingSize(true)
     try {
-      const res = await createSizeOption(newSizeName.trim(), categoryId)
+      const res = await createSizeOption(newSizeName.trim())
       if (res.success && res.data) {
         const newSize = res.data as SizeOption
         setLocalSizes(prev => [...prev, newSize])
@@ -243,6 +252,8 @@ export default function ProductForm({
     if (!categoryId) return setError('Vui lòng chọn danh mục sản phẩm.')
     if (images.length === 0) return setError('Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm.')
     if (stockQuantity < 0) return setError('Số lượng tồn kho không được nhỏ hơn 0.')
+    if (selectedFinishIds.length < 1) return setError('Vui lòng chọn ít nhất 1 kỹ thuật hoàn thiện.')
+    if (selectedFinishIds.length > 3) return setError('Chỉ được chọn tối đa 3 kỹ thuật hoàn thiện.')
 
     setSubmitting(true)
 
@@ -260,7 +271,8 @@ export default function ProductForm({
       colorId: colorId || null,
       sizeId: sizeId || null,
       stockQuantity: Number(stockQuantity),
-      visibility: visibility
+      visibility: visibility,
+      finishIds: selectedFinishIds
     }
 
     try {
@@ -364,7 +376,6 @@ export default function ProductForm({
                 value={categoryId}
                 onChange={(e) => {
                   setCategoryId(e.target.value)
-                  setSizeId('') // Reset size selection when category changes
                 }}
                 className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer font-semibold"
                 required
@@ -428,25 +439,16 @@ export default function ProductForm({
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-bold text-gray-600 dark:text-gray-400">Kích cỡ (Size)</label>
-                {categoryId && (
-                  <button
-                    type="button"
-                    onClick={() => setShowNewSizeForm(!showNewSizeForm)}
-                    className="text-[10px] font-bold text-orange-500 hover:text-orange-600 transition-colors flex items-center gap-0.5"
-                  >
-                    <Plus size={10} /> Thêm mới
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowNewSizeForm(!showNewSizeForm)}
+                  className="text-[10px] font-bold text-orange-500 hover:text-orange-600 transition-colors flex items-center gap-0.5"
+                >
+                  <Plus size={10} /> Thêm mới
+                </button>
               </div>
 
-              {!categoryId ? (
-                <select
-                  disabled
-                  className="w-full text-xs bg-gray-100 dark:bg-zinc-800/40 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-400 transition-all cursor-not-allowed"
-                >
-                  <option>-- Chọn danh mục trước --</option>
-                </select>
-              ) : showNewSizeForm ? (
+              {showNewSizeForm ? (
                 <div className="p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-gray-800/80 flex flex-col gap-2 transition-all">
                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Thêm kích cỡ mới</span>
                   <div className="flex gap-2">
@@ -474,7 +476,7 @@ export default function ProductForm({
                   className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold cursor-pointer"
                 >
                   <option value="">-- Chọn kích cỡ --</option>
-                  {localSizes.filter(s => s.categoryId === categoryId).map(s => (
+                  {localSizes.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
@@ -554,6 +556,57 @@ export default function ProductForm({
             </div>
 
           </div>
+
+          {/* Kỹ thuật Hoàn thiện */}
+          <div className="border-t border-gray-100 dark:border-gray-800/80 pt-5 flex flex-col gap-2.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                Kỹ thuật hoàn thiện <span className="text-gray-400 font-medium">(Chọn 1 - 3 kỹ thuật) *</span>
+              </label>
+              {selectedFinishIds.length === 0 && (
+                <span className="text-[10px] text-red-500 font-bold">Bắt buộc chọn ít nhất 1 kỹ thuật</span>
+              )}
+              {selectedFinishIds.length > 3 && (
+                <span className="text-[10px] text-red-500 font-bold">Chỉ được chọn tối đa 3 kỹ thuật</span>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {finishes.map(f => {
+                const isSelected = selectedFinishIds.includes(f.id);
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedFinishIds(prev => {
+                        if (prev.includes(f.id)) {
+                          return prev.filter(id => id !== f.id);
+                        } else {
+                          if (prev.length >= 3) {
+                            return prev;
+                          }
+                          return [...prev, f.id];
+                        }
+                      });
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                      isSelected
+                        ? "bg-deep-indigo text-warm-white border-deep-indigo shadow-sm"
+                        : "bg-cream dark:bg-zinc-800 text-deep-indigo dark:text-gray-300 border-gray-200 dark:border-zinc-700 hover:bg-sand dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {isSelected && <span className="mr-1">✓</span>}
+                    {f.name}
+                  </button>
+                );
+              })}
+            </div>
+            {finishes.length === 0 && (
+              <span className="text-xs text-gray-400 italic">Không tìm thấy kỹ thuật hoàn thiện nào. Vui lòng thêm trong Cấu hình sản phẩm.</span>
+            )}
+          </div>
+
         </div>
 
         {/* Khối Hình ảnh */}

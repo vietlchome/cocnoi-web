@@ -258,12 +258,12 @@ export async function deleteColorOption(id: string) {
 // 5. SIZE OPTION ACTIONS
 // =========================================================
 
-export async function createSizeOption(name: string, categoryId: string) {
+export async function createSizeOption(name: string, description?: string | null, sortOrder?: number) {
   await requireAdmin();
 
   try {
-    const size = await ProductService.createSizeOption(name, categoryId);
-    revalidatePath('/admin/categories');
+    const size = await ProductService.createSizeOption(name, description, sortOrder);
+    revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
     return { success: true, data: size };
   } catch (error: any) {
@@ -271,12 +271,13 @@ export async function createSizeOption(name: string, categoryId: string) {
   }
 }
 
-export async function getSizeOptions(categoryId?: string) {
+export async function getSizeOptions() {
   try {
     const sizes = await prisma.sizeOption.findMany({
-      where: categoryId ? { categoryId } : {},
-      include: { category: true },
-      orderBy: { name: 'asc' },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { name: 'asc' }
+      ],
     });
     return { success: true, data: sizes };
   } catch (error: any) {
@@ -284,12 +285,12 @@ export async function getSizeOptions(categoryId?: string) {
   }
 }
 
-export async function updateSizeOption(id: string, name: string, categoryId: string) {
+export async function updateSizeOption(id: string, name: string, description?: string | null, sortOrder?: number) {
   await requireAdmin();
 
   try {
-    const size = await ProductService.updateSizeOption(id, name, categoryId);
-    revalidatePath('/admin/categories');
+    const size = await ProductService.updateSizeOption(id, name, description, sortOrder);
+    revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
     return { success: true, data: size };
   } catch (error: any) {
@@ -302,10 +303,22 @@ export async function deleteSizeOption(id: string) {
 
   try {
     await ProductService.deleteSizeOption(id);
-    revalidatePath('/admin/categories');
+    revalidatePath('/admin/products/settings');
     revalidatePath('/admin/products');
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Lỗi khi xóa kích cỡ.' };
+  }
+}
+
+export async function reorderSizeOptions(ids: string[]) {
+  await requireAdmin();
+
+  try {
+    await ProductService.reorderSizeOptions(ids);
+    revalidatePath('/admin/products/settings');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Lỗi khi thay đổi thứ tự kích cỡ.' };
   }
 }

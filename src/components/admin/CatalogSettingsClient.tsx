@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Folder, Boxes, Ruler, Palette, Plus, Edit, Trash2, Loader2, RefreshCw } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Folder, Boxes, Ruler, Palette, Plus, Edit, Trash2, Loader2, GripVertical, Sparkles } from 'lucide-react'
 import {
   createCategory,
   updateCategory,
@@ -14,9 +14,34 @@ import {
   deleteColorOption,
   createSizeOption,
   updateSizeOption,
-  deleteSizeOption
+  deleteSizeOption,
+  reorderSizeOptions
 } from '@/lib/actions/product.actions'
+import {
+  createFinish,
+  updateFinish,
+  deleteFinish,
+  reorderFinishes
+} from '@/lib/actions/finish.actions'
+import ImageCropUploader from './ImageCropUploader'
+import { slugify } from '@/lib/utils/slug'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
+// Interfaces
 interface Category {
   id: string
   name: string
@@ -38,11 +63,9 @@ interface ProductGroup {
 interface SizeOption {
   id: string
   name: string
-  categoryId: string
-  category: {
-    id: string
-    name: string
-  }
+  slug: string
+  description: string | null
+  sortOrder: number
   _count?: {
     products: number
   }
@@ -57,37 +80,186 @@ interface ColorOption {
   }
 }
 
+interface FinishOption {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  imageUrl: string | null
+  sortOrder: number
+  _count?: {
+    products: number
+  }
+}
+
 interface CatalogSettingsClientProps {
   initialCategories: Category[]
   initialProductGroups: ProductGroup[]
   initialSizes: SizeOption[]
   initialColors: ColorOption[]
+  initialFinishes: FinishOption[]
 }
 
-type TabType = 'categories' | 'groups' | 'sizes' | 'colors'
+type TabType = 'categories' | 'groups' | 'sizes' | 'colors' | 'finishes'
+
+// Sortable Row Components
+interface SortableSizeRowProps {
+  size: SizeOption
+  onEdit: (s: SizeOption) => void
+  onDelete: (id: string) => void
+}
+
+function SortableSizeRow({ size, onEdit, onDelete }: SortableSizeRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: size.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors"
+    >
+      <td className="py-3 px-3 text-center w-10">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="p-1 text-gray-400 hover:text-orange-500 rounded cursor-grab active:cursor-grabbing"
+          title="Kéo để đổi thứ tự"
+        >
+          <GripVertical size={14} />
+        </button>
+      </td>
+      <td className="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200">{size.name}</td>
+      <td className="py-3 px-3 font-mono text-gray-400">{size.slug}</td>
+      <td className="py-3 px-3 text-gray-500 max-w-xs truncate" title={size.description || ''}>
+        {size.description || '—'}
+      </td>
+      <td className="py-3 px-3 text-center font-bold text-gray-600 dark:text-gray-400">
+        {size._count?.products || 0}
+      </td>
+      <td className="py-3 px-3 text-right">
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={() => onEdit(size)}
+            className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 rounded-lg transition-colors cursor-pointer"
+            title="Sửa kích cỡ"
+          >
+            <Edit size={13} />
+          </button>
+          <button
+            onClick={() => onDelete(size.id)}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors cursor-pointer"
+            title="Xóa kích cỡ"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+interface SortableFinishRowProps {
+  finish: FinishOption
+  onEdit: (f: FinishOption) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableFinishRow({ finish, onEdit, onDelete }: SortableFinishRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: finish.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors"
+    >
+      <td className="py-3 px-3 text-center w-10">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="p-1 text-gray-400 hover:text-orange-500 rounded cursor-grab active:cursor-grabbing"
+          title="Kéo để đổi thứ tự"
+        >
+          <GripVertical size={14} />
+        </button>
+      </td>
+      <td className="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200">
+        <div className="flex items-center gap-2.5">
+          {finish.imageUrl ? (
+            <img
+              src={finish.imageUrl}
+              alt={finish.name}
+              className="w-8 h-8 rounded-lg object-cover border border-gray-200 dark:border-gray-850"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 font-bold text-[10px]">
+              Men
+            </div>
+          )}
+          <span>{finish.name}</span>
+        </div>
+      </td>
+      <td className="py-3 px-3 font-mono text-gray-400">{finish.slug}</td>
+      <td className="py-3 px-3 text-gray-500 max-w-xs truncate" title={finish.description || ''}>
+        {finish.description || '—'}
+      </td>
+      <td className="py-3 px-3 text-center font-bold text-gray-600 dark:text-gray-400">
+        {finish._count?.products || 0}
+      </td>
+      <td className="py-3 px-3 text-right">
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={() => onEdit(finish)}
+            className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 rounded-lg transition-colors cursor-pointer"
+            title="Sửa hoàn thiện"
+          >
+            <Edit size={13} />
+          </button>
+          <button
+            onClick={() => onDelete(finish.id)}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors cursor-pointer"
+            title="Xóa hoàn thiện"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
 
 export default function CatalogSettingsClient({
   initialCategories,
   initialProductGroups,
   initialSizes,
-  initialColors
+  initialColors,
+  initialFinishes
 }: CatalogSettingsClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>('categories')
-  
+
   // Lists state
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [productGroups, setProductGroups] = useState<ProductGroup[]>(initialProductGroups)
   const [sizes, setSizes] = useState<SizeOption[]>(initialSizes)
   const [colors, setColors] = useState<ColorOption[]>(initialColors)
+  const [finishes, setFinishes] = useState<FinishOption[]>(initialFinishes)
 
   // Common UI State
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-
-  // -------------------------------------------------------------
-  // TAB STATES & SUBMITS
-  // -------------------------------------------------------------
 
   // 1. Category Form State
   const [categoryName, setCategoryName] = useState('')
@@ -99,36 +271,66 @@ export default function CatalogSettingsClient({
 
   // 3. Size Form State
   const [sizeName, setSizeName] = useState('')
-  const [sizeCategoryId, setSizeCategoryId] = useState('')
+  const [sizeDescription, setSizeDescription] = useState('')
   const [editingSizeId, setEditingSizeId] = useState<string | null>(null)
 
   // 4. Color Form State
   const [colorName, setColorName] = useState('')
-  const [colorHex, setColorHex] = useState('#B48B5E') // Màu nâu gốm đặc trưng làm mặc định
+  const [colorHex, setColorHex] = useState('#B48B5E') // Màu nâu gốm đặc trưng
   const [editingColorId, setEditingColorId] = useState<string | null>(null)
+
+  // 5. Finish Form State
+  const [finishName, setFinishName] = useState('')
+  const [finishSlug, setFinishSlug] = useState('')
+  const [finishDescription, setFinishDescription] = useState('')
+  const [finishImageUrl, setFinishImageUrl] = useState('')
+  const [editingFinishId, setEditingFinishId] = useState<string | null>(null)
+
+  // Auto-generate slug for Finish Name when typing name
+  useEffect(() => {
+    if (!editingFinishId && finishName) {
+      setFinishSlug(slugify(finishName))
+    }
+  }, [finishName, editingFinishId])
+
+  // DND Kit Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  )
 
   // Resets
   const resetForm = () => {
     setError('')
     setSuccess('')
-    
+
     // Reset Categories
     setCategoryName('')
     setEditingCategoryId(null)
-    
+
     // Reset Collections
     setGroupName('')
     setEditingGroupId(null)
-    
+
     // Reset Sizes
     setSizeName('')
-    setSizeCategoryId('')
+    setSizeDescription('')
     setEditingSizeId(null)
-    
+
     // Reset Colors
     setColorName('')
     setColorHex('#B48B5E')
     setEditingColorId(null)
+
+    // Reset Finishes
+    setFinishName('')
+    setFinishSlug('')
+    setFinishDescription('')
+    setFinishImageUrl('')
+    setEditingFinishId(null)
   }
 
   // Handle Tab Switch
@@ -154,10 +356,6 @@ export default function CatalogSettingsClient({
         if (res.success && res.data) {
           setCategories(prev =>
             prev.map(c => (c.id === editingCategoryId ? { ...c, name: res.data.name, slug: res.data.slug } : c))
-          )
-          // Update sizes inline category cache as well
-          setSizes(prev =>
-            prev.map(s => (s.categoryId === editingCategoryId ? { ...s, category: { ...s.category, name: res.data.name } } : s))
           )
           setSuccess('Cập nhật danh mục thành công!')
           resetForm()
@@ -207,8 +405,6 @@ export default function CatalogSettingsClient({
       const res = await deleteCategory(id)
       if (res.success) {
         setCategories(prev => prev.filter(c => c.id !== id))
-        // Dọn dẹp size thuộc category vừa xóa trong local state
-        setSizes(prev => prev.filter(s => s.categoryId !== id))
         setSuccess('Đã xóa danh mục thành công!')
         resetForm()
       } else {
@@ -304,7 +500,7 @@ export default function CatalogSettingsClient({
   // -------------------------------------------------------------
   const handleSizeSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!sizeName.trim() || !sizeCategoryId) return
+    if (!sizeName.trim()) return
 
     setLoading(true)
     setError('')
@@ -312,17 +508,17 @@ export default function CatalogSettingsClient({
 
     try {
       if (editingSizeId) {
-        const res = await updateSizeOption(editingSizeId, sizeName.trim(), sizeCategoryId)
+        const res = await updateSizeOption(editingSizeId, sizeName.trim(), sizeDescription || null)
         if (res.success && res.data) {
-          const matchedCategory = categories.find(c => c.id === sizeCategoryId)
           setSizes(prev =>
             prev.map(s =>
               s.id === editingSizeId
                 ? {
                     ...s,
                     name: res.data.name,
-                    categoryId: sizeCategoryId,
-                    category: { id: sizeCategoryId, name: matchedCategory?.name || '' }
+                    slug: res.data.slug,
+                    description: res.data.description,
+                    sortOrder: res.data.sortOrder
                   }
                 : s
             )
@@ -333,14 +529,12 @@ export default function CatalogSettingsClient({
           setError(res.error || 'Có lỗi xảy ra khi cập nhật Kích cỡ.')
         }
       } else {
-        const res = await createSizeOption(sizeName.trim(), sizeCategoryId)
+        const res = await createSizeOption(sizeName.trim(), sizeDescription || null)
         if (res.success && res.data) {
-          const matchedCategory = categories.find(c => c.id === sizeCategoryId)
           setSizes(prev => [
             ...prev,
             {
               ...res.data,
-              category: { id: sizeCategoryId, name: matchedCategory?.name || '' },
               _count: { products: 0 }
             }
           ])
@@ -360,7 +554,7 @@ export default function CatalogSettingsClient({
   const handleEditSize = (sz: SizeOption) => {
     setEditingSizeId(sz.id)
     setSizeName(sz.name)
-    setSizeCategoryId(sz.categoryId)
+    setSizeDescription(sz.description || '')
     setError('')
     setSuccess('')
   }
@@ -369,7 +563,7 @@ export default function CatalogSettingsClient({
     const sz = sizes.find(s => s.id === id)
     const productCount = sz?._count?.products || 0
 
-    let message = `Bạn có chắc chắn muốn xóa Kích cỡ "${sz?.name}" của danh mục "${sz?.category.name}"?`
+    let message = `Bạn có chắc chắn muốn xóa Kích cỡ "${sz?.name}"?`
     if (productCount > 0) {
       message = `CẢNH BÁO: Kích cỡ "${sz?.name}" hiện đang được sử dụng bởi ${productCount} sản phẩm. Nếu xóa, thuộc tính Kích cỡ của các sản phẩm đó sẽ trở về Rỗng. Bạn vẫn muốn xóa?`
     }
@@ -393,6 +587,27 @@ export default function CatalogSettingsClient({
       setError(err.message || 'Lỗi hệ thống.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSizesDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = sizes.findIndex(s => s.id === active.id)
+    const newIndex = sizes.findIndex(s => s.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const nextList = arrayMove(sizes, oldIndex, newIndex)
+      setSizes(nextList)
+
+      const res = await reorderSizeOptions(nextList.map(s => s.id))
+      if (!res.success) {
+        setError(res.error || 'Lỗi khi lưu thứ tự kích cỡ.')
+        setSizes(sizes)
+      } else {
+        setSuccess('Đã cập nhật thứ tự kích cỡ!')
+      }
     }
   }
 
@@ -475,18 +690,139 @@ export default function CatalogSettingsClient({
     }
   }
 
+  // -------------------------------------------------------------
+  // 5. FINISH OPTION HANDLERS
+  // -------------------------------------------------------------
+  const handleFinishSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!finishName.trim() || !finishSlug.trim()) return
+
+    setLoading(true)
+    setError('')
+    setSuccess('')
+
+    const payload = {
+      name: finishName.trim(),
+      slug: finishSlug.trim(),
+      description: finishDescription.trim() || null,
+      imageUrl: finishImageUrl.trim() || null
+    }
+
+    try {
+      if (editingFinishId) {
+        const res = await updateFinish(editingFinishId, payload)
+        if (res.success && res.data) {
+          setFinishes(prev =>
+            prev.map(f =>
+              f.id === editingFinishId
+                ? {
+                    ...f,
+                    name: res.data.name,
+                    slug: res.data.slug,
+                    description: res.data.description,
+                    imageUrl: res.data.imageUrl,
+                    sortOrder: res.data.sortOrder
+                  }
+                : f
+            )
+          )
+          setSuccess('Cập nhật kỹ thuật hoàn thiện thành công!')
+          resetForm()
+        } else {
+          setError(res.error || 'Có lỗi xảy ra khi cập nhật kỹ thuật hoàn thiện.')
+        }
+      } else {
+        const res = await createFinish(payload)
+        if (res.success && res.data) {
+          setFinishes(prev => [
+            ...prev,
+            {
+              ...res.data,
+              _count: { products: 0 }
+            }
+          ])
+          setSuccess('Tạo kỹ thuật hoàn thiện mới thành công!')
+          resetForm()
+        } else {
+          setError(res.error || 'Có lỗi xảy ra khi tạo kỹ thuật hoàn thiện.')
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Lỗi hệ thống.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditFinish = (f: FinishOption) => {
+    setEditingFinishId(f.id)
+    setFinishName(f.name)
+    setFinishSlug(f.slug)
+    setFinishDescription(f.description || '')
+    setFinishImageUrl(f.imageUrl || '')
+    setError('')
+    setSuccess('')
+  }
+
+  const handleDeleteFinish = async (id: string, isForced = false) => {
+    setLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const res = await deleteFinish(id, isForced)
+      if (res.success) {
+        setFinishes(prev => prev.filter(f => f.id !== id))
+        setSuccess('Đã xóa kỹ thuật hoàn thiện thành công!')
+        resetForm()
+      } else if (res.warning) {
+        setLoading(false)
+        if (confirm(res.message)) {
+          await handleDeleteFinish(id, true)
+        }
+      } else {
+        setError(res.error || 'Có lỗi xảy ra khi xóa kỹ thuật hoàn thiện.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Lỗi hệ thống.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFinishesDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = finishes.findIndex(f => f.id === active.id)
+    const newIndex = finishes.findIndex(f => f.id === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const nextList = arrayMove(finishes, oldIndex, newIndex)
+      setFinishes(nextList)
+
+      const res = await reorderFinishes(nextList.map(f => f.id))
+      if (!res.success) {
+        setError(res.error || 'Lỗi khi lưu thứ tự kỹ thuật hoàn thiện.')
+        setFinishes(finishes)
+      } else {
+        setSuccess('Đã cập nhật thứ tự kỹ thuật hoàn thiện!')
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-8 font-bvp">
-      
+
       {/* 1. TỔNG QUAN STATS CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+
         <div onClick={() => handleTabChange('categories')} className={`cursor-pointer p-5 bg-white dark:bg-zinc-900 border rounded-2xl shadow-xs transition-all duration-200 hover:shadow-md flex items-center justify-between group ${activeTab === 'categories' ? 'border-orange-500/60 ring-2 ring-orange-500/10' : 'border-gray-200 dark:border-gray-800'}`}>
           <div className="flex flex-col gap-1">
             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Danh mục</span>
             <span className="text-2xl font-bold font-playfair text-primary dark:text-canvas">{categories.length}</span>
           </div>
-          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
+          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'categories' ? 'bg-orange-50 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
             <Folder size={18} />
           </div>
         </div>
@@ -496,7 +832,7 @@ export default function CatalogSettingsClient({
             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Bộ sưu tập</span>
             <span className="text-2xl font-bold font-playfair text-primary dark:text-canvas">{productGroups.length}</span>
           </div>
-          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'groups' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
+          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'groups' ? 'bg-orange-50 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
             <Boxes size={18} />
           </div>
         </div>
@@ -506,7 +842,7 @@ export default function CatalogSettingsClient({
             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Kích cỡ (Size)</span>
             <span className="text-2xl font-bold font-playfair text-primary dark:text-canvas">{sizes.length}</span>
           </div>
-          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'sizes' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
+          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'sizes' ? 'bg-orange-50 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
             <Ruler size={18} />
           </div>
         </div>
@@ -516,18 +852,28 @@ export default function CatalogSettingsClient({
             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Màu sắc</span>
             <span className="text-2xl font-bold font-playfair text-primary dark:text-canvas">{colors.length}</span>
           </div>
-          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'colors' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
+          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'colors' ? 'bg-orange-50 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
             <Palette size={18} />
+          </div>
+        </div>
+
+        <div onClick={() => handleTabChange('finishes')} className={`cursor-pointer p-5 bg-white dark:bg-zinc-900 border rounded-2xl shadow-xs transition-all duration-200 hover:shadow-md flex items-center justify-between group ${activeTab === 'finishes' ? 'border-orange-500/60 ring-2 ring-orange-500/10' : 'border-gray-200 dark:border-gray-800'}`}>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Hoàn thiện</span>
+            <span className="text-2xl font-bold font-playfair text-primary dark:text-canvas">{finishes.length}</span>
+          </div>
+          <div className={`p-3 rounded-xl transition-colors ${activeTab === 'finishes' ? 'bg-orange-50 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 group-hover:text-orange-500'}`}>
+            <Sparkles size={18} />
           </div>
         </div>
 
       </div>
 
       {/* 2. CHUYỂN TABS CHI TIẾT */}
-      <div className="flex border-b border-gray-200 dark:border-gray-800 gap-6 text-sm font-semibold select-none">
+      <div className="flex border-b border-gray-200 dark:border-gray-800 gap-6 text-sm font-semibold select-none overflow-x-auto">
         <button
           onClick={() => handleTabChange('categories')}
-          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'categories' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
+          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === 'categories' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <Folder size={15} />
           <span>Danh mục</span>
@@ -535,7 +881,7 @@ export default function CatalogSettingsClient({
 
         <button
           onClick={() => handleTabChange('groups')}
-          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'groups' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
+          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === 'groups' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <Boxes size={15} />
           <span>Bộ sưu tập (BST)</span>
@@ -543,7 +889,7 @@ export default function CatalogSettingsClient({
 
         <button
           onClick={() => handleTabChange('sizes')}
-          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'sizes' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
+          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === 'sizes' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <Ruler size={15} />
           <span>Kích cỡ (Size)</span>
@@ -551,10 +897,18 @@ export default function CatalogSettingsClient({
 
         <button
           onClick={() => handleTabChange('colors')}
-          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'colors' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
+          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === 'colors' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
         >
           <Palette size={15} />
           <span>Màu sắc</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('finishes')}
+          className={`pb-3.5 border-b-2 px-1 transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === 'finishes' ? 'border-orange-500 text-orange-500 font-bold' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'}`}
+        >
+          <Sparkles size={15} />
+          <span>Kỹ thuật Hoàn thiện</span>
         </button>
       </div>
 
@@ -575,10 +929,10 @@ export default function CatalogSettingsClient({
 
       {/* 4. GRID FORM & TABLE THEO ACTIVE TAB */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
+
         {/* CỘT TRÁI: FORM THÊM / SỬA */}
         <div className="lg:col-span-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 p-6 rounded-2xl shadow-xs">
-          
+
           {/* TAB 1: DANH MỤC */}
           {activeTab === 'categories' && (
             <form onSubmit={handleCategorySubmit} className="flex flex-col gap-4">
@@ -675,14 +1029,14 @@ export default function CatalogSettingsClient({
                 <span>{editingSizeId ? 'Sửa Kích Cỡ' : 'Tạo Kích Cỡ Mới'}</span>
               </h3>
               <p className="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
-                Quy chuẩn kích cỡ được gắn theo từng Danh mục tương ứng.
+                Quy chuẩn kích cỡ sản phẩm chung toàn hệ thống (không phân theo danh mục).
               </p>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-gray-500">Kích cỡ (Size Name) *</label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: Medium, Large, Set of 2"
+                  placeholder="Ví dụ: Medium, Large, Set of 2, Beaker-S"
                   value={sizeName}
                   onChange={(e) => setSizeName(e.target.value)}
                   className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold"
@@ -691,24 +1045,19 @@ export default function CatalogSettingsClient({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-gray-500">Danh mục liên kết *</label>
-                <select
-                  value={sizeCategoryId}
-                  onChange={(e) => setSizeCategoryId(e.target.value)}
-                  className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold cursor-pointer"
-                  required
-                >
-                  <option value="">-- Chọn danh mục --</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
+                <label className="text-[11px] font-bold text-gray-500">Mô tả (Không bắt buộc)</label>
+                <textarea
+                  placeholder="Mô tả kích thước hoặc dung tích..."
+                  value={sizeDescription}
+                  onChange={(e) => setSizeDescription(e.target.value)}
+                  className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold resize-y min-h-[80px]"
+                />
               </div>
 
               <div className="flex gap-2 mt-2">
                 <button
                   type="submit"
-                  disabled={loading || !sizeName.trim() || !sizeCategoryId}
+                  disabled={loading || !sizeName.trim()}
                   className="flex-grow bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shadow-orange-500/10"
                 >
                   {loading ? <Loader2 size={13} className="animate-spin" /> : editingSizeId ? 'Cập nhật' : 'Tạo kích cỡ'}
@@ -790,18 +1139,95 @@ export default function CatalogSettingsClient({
             </form>
           )}
 
+          {/* TAB 5: HOÀN THIỆN */}
+          {activeTab === 'finishes' && (
+            <form onSubmit={handleFinishSubmit} className="flex flex-col gap-4">
+              <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-1">
+                <Sparkles size={18} className="text-orange-500" />
+                <span>{editingFinishId ? 'Sửa Hoàn Thiện' : 'Tạo Hoàn Thiện Mới'}</span>
+              </h3>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
+                Kỹ thuật xử lý bề mặt sản phẩm (Tráng men màu, vẽ tay, khắc nổi...).
+              </p>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-gray-500">Tên kỹ thuật hoàn thiện *</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Vẽ tay thủ công"
+                  value={finishName}
+                  onChange={(e) => setFinishName(e.target.value)}
+                  className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-gray-500">Đường dẫn (Slug) *</label>
+                <input
+                  type="text"
+                  placeholder="ve-tay-thu-cong"
+                  value={finishSlug}
+                  onChange={(e) => setFinishSlug(slugify(e.target.value))}
+                  className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-mono"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-gray-500">Mô tả chi tiết</label>
+                <textarea
+                  placeholder="Mô tả kỹ thuật hoàn thiện này..."
+                  value={finishDescription}
+                  onChange={(e) => setFinishDescription(e.target.value)}
+                  className="w-full text-xs bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-800 px-3.5 py-2.5 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-semibold resize-y min-h-[80px]"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <ImageCropUploader
+                  label="Ảnh minh họa (không bắt buộc)"
+                  value={finishImageUrl}
+                  onChange={setFinishImageUrl}
+                  aspectRatio={1}
+                  recommendedSize="300x300 px"
+                  folder="finishes"
+                />
+              </div>
+
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="submit"
+                  disabled={loading || !finishName.trim() || !finishSlug.trim()}
+                  className="flex-grow bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shadow-orange-500/10"
+                >
+                  {loading ? <Loader2 size={13} className="animate-spin" /> : editingFinishId ? 'Cập nhật' : 'Tạo hoàn thiện'}
+                </button>
+                {editingFinishId && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="bg-gray-100 hover:bg-gray-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer"
+                  >
+                    Hủy
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
+
         </div>
 
         {/* CỘT PHẢI: DANH SÁCH BẢNG DỮ LIỆU */}
         <div className="lg:col-span-8 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 p-6 rounded-2xl shadow-xs">
-          
+
           {/* 1. DANH MỤC TABLE */}
           {activeTab === 'categories' && (
             <div className="flex flex-col gap-4">
               <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100">
                 Danh sách Danh mục hiện tại
               </h3>
-              
+
               {categories.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-850 rounded-2xl text-xs text-gray-400">
                   Chưa có danh mục nào được khởi tạo.
@@ -819,7 +1245,7 @@ export default function CatalogSettingsClient({
                     </thead>
                     <tbody>
                       {categories.map(cat => (
-                        <tr key={cat.id} className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
+                        <tr key={cat.id} className="border-b border-gray-55 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
                           <td className="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200">{cat.name}</td>
                           <td className="py-3 px-3 font-mono text-gray-400">{cat.slug}</td>
                           <td className="py-3 px-3 text-center font-bold text-gray-600 dark:text-gray-400">{cat._count?.products || 0}</td>
@@ -856,7 +1282,7 @@ export default function CatalogSettingsClient({
               <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100">
                 Danh sách Bộ sưu tập hiện tại
               </h3>
-              
+
               {productGroups.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-850 rounded-2xl text-xs text-gray-400">
                   Chưa có bộ sưu tập nào được khởi tạo.
@@ -874,7 +1300,7 @@ export default function CatalogSettingsClient({
                     </thead>
                     <tbody>
                       {productGroups.map(group => (
-                        <tr key={group.id} className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
+                        <tr key={group.id} className="border-b border-gray-55 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
                           <td className="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200">{group.name}</td>
                           <td className="py-3 px-3 font-mono text-gray-400">{group.slug}</td>
                           <td className="py-3 px-3 text-center font-bold text-gray-600 dark:text-gray-400">{group._count?.products || 0}</td>
@@ -905,56 +1331,40 @@ export default function CatalogSettingsClient({
             </div>
           )}
 
-          {/* 3. KÍCH CỠ (SIZE) TABLE */}
+          {/* 3. KÍCH CỠ (SIZE) TABLE WITH DRAG REORDER */}
           {activeTab === 'sizes' && (
             <div className="flex flex-col gap-4">
               <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100">
-                Danh sách Kích cỡ hiện tại
+                Danh sách Kích cỡ hiện tại (Kéo để đổi thứ tự)
               </h3>
-              
+
               {sizes.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-850 rounded-2xl text-xs text-gray-400">
                   Chưa có kích cỡ nào được khởi tạo.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 uppercase font-bold tracking-wider">
-                        <th className="pb-3 px-3">Kích cỡ</th>
-                        <th className="pb-3 px-3">Thuộc danh mục</th>
-                        <th className="pb-3 px-3 text-center">Số sản phẩm đang dùng</th>
-                        <th className="pb-3 px-3 text-right">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sizes.map(sz => (
-                        <tr key={sz.id} className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
-                          <td className="py-3 px-3 font-semibold text-gray-800 dark:text-gray-200">{sz.name}</td>
-                          <td className="py-3 px-3 font-bold text-orange-600/80 bg-orange-50/20 dark:bg-orange-950/5 px-2 py-1 rounded-lg w-fit">{sz.category?.name || 'Chưa phân loại'}</td>
-                          <td className="py-3 px-3 text-center font-bold text-gray-600 dark:text-gray-400">{sz._count?.products || 0}</td>
-                          <td className="py-3 px-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => handleEditSize(sz)}
-                                className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 rounded-lg transition-colors cursor-pointer"
-                                title="Sửa kích cỡ"
-                              >
-                                <Edit size={13} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteSize(sz.id)}
-                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors cursor-pointer"
-                                title="Xóa kích cỡ"
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          </td>
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSizesDragEnd}>
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 uppercase font-bold tracking-wider">
+                          <th className="pb-3 px-3 text-center w-10">Kéo</th>
+                          <th className="pb-3 px-3">Kích cỡ</th>
+                          <th className="pb-3 px-3">Slug</th>
+                          <th className="pb-3 px-3">Mô tả</th>
+                          <th className="pb-3 px-3 text-center">Số sản phẩm đang dùng</th>
+                          <th className="pb-3 px-3 text-right">Thao tác</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <SortableContext items={sizes.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                        <tbody>
+                          {sizes.map(sz => (
+                            <SortableSizeRow key={sz.id} size={sz} onEdit={handleEditSize} onDelete={handleDeleteSize} />
+                          ))}
+                        </tbody>
+                      </SortableContext>
+                    </table>
+                  </DndContext>
                 </div>
               )}
             </div>
@@ -966,7 +1376,7 @@ export default function CatalogSettingsClient({
               <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100">
                 Danh sách Màu sắc hiện tại
               </h3>
-              
+
               {colors.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-850 rounded-2xl text-xs text-gray-400">
                   Chưa có màu sắc nào được khởi tạo.
@@ -985,7 +1395,7 @@ export default function CatalogSettingsClient({
                     </thead>
                     <tbody>
                       {colors.map(col => (
-                        <tr key={col.id} className="border-b border-gray-50 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
+                        <tr key={col.id} className="border-b border-gray-55 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-zinc-800/10 transition-colors">
                           <td className="py-3 px-3 text-center">
                             <div
                               className="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-800 shadow-xs mx-auto"
@@ -1017,6 +1427,45 @@ export default function CatalogSettingsClient({
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 5. KỸ THUẬT HOÀN THIỆN TABLE WITH DRAG REORDER */}
+          {activeTab === 'finishes' && (
+            <div className="flex flex-col gap-4">
+              <h3 className="font-playfair font-bold text-base text-gray-800 dark:text-gray-100">
+                Danh sách Kỹ thuật Hoàn thiện (Kéo để đổi thứ tự)
+              </h3>
+
+              {finishes.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-850 rounded-2xl text-xs text-gray-400">
+                  Chưa có kỹ thuật hoàn thiện nào được khởi tạo.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleFinishesDragEnd}>
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 uppercase font-bold tracking-wider">
+                          <th className="pb-3 px-3 text-center w-10">Kéo</th>
+                          <th className="pb-3 px-3">Kỹ thuật hoàn thiện</th>
+                          <th className="pb-3 px-3">Slug</th>
+                          <th className="pb-3 px-3">Mô tả</th>
+                          <th className="pb-3 px-3 text-center">Số sản phẩm đang dùng</th>
+                          <th className="pb-3 px-3 text-right">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <SortableContext items={finishes.map(f => f.id)} strategy={verticalListSortingStrategy}>
+                        <tbody>
+                          {finishes.map(f => (
+                            <SortableFinishRow key={f.id} finish={f} onEdit={handleEditFinish} onDelete={handleDeleteFinish} />
+                          ))}
+                        </tbody>
+                      </SortableContext>
+                    </table>
+                  </DndContext>
                 </div>
               )}
             </div>

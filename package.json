@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:seed-finishes": "npx tsx prisma/seed-finishes.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

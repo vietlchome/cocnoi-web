@@ -122,13 +122,12 @@ model VerificationToken {
 // ---------------------------------------------------------
 
 model Category {
-  id        String       @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
-  slug      String       @unique
+  slug      String    @unique
   products  Product[]
-  sizes     SizeOption[] // Quan hệ với Kích cỡ tùy chọn ( dependent size options )
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model ProductGroup {
@@ -150,15 +149,16 @@ model ColorOption {
 }
 
 model SizeOption {
-  id         String    @id @default(cuid())
-  name       String
-  categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products   Product[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  sortOrder   Int       @default(0)
 
-  @@unique([name, categoryId])
+  products    Product[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Product {
@@ -192,6 +192,8 @@ model Product {
   categoryId       String?
   category         Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   
+  finishes         FinishOption[] // M2M, Prisma tự tạo bảng trung gian
+  
   orderItems       OrderItem[]   // Quan hệ với Module 4
   inquiries        OrderInquiry[] // Quan hệ với các đơn tư vấn gốm (Module 3)
   reviews          Review[]      // Đánh giá sản phẩm từ người dùng
@@ -202,6 +204,20 @@ model Product {
   @@index([categoryId])
   @@index([productGroupId])
   @@index([isActive, visibility])
+}
+
+model FinishOption {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int       @default(0)
+  
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 // ---------------------------------------------------------

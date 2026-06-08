@@ -13,17 +13,20 @@ interface PageProps {
 export default async function AdminProductEditPage({ params }: PageProps) {
   const { id } = await params
 
-  // Lấy chi tiết sản phẩm cùng các biến thể
+  // Lấy chi tiết sản phẩm cùng các biến thể và kỹ thuật hoàn thiện
   const product = await prisma.product.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      finishes: true
+    }
   })
 
   if (!product) {
     notFound()
   }
 
-  // Lấy dữ liệu phân loại, bộ sưu tập, màu sắc và kích cỡ
-  const [categories, productGroups, colors, sizes] = await Promise.all([
+  // Lấy dữ liệu phân loại, bộ sưu tập, màu sắc, kích cỡ và kỹ thuật hoàn thiện
+  const [categories, productGroups, colors, sizes, finishes] = await Promise.all([
     prisma.category.findMany({
       select: { id: true, name: true },
       orderBy: { name: 'asc' }
@@ -37,8 +40,15 @@ export default async function AdminProductEditPage({ params }: PageProps) {
       orderBy: { name: 'asc' }
     }),
     prisma.sizeOption.findMany({
-      select: { id: true, name: true, categoryId: true },
-      orderBy: { name: 'asc' }
+      select: { id: true, name: true, slug: true },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { name: 'asc' }
+      ]
+    }),
+    prisma.finishOption.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { sortOrder: 'asc' }
     })
   ])
 
@@ -56,6 +66,7 @@ export default async function AdminProductEditPage({ params }: PageProps) {
         productGroups={productGroups} 
         colors={colors} 
         sizes={sizes} 
+        finishes={finishes}
         initialProduct={product as any} 
       />
     </div>

@@ -18,6 +18,7 @@ export const CreateProductSchema = z.object({
   isActive: z.boolean().default(true),
   visibility: VisibilitySchema.default('PUBLIC'),
   categoryId: z.string().nullable().optional(),
+  finishIds: z.array(z.string()).optional(),
 });
 
 export const UpdateProductSchema = CreateProductSchema.partial();

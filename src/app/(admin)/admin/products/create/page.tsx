@@ -4,8 +4,8 @@ import ProductForm from '@/components/admin/ProductForm'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminProductCreatePage() {
-  // Lấy dữ liệu phân loại, bộ sưu tập, màu sắc và kích cỡ
-  const [categories, productGroups, colors, sizes] = await Promise.all([
+  // Lấy dữ liệu phân loại, bộ sưu tập, màu sắc, kích cỡ và kỹ thuật hoàn thiện
+  const [categories, productGroups, colors, sizes, finishes] = await Promise.all([
     prisma.category.findMany({
       select: { id: true, name: true },
       orderBy: { name: 'asc' }
@@ -19,8 +19,15 @@ export default async function AdminProductCreatePage() {
       orderBy: { name: 'asc' }
     }),
     prisma.sizeOption.findMany({
-      select: { id: true, name: true, categoryId: true },
-      orderBy: { name: 'asc' }
+      select: { id: true, name: true, slug: true },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { name: 'asc' }
+      ]
+    }),
+    prisma.finishOption.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { sortOrder: 'asc' }
     })
   ])
 
@@ -36,6 +43,7 @@ export default async function AdminProductCreatePage() {
         productGroups={productGroups} 
         colors={colors} 
         sizes={sizes} 
+        finishes={finishes}
       />
     </div>
   )
