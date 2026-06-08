@@ -64,7 +64,8 @@ export class SearchService {
       // 2. Search Published Blog/Campaign Posts
       prisma.post.findMany({
         where: {
-          isPublished: true,
+          status: "PUBLISHED",
+          publishedAt: { lte: new Date() },
           OR: [
             { title: { contains: trimmed, mode: "insensitive" } },
             { excerpt: { contains: trimmed, mode: "insensitive" } },

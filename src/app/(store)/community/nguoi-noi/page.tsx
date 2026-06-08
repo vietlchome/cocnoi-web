@@ -7,11 +7,12 @@ export const revalidate = 0; // Vô hiệu hóa bộ nhớ đệm để tải c�
 
 export default async function NguoiNoiCampaignPage() {
   const posts = await prisma.post.findMany({
-    where: { 
-      isPublished: true,
+    where: {
+      status: "PUBLISHED",
+      publishedAt: { lte: new Date() },
       category: "UNSUNG_HEROES" // Chỉ lấy các bài viết thuộc danh mục Người Nối
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { publishedAt: "desc" },
   });
 
   const teamMembers = [

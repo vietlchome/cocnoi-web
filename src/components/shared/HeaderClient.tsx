@@ -177,7 +177,7 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
                   
                   {/* Mega Menu Dropdown for SHOP */}
                   {link.title.toUpperCase() === "SHOP" && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-[550px] bg-canvas border border-border rounded-4 shadow-xl opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300 z-50 p-6">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-[550px] bg-canvas border border-border rounded-4 shadow-xl opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300 z-50 p-6">
                       <div className="grid grid-cols-3 gap-6 text-left">
                         {/* Column 1: Mugs */}
                         <div className="flex flex-col gap-2.5">
@@ -221,7 +221,7 @@ export default function HeaderClient({ config, navLinks, dbCollections }: Header
                   
                   {/* Standard Dropdown Menu (for non-SHOP links) */}
                   {link.title.toUpperCase() !== "SHOP" && submenu && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-56 bg-canvas border border-border rounded-3 shadow-lg opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300 z-50 p-2">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-56 bg-canvas border border-border rounded-3 shadow-lg opacity-0 translate-y-2 pointer-events-none group-hover/item:opacity-100 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-300 z-50 p-2">
                       <div className="py-1">
                         {submenu.map((sub) => (
                           <Link
