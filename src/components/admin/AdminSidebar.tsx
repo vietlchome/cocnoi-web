@@ -11,6 +11,16 @@ import {
 } from "lucide-react";
 import { useAdminLayoutStore } from "@/store/admin-layout.store";
 
+{/* AdminBrand: Phase 10 sẽ đọc từ siteConfig.brand.brandName */}
+function AdminBrand() {
+  return (
+    <>
+      <span className="font-playfair text-base font-bold tracking-wider block leading-tight">CỐC NỐI</span>
+      <span className="text-[10px] text-secondary/60 uppercase font-bold tracking-widest block leading-none">Quản trị viên</span>
+    </>
+  );
+}
+
 const MENU_ITEMS = [
   {
     title: "Tổng quan",
@@ -142,8 +152,7 @@ export default function AdminSidebar({ pendingRetailOrdersCount = 0, pendingB2BO
             </svg>
           </div>
           <div>
-            <span className="font-playfair text-base font-bold tracking-wider block leading-tight">CỐC NỐI</span>
-            <span className="text-[10px] text-secondary/60 uppercase font-bold tracking-widest block leading-none">Quản trị viên</span>
+            <AdminBrand />
           </div>
         </Link>
         <button 

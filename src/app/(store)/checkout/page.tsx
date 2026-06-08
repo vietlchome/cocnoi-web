@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 import { ShoppingBag, ArrowLeft, Check, AlertCircle, Sparkles, CreditCard, Truck, Clock } from 'lucide-react'
 import { useCartStore } from '@/store/cart.store'
 import { createRetailOrder } from '@/lib/actions/order.actions'
@@ -39,29 +40,7 @@ export default function CheckoutPage() {
   }
 
   if (process.env.NEXT_PUBLIC_ENABLE_CART !== "true") {
-    return (
-      <div className="w-full min-h-screen bg-canvas py-20 font-bvp text-secondary flex items-center justify-center select-none">
-        <div className="max-w-[650px] w-full mx-auto px-4 text-center">
-          <div className="bg-white border border-border/40 rounded-3 shadow-md p-8 md:p-12 flex flex-col items-center gap-6 relative">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-accent" style={{ backgroundColor: "var(--color-terracotta)" }} />
-            <div className="w-16 h-16 rounded-full bg-accent/5 flex items-center justify-center text-accent" style={{ color: "var(--color-terracotta)" }}>
-              <ShoppingBag className="w-8 h-8" />
-            </div>
-            <h1 className="font-playfair font-bold text-2xl md:text-3xl text-primary">Đặt hàng qua tư vấn</h1>
-            <p className="text-xs md:text-sm text-secondary/70 leading-relaxed max-w-md mx-auto">
-              Cốc Nối hiện nhận đơn hàng thông qua hình thức tư vấn để hỗ trợ chu đáo nhất. Vui lòng chọn sản phẩm trong cửa hàng và nhấn Đặt hàng để gửi yêu cầu.
-            </p>
-            <Link
-              href="/cua-hang"
-              style={{ backgroundColor: "var(--color-deep-indigo)" }}
-              className="bg-primary hover:bg-opacity-90 text-canvas text-xs font-bold px-8 py-4 rounded-2 shadow-md uppercase tracking-wider transition-colors"
-            >
-              Vào cửa hàng
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
+    redirect("/cua-hang");
   }
 
   // Cart math
