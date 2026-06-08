@@ -204,7 +204,20 @@ export const SiteConfigSchema = z.object({
         ctaLabel: textValidator,
       })),
     }),
-  })
+  }),
+  community_stories: z.object({
+    title: textValidator,
+    intro: textValidator,
+    ctaText: textValidator,
+    ctaUrl: urlValidator,
+    stories: z.array(z.object({
+      authorName: textValidator,
+      location: textValidator,
+      content: textValidator,
+      image: textValidator,
+      date: textValidator,
+    })).default([]),
+  }).optional(),
 });
 
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;

@@ -678,4 +678,25 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       }
     }
   },
+  community_stories: {
+    label: "Trang 'Câu chuyện của bạn'",
+    fields: {
+      title: { type: "text", label: "Tiêu đề trang", default: "Câu chuyện của bạn" },
+      intro: { type: "textarea", label: "Đoạn mở đầu", default: "Chiếc cốc Cốc Nối của bạn đã đi cùng những khoảnh khắc nào? Chúng tôi muốn lắng nghe câu chuyện của bạn." },
+      ctaText: { type: "text", label: "Text nút CTA", default: "Gửi câu chuyện qua Telegram" },
+      ctaUrl: { type: "url", label: "Link CTA", default: "https://t.me/cocnoi" },
+      stories: {
+        type: "repeatable",
+        label: "Câu chuyện đã chia sẻ",
+        default: [],
+        itemSchema: {
+          authorName: { type: "text", label: "Tên người chia sẻ", default: "" },
+          location: { type: "text", label: "Địa điểm", default: "" },
+          content: { type: "textarea", label: "Nội dung câu chuyện", default: "" },
+          image: { type: "image", label: "Ảnh kèm", default: "", folder: "community/stories" },
+          date: { type: "text", label: "Ngày (định dạng tự do)", default: "" },
+        }
+      }
+    }
+  },
 };
