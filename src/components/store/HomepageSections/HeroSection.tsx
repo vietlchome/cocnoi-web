@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 interface HeroSectionProps {
@@ -7,13 +8,58 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ config, quickChips }: HeroSectionProps) {
+  const isVideo = config.mediaType === "video" && !!config.videoUrl;
+
   return (
-    <section className="relative overflow-hidden bg-subtle border-b border-border py-20 md:py-32 lg:py-40">
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <section className="relative overflow-hidden bg-subtle border-b border-border min-h-[80vh] flex items-center">
+      {/* === MEDIA BACKGROUND === */}
+      <div className="absolute inset-0 z-0">
+        {isVideo ? (
+          <>
+            <video
+              autoPlay={config.videoAutoplay !== false}
+              muted
+              loop
+              playsInline
+              poster={config.videoPosterUrl || undefined}
+              className="motion-safe:block motion-reduce:hidden absolute inset-0 w-full h-full object-cover"
+            >
+              <source src={config.videoUrl} type="video/mp4" />
+            </video>
+            {config.videoPosterUrl && (
+              <Image
+                src={config.videoPosterUrl}
+                alt={config.imageAlt || config.title || ""}
+                fill
+                priority
+                sizes="100vw"
+                className="motion-safe:hidden motion-reduce:block object-cover"
+              />
+            )}
+          </>
+        ) : (
+          config.imageUrl && (
+            <Image
+              src={config.imageUrl}
+              alt={config.imageAlt || config.title || ""}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          )
+        )}
+        {(isVideo || config.imageUrl) && (
+          <div className="absolute inset-0 bg-deep-indigo/20" />
+        )}
+      </div>
+
+      {/* === CONTENT (giữ nguyên từ version cũ, chỉ thêm relative z-10) === */}
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 md:px-8 py-20 md:py-32 lg:py-40 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         <div className="lg:col-span-7 flex flex-col items-start text-left z-10 font-bvp">
           <div className="inline-flex items-center gap-2 border border-border px-3.5 py-1.5 rounded-pill mb-6 bg-canvas shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" style={{ backgroundColor: "var(--color-terracotta)" }}></span>
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" style={{ backgroundColor: "var(--color-accent)" }}></span>
             <span className="font-quicksand font-bold text-xs uppercase tracking-widest text-secondary">
               {config.badge}
             </span>

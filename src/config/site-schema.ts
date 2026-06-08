@@ -102,7 +102,32 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
         }
       },
       floatingLabel: { type: "text", label: "Nhãn nổi trang trí", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
-      imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] }
+      imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] },
+      imageAlt: { type: "text", label: "Alt text ảnh Hero", default: "Cốc Nối - Gốm thủ công" },
+      mediaType: {
+        type: "select",
+        label: "Loại media chính",
+        options: [
+          { value: "image", label: "Ảnh tĩnh" },
+          { value: "video", label: "Video (MP4 Cloudinary)" },
+        ],
+        default: "image",
+      },
+      videoUrl: {
+        type: "text",
+        label: "URL video MP4 (Cloudinary)",
+        default: "",
+        helpText: "VD: https://res.cloudinary.com/dxjplgard/video/upload/q_auto,f_mp4/hero.mp4",
+      },
+      videoPosterUrl: {
+        type: "image",
+        label: "Ảnh poster (fallback reduced-motion)",
+        default: "",
+        aspectRatio: 1.7777,
+        folder: "theme/hero",
+        helpText: "Hiển thị thay video khi user tắt animation hoặc băng thông thấp.",
+      },
+      videoAutoplay: { type: "boolean", label: "Tự động phát video (muted)", default: true },
     }
   },
   campaign: {

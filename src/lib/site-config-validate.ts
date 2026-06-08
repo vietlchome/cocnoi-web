@@ -36,6 +36,11 @@ export const SiteConfigSchema = z.object({
     }),
     floatingLabel: textValidator,
     imageUrl: imageValidator,
+    imageAlt: textValidator,
+    mediaType: z.enum(["image", "video"]).default("image"),
+    videoUrl: textValidator,
+    videoPosterUrl: textValidator,
+    videoAutoplay: booleanValidator,
   }),
   campaign: z.object({
     badge: textValidator,
