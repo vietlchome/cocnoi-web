@@ -464,5 +464,23 @@ model Notification {
   @@index([isRead, createdAt])
 }
 
+model Stockist {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  address     String
+  city        String
+  province    String?
+  mapUrl      String?
+  imageUrl    String?
+  description String?
+  phone       String?
+  hours       String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 
 
