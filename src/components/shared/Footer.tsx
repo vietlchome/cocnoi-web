@@ -10,14 +10,14 @@ interface FooterProps {
 
 export default function Footer({ config }: FooterProps) {
   // Cac cau hinh tu SiteConfig
-  const footerLogoUrl = config.header.logoUrl || "";
-  const footerLogoText = config.header.logoText || "CỐC NỐI";
-  const footerAddress = config.contact.address || "Xưởng gốm Cốc Nối, Bát Tràng, Gia Lâm, Hà Nội";
-  const footerPhone = config.contact.phone || "+84 (0) 98 765 4321";
-  const footerEmail = config.contact.email || "hello@cocnoi.com";
-  const footerNewsletterTitle = config.footer.newsletterTitle || "Hộp tin Cốc Nối";
-  const footerNewsletterDesc = config.footer.newsletterDesc || "Đăng ký để nhận câu chuyện mới về 'Người Nối' và ưu đãi sớm nhất của các bộ sưu tập.";
-  const footerCopyright = config.footer.copyright || "CỐC NỐI. Bảo lưu mọi quyền.";
+  const footerLogoUrl = config.header.logoUrl;
+  const footerLogoText = config.header.logoText;
+  const footerAddress = config.contact.address;
+  const footerPhone = config.contact.phone;
+  const footerEmail = config.contact.email;
+  const footerNewsletterTitle = config.footer.newsletterTitle;
+  const footerNewsletterDesc = config.footer.newsletterDesc;
+  const footerCopyright = config.footer.copyright;
   const footerLegal = config.footer.legal || {};
 
   return (

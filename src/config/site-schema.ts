@@ -330,16 +330,16 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
   contact: {
     label: "Thông tin liên hệ",
     fields: {
-      address: { type: "text", label: "Địa chỉ", default: "", aliases: ["contact_address"], helpText: "Hiển thị ở Footer + trang Liên hệ" },
-      phone: { type: "text", label: "Điện thoại", default: "", aliases: ["contact_phone"] },
-      email: { type: "text", label: "Email", default: "", aliases: ["contact_email"] }
+      address: { type: "text", label: "Địa chỉ", default: "Xưởng gốm Cốc Nối, Bát Tràng, Gia Lâm, Hà Nội", aliases: ["contact_address"], helpText: "Hiển thị ở Footer + trang Liên hệ" },
+      phone: { type: "text", label: "Điện thoại", default: "+84 (0) 98 765 4321", aliases: ["contact_phone"] },
+      email: { type: "text", label: "Email", default: "hello@cocnoi.com", aliases: ["contact_email"] },
     }
   },
   footer: {
     label: "Footer",
     fields: {
       newsletterTitle: { type: "text", label: "Tiêu đề Newsletter", default: "Hộp tin Cốc Nối", aliases: ["footer_newsletter_title"] },
-      newsletterDesc: { type: "text", label: "Mô tả Newsletter", default: "", aliases: ["footer_newsletter_desc"] },
+      newsletterDesc: { type: "text", label: "Mô tả Newsletter", default: "Đăng ký để nhận câu chuyện mới về 'Người Nối' và ưu đãi sớm nhất của các bộ sưu tập.", aliases: ["footer_newsletter_desc"] },
       copyright: { type: "text", label: "Bản quyền", default: "CỐC NỐI. Bảo lưu mọi quyền.", aliases: ["footer_copyright"] },
       legal: {
         type: "group",
