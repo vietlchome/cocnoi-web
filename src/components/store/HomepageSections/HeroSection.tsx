@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 
 interface HeroSectionProps {
   config: any;
-  quickChips?: Array<{ text: string; url: string }>;
 }
 
 export default function HeroSection({ config }: HeroSectionProps) {

@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
 import { getSiteConfig } from "@/lib/site-config";
-import { SettingsService } from "@/lib/services/settings.service";
 import { ReviewService } from "@/lib/services/review.service";
 import TestimonialSection from "@/components/store/TestimonialSection";
 import HeroSection from "@/components/store/HomepageSections/HeroSection";
@@ -16,23 +15,6 @@ export const revalidate = 0; // Đọc live settings từ database SQLite lập 
 export default async function StoreHome() {
   // 1. Truy vấn cấu hình giao diện hợp nhất qua site config schema
   const config = await getSiteConfig();
-
-  // Lấy danh sách chip tìm nhanh từ settings
-  let quickChips: Array<{ text: string; url: string }> = [];
-  try {
-    const chipsSetting = await SettingsService.getValue("hero_quick_chips");
-    quickChips = chipsSetting ? JSON.parse(chipsSetting) : [];
-  } catch (e) {
-    quickChips = [];
-  }
-  if (!quickChips || quickChips.length === 0) {
-    quickChips = [
-      { text: "Cốc có quai", url: "/cua-hang?category=Mugs" },
-      { text: "Cốc không quai", url: "/cua-hang?category=Beakers" },
-      { text: "BST Đặc biệt", url: "/cua-hang?category=Limited" },
-      { text: "Quà tặng", url: "/cua-hang?category=Gifts" }
-    ];
-  }
 
   // 2. Truy vấn danh sách sản phẩm thực tế từ Database
   const dbProducts = await prisma.product.findMany({
@@ -143,7 +125,7 @@ export default async function StoreHome() {
     .map((s: any) => s.key);
 
   const sectionComponents: Record<string, React.ReactElement> = {
-    hero: <HeroSection config={config.hero} quickChips={quickChips} />,
+    hero: <HeroSection config={config.hero} />,
     campaign: <CampaignSection config={config.campaign} />,
     products: <ProductsSection config={config.products} products={featuredProducts} />,
     story: <StorySection config={config.story} />,
