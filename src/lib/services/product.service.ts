@@ -401,6 +401,20 @@ export class ProductService {
     return prisma.category.delete({ where: { id } });
   }
 
+  /**
+   * Thay đổi thứ tự sắp xếp danh mục
+   */
+  static async reorderCategories(ids: string[]) {
+    return prisma.$transaction(
+      ids.map((id, index) =>
+        prisma.category.update({
+          where: { id },
+          data: { sortOrder: index + 1 },
+        })
+      )
+    );
+  }
+
   // ---------------------------------------------------------
   // PRODUCT GROUP OPERATIONS
   // ---------------------------------------------------------
@@ -441,6 +455,20 @@ export class ProductService {
   static async deleteProductGroup(id: string) {
     // SetNull tự động cho các sản phẩm liên kết theo Prisma schema config
     return prisma.productGroup.delete({ where: { id } });
+  }
+
+  /**
+   * Thay đổi thứ tự sắp xếp bộ sưu tập (Product Group)
+   */
+  static async reorderProductGroups(ids: string[]) {
+    return prisma.$transaction(
+      ids.map((id, index) =>
+        prisma.productGroup.update({
+          where: { id },
+          data: { sortOrder: index + 1 },
+        })
+      )
+    );
   }
 
   // ---------------------------------------------------------
