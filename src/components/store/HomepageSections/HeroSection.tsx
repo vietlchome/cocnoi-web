@@ -63,8 +63,8 @@ export default function HeroSection({ config }: HeroSectionProps) {
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 md:px-8 py-20 md:py-32 lg:py-40 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
         {/* LEFT: Glass panel content */}
-        <div className={`${showShowcase ? "lg:col-span-7" : "lg:col-span-8"} flex flex-col items-start text-left font-bvp`}>
-          <div className="bg-canvas/85 backdrop-blur-md border border-border/40 shadow-xl rounded-4 p-6 md:p-10 w-full">
+        <div className={`${showShowcase ? "lg:col-span-7" : "lg:col-span-6"} flex flex-col items-start text-left font-bvp`}>
+          <div className="bg-canvas/85 backdrop-blur-md border border-border/40 shadow-xl rounded-4 p-6 md:p-8 w-full max-w-2xl">
             <div className="inline-flex items-center gap-2 border border-border px-3.5 py-1.5 rounded-pill mb-6 bg-canvas shadow-xs">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" style={{ backgroundColor: "var(--color-accent)" }}></span>
               <span className="font-quicksand font-bold text-xs uppercase tracking-widest text-secondary">
@@ -72,7 +72,7 @@ export default function HeroSection({ config }: HeroSectionProps) {
               </span>
             </div>
 
-            <h1 className="font-playfair italic font-semibold text-3xl md:text-4xl lg:text-5xl mb-5 text-primary leading-tight">
+            <h1 className="font-playfair italic font-semibold text-2xl md:text-3xl lg:text-4xl mb-5 text-primary leading-tight whitespace-nowrap">
               {titleParts.map((part, idx) =>
                 part === "Nối" ? (
                   <span key={idx} style={{ color: "var(--color-terracotta)" }}>{part}</span>
