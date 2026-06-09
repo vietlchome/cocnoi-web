@@ -160,37 +160,7 @@ export default function MegaMenuMobile({
         )}
       </div>
 
-      {/* 4. FEATURED CARDS */}
-      <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-border/40">
-        {config.featuredCards.map((card: any, i: number) => (
-          <Link
-            key={i}
-            href={card.href}
-            onClick={onClose}
-            className="block group"
-          >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border/40 bg-cream/35">
-              {card.image ? (
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-secondary/40 text-[9px] font-bold uppercase tracking-wider">
-                  No image
-                </div>
-              )}
-            </div>
-            <h4 className="font-playfair text-xs font-bold text-primary mt-1.5 group-hover:text-accent transition-colors line-clamp-1">
-              {card.title}
-            </h4>
-            <span className="text-accent text-[9px] font-bold uppercase tracking-wider block mt-0.5">
-              {card.ctaLabel} →
-            </span>
-          </Link>
-        ))}
-      </div>
+      {/* Phase 9f: Skip featured cards per user feedback. Keep config.featuredCards field for future. */}
     </div>
   );
 }

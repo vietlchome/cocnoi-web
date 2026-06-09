@@ -94,14 +94,15 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       },
       ctaSecondary: {
         type: "group",
-        label: "CTA Phụ",
-        default: { text: "Chiến dịch 'Người Nối'", url: "/campaign" },
+        label: "CTA Phụ (để text trống = ẩn nút)",
+        default: { text: "", url: "" },
         fields: {
-          text: { type: "text", label: "Nhãn nút", default: "Chiến dịch 'Người Nối'", aliases: ["hero_cta_secondary"] },
-          url: { type: "url", label: "Link đích", default: "/campaign" }
+          text: { type: "text", label: "Nhãn nút (trống = ẩn)", default: "", aliases: ["hero_cta_secondary"] },
+          url: { type: "url", label: "Link đích", default: "" }
         }
       },
-      floatingLabel: { type: "text", label: "Nhãn nổi trang trí", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
+      showShowcaseCard: { type: "boolean", label: "Hiển thị card showcase bên phải", default: false, helpText: "Tắt mặc định để focus vào video Hero." },
+      floatingLabel: { type: "text", label: "Nhãn nổi trang trí (chỉ hiện khi card showcase bật)", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
       imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] },
       imageAlt: { type: "text", label: "Alt text ảnh Hero", default: "Cốc Nối - Gốm thủ công" },
       mediaType: {

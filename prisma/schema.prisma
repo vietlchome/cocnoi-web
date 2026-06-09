@@ -125,6 +125,7 @@ model Category {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
+  sortOrder Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -134,6 +135,7 @@ model ProductGroup {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
+  sortOrder Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

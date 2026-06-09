@@ -53,6 +53,38 @@ export async function deleteCategory(id: string) {
   }
 }
 
+/**
+ * Thay đổi thứ tự sắp xếp danh mục
+ */
+export async function reorderCategories(ids: string[]) {
+  await requireAdmin();
+
+  try {
+    await ProductService.reorderCategories(ids);
+    revalidatePath('/admin/products/settings');
+    revalidateTag('mega-menu-data', 'default');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Lỗi khi thay đổi thứ tự danh mục.' };
+  }
+}
+
+/**
+ * Thay đổi thứ tự sắp xếp bộ sưu tập (Product Group)
+ */
+export async function reorderProductGroups(ids: string[]) {
+  await requireAdmin();
+
+  try {
+    await ProductService.reorderProductGroups(ids);
+    revalidatePath('/admin/products/settings');
+    revalidateTag('mega-menu-data', 'default');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Lỗi khi thay đổi thứ tự bộ sưu tập.' };
+  }
+}
+
 // =========================================================
 // 2. PRODUCT ACTIONS
 // =========================================================

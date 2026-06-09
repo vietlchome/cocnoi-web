@@ -41,6 +41,7 @@ export const SiteConfigSchema = z.object({
     videoUrl: textValidator,
     videoPosterUrl: textValidator,
     videoAutoplay: booleanValidator,
+    showShowcaseCard: booleanValidator.default(false),
   }),
   campaign: z.object({
     badge: textValidator,

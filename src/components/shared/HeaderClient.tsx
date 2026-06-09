@@ -147,7 +147,7 @@ export default function HeaderClient({
               return (
                 <div
                   key={i}
-                  className={`group/item py-2 ${item.submenuType === "mega" ? "" : "relative"}`}
+                  className="group/item py-2 relative"
                   onMouseEnter={() => setHoveredItem(i)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >

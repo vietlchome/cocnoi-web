@@ -1,0 +1,44 @@
+# .clinerules — cocnoi-web
+
+Bạn là executor cho project Cốc Nối. Bạn THỰC THI theo spec, không tự quyết kiến trúc. Khi spec mơ hồ, HỎI lại, không đoán.
+
+## Project
+
+- Cốc Nối: ecommerce gốm thủ công Bát Tràng (since 1994). B2C retail + B2B. Site tiếng Việt, đã LAUNCH tại cocnoi.com.
+- Stack: Next.js 16 (App Router) + React 19 + TypeScript strict + Tailwind 4 + Prisma 5 (PostgreSQL) + NextAuth v5 (JWT/Credentials) + Zustand + Zod + Recharts.
+- Deploy: Vercel Hobby (free) + Neon Postgres + Cloudinary. Lưu ý Vercel filesystem read-only → upload ảnh PHẢI qua Cloudinary, không `writeFile`.
+- Source of truth brand/spec: `D:\CỐC NỐI\README.md` và `docs/customize-refactor-spec*.md`. Đọc `CLAUDE.md` ở root project để có shortcut links.
+
+## Kiến trúc — bắt buộc tuân thủ
+
+- Luồng dữ liệu: Validator (Zod) → Action (`'use server'`) → Service (Prisma logic) → Component. KHÔNG gọi Prisma trực tiếp trong component.
+- Route Groups: `(admin)` và `(store)` có layout riêng. Middleware Edge bảo vệ `/admin/*` và `/api/admin/*`.
+- Config site đọc qua `getSiteConfig()` typed reader (`src/lib/site-config.ts`), KHÔNG dùng `getSetting()` cũ. Thêm/sửa setting chỉ đụng `src/config/site-schema.ts`.
+
+## Quy tắc Next.js — tránh lỗi đã gặp
+
+- KHÔNG đặt route segment bắt đầu bằng `_`. Folder `_foo` trong `src/app/` là private, bị loại khỏi routing → URL trả 404. Dùng tên không underscore (vd `sandbox`, không `_sandbox`).
+- `()` = route group, `[...]` = dynamic. Đừng nhầm.
+- TypeScript strict: không thêm `any` mới trừ khi value cast bất khả kháng, và phải comment lý do.
+
+## Copy / content — luật brand (CẤM vi phạm)
+
+- KHÔNG dùng em-dash `—` trong prose/copy. Thay bằng dấu phẩy, dấu chấm, dấu hai chấm, hoặc gạch nối ngắn `-`. (Em-dash trong markdown table / code comment / file path thì OK.)
+- Emoji < 2 mỗi đoạn. Sentence case, không Title Case ALL CAPS.
+- CẤM từ sáo rỗng: "sống chậm", "thiền định", "về với cội nguồn", "gốm cổ", "hoài cổ", "siêu phẩm", "đẳng cấp", "sang trọng", scarcity giả.
+- Tone: ấm áp, chân thật. "mình/bạn" trên MXH, "chúng tôi" trên website. Kể chuyện > bán hàng.
+- 4 Brand Pillar: KẾT NỐI (cốt lõi) / CHÂN THÀNH / CHỈN CHU / CỞI MỞ. Tagline: "Kết tình thân, Nối tinh thần" / "Crafted bonds. Connected souls."
+
+## Visual
+
+- Màu: Warm White `#FEFCF9` 65% / Deep Indigo `#131829` 25% / Terracotta `#C2703E` 8% / accent 2%. Mọi thiết kế dùng cả 3 màu chính.
+- Font: Playfair Display + Be Vietnam Pro + Quicksand.
+
+## Quy trình làm việc
+
+- TRƯỚC khi bắt đầu bất kỳ task nào: chạy `git log --oneline -20` để xem trạng thái thật, có thể có thay đổi ngoài luồng.
+- Làm theo từng PR nhỏ, dễ review, dễ rollback. Một task = một mục đích rõ.
+- Sau khi sửa: build/test phải pass trước khi báo xong. Đừng claim "done" nếu chưa verify.
+- Commit message tiếng Việt, rõ scope.
+- KHÔNG tự ý đổi schema Prisma, env vars, hoặc config deploy mà không có spec/đồng ý rõ ràng.
+- Không commit secret/key. `.env` không bao giờ vào git.

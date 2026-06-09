@@ -241,5 +241,34 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       return item;
     });
   }
+  // Phase 9g: clear legacy default ctaSecondary text "Chiến dịch 'Người Nối'"
+  if (patched.hero?.ctaSecondary?.text === "Chiến dịch 'Người Nối'") {
+    patched.hero.ctaSecondary.text = "";
+    patched.hero.ctaSecondary.url = "";
+  }
+  // Phase 9f: migrate megaMenu.column* from legacy string -> object {title, viewAllLabel}
+  if (patched.navigation?.megaMenu) {
+    const mm = patched.navigation.megaMenu;
+    const columnDefaults: Record<string, { title: string; viewAllLabel: string }> = {
+      column1: { title: "DANH MỤC", viewAllLabel: "→ Xem tất cả sản phẩm" },
+      column2: { title: "BỘ SƯU TẬP", viewAllLabel: "→ Xem tất cả BST" },
+      column3: { title: "HOÀN THIỆN", viewAllLabel: "→ Xem tất cả kỹ thuật" },
+    };
+    for (const key of ["column1", "column2", "column3"]) {
+      const val = mm[key];
+      if (typeof val === "string") {
+        // Legacy format: column was just a title string
+        mm[key] = { title: val, viewAllLabel: columnDefaults[key].viewAllLabel };
+      } else if (!val || typeof val !== "object") {
+        // Missing or invalid: use default
+        mm[key] = columnDefaults[key];
+      } else {
+        // Object but might be missing keys
+        if (typeof val.title !== "string") val.title = columnDefaults[key].title;
+        if (typeof val.viewAllLabel !== "string") val.viewAllLabel = columnDefaults[key].viewAllLabel;
+      }
+    }
+    if (!Array.isArray(mm.featuredCards)) mm.featuredCards = [];
+  }
   return patched as SiteConfig;
 }
