@@ -54,10 +54,10 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
   return (
     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
-      <div className="bg-warm-white shadow-lg rounded border border-sand p-6 grid grid-cols-3 gap-6 min-w-[600px] max-w-[720px]">
+      <div className="bg-canvas shadow-lg rounded border border-border p-6 grid grid-cols-3 gap-6 min-w-[600px] max-w-[720px]">
         {/* Cột 1 - Danh mục */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-deep-indigo/60 font-bold mb-3 uppercase">
+          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
             {config.column1.title}
           </h3>
           <ul className="space-y-1">
@@ -65,7 +65,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               <li key={cat.id}>
                 <Link
                   href={`/cua-hang?category=${cat.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-deep-indigo hover:text-terracotta transition-colors"
+                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
                 >
                   {cat.name}
                 </Link>
@@ -74,7 +74,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             <li className="pt-2">
               <Link
                 href="/cua-hang"
-                className="block text-xs font-bvp text-terracotta hover:text-terracotta/80 transition-colors"
+                className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
                 {config.column1.viewAllLabel}
               </Link>
@@ -84,7 +84,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 2 - BST */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-deep-indigo/60 font-bold mb-3 uppercase">
+          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
             {config.column2.title}
           </h3>
           <ul className="space-y-1">
@@ -92,7 +92,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               <li key={pg.id}>
                 <Link
                   href={`/cua-hang?collection=${pg.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-deep-indigo hover:text-terracotta transition-colors"
+                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
                 >
                   {pg.name}
                 </Link>
@@ -101,7 +101,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             <li className="pt-2">
               <Link
                 href="/cua-hang?view=collections"
-                className="block text-xs font-bvp text-terracotta hover:text-terracotta/80 transition-colors"
+                className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
                 {config.column2.viewAllLabel}
               </Link>
@@ -111,7 +111,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 3 - Hoàn thiện */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-deep-indigo/60 font-bold mb-3 uppercase">
+          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
             {config.column3.title}
           </h3>
           <ul className="space-y-1">
@@ -119,7 +119,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
               <li key={f.id}>
                 <Link
                   href={`/cua-hang?finish=${f.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-deep-indigo hover:text-terracotta transition-colors"
+                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
                 >
                   {f.name}
                 </Link>
@@ -128,7 +128,7 @@ export async function MegaMenu({ config }: MegaMenuProps) {
             <li className="pt-2">
               <Link
                 href="/cua-hang?view=finishes"
-                className="block text-xs font-bvp text-terracotta hover:text-terracotta/80 transition-colors"
+                className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
                 {config.column3.viewAllLabel}
               </Link>
