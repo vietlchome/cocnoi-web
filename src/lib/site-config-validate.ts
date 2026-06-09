@@ -41,10 +41,6 @@ export const SiteConfigSchema = z.object({
     videoUrl: textValidator,
     videoPosterUrl: textValidator,
     videoAutoplay: booleanValidator,
-    quickLinks: z.array(z.object({
-      label: textValidator,
-      href: urlValidator,
-    })).default([]),
     showShowcaseCard: booleanValidator.default(false),
   }),
   campaign: z.object({

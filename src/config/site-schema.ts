@@ -101,21 +101,6 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           url: { type: "url", label: "Link đích", default: "" }
         }
       },
-      quickLinks: {
-        type: "repeatable",
-        label: "Chips Tìm nhanh",
-        helpText: "Hiển thị dưới CTA. Để trống mảng = ẩn block Tìm nhanh.",
-        default: [
-          { label: "Cốc có quai", href: "/cua-hang?category=coc-co-quai" },
-          { label: "Cốc không quai", href: "/cua-hang?category=coc-khong-quai" },
-          { label: "BST Đặc biệt", href: "/cua-hang?view=collections" },
-          { label: "Quà tặng", href: "/cua-hang?category=qua-tang" },
-        ],
-        itemSchema: {
-          label: { type: "text", label: "Nhãn chip", default: "" },
-          href: { type: "url", label: "Link đích", default: "" },
-        },
-      },
       showShowcaseCard: { type: "boolean", label: "Hiển thị card showcase bên phải", default: false, helpText: "Tắt mặc định để focus vào video Hero." },
       floatingLabel: { type: "text", label: "Nhãn nổi trang trí (chỉ hiện khi card showcase bật)", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
       imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] },
