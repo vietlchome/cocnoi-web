@@ -57,26 +57,26 @@ export async function MegaMenu({ config }: MegaMenuProps) {
       <div className="bg-canvas shadow-lg rounded border border-border p-6 grid grid-cols-3 gap-6 min-w-[600px] max-w-[720px]">
         {/* Cột 1 - Danh mục */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
-            {config.column1.title}
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary font-bold mb-3 pb-2 uppercase border-b border-border">
+            {config.column1.title || "DANH MỤC"}
           </h3>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {categories.map((cat: { id: string; name: string; slug: string }) => (
               <li key={cat.id}>
                 <Link
                   href={`/cua-hang?category=${cat.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
+                  className="block px-3 py-2 -mx-3 rounded text-sm font-bvp font-medium text-primary hover:bg-subtle hover:text-accent transition-colors"
                 >
                   {cat.name}
                 </Link>
               </li>
             ))}
-            <li className="pt-2">
+            <li className="pt-2 px-3 -mx-3">
               <Link
                 href="/cua-hang"
                 className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
-                {config.column1.viewAllLabel}
+                {config.column1.viewAllLabel || "→ Xem tất cả sản phẩm"}
               </Link>
             </li>
           </ul>
@@ -84,26 +84,26 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 2 - BST */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
-            {config.column2.title}
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary font-bold mb-3 pb-2 uppercase border-b border-border">
+            {config.column2.title || "BỘ SƯU TẬP"}
           </h3>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {productGroups.map((pg: { id: string; name: string; slug: string }) => (
               <li key={pg.id}>
                 <Link
                   href={`/cua-hang?collection=${pg.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
+                  className="block px-3 py-2 -mx-3 rounded text-sm font-bvp font-medium text-primary hover:bg-subtle hover:text-accent transition-colors"
                 >
                   {pg.name}
                 </Link>
               </li>
             ))}
-            <li className="pt-2">
+            <li className="pt-2 px-3 -mx-3">
               <Link
                 href="/cua-hang?view=collections"
                 className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
-                {config.column2.viewAllLabel}
+                {config.column2.viewAllLabel || "→ Xem tất cả BST"}
               </Link>
             </li>
           </ul>
@@ -111,26 +111,26 @@ export async function MegaMenu({ config }: MegaMenuProps) {
 
         {/* Cột 3 - Hoàn thiện */}
         <div>
-          <h3 className="font-playfair text-[11px] tracking-[0.15em] text-primary/60 font-bold mb-3 uppercase">
-            {config.column3.title}
+          <h3 className="font-playfair text-xs tracking-[0.15em] text-primary font-bold mb-3 pb-2 uppercase border-b border-border">
+            {config.column3.title || "HOÀN THIỆN"}
           </h3>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {finishes.map((f: { id: string; name: string; slug: string }) => (
               <li key={f.id}>
                 <Link
                   href={`/cua-hang?finish=${f.slug}`}
-                  className="block py-1 text-sm font-bvp font-medium text-primary hover:text-accent transition-colors"
+                  className="block px-3 py-2 -mx-3 rounded text-sm font-bvp font-medium text-primary hover:bg-subtle hover:text-accent transition-colors"
                 >
                   {f.name}
                 </Link>
               </li>
             ))}
-            <li className="pt-2">
+            <li className="pt-2 px-3 -mx-3">
               <Link
                 href="/cua-hang?view=finishes"
                 className="block text-xs font-bvp text-accent hover:text-accent/80 transition-colors"
               >
-                {config.column3.viewAllLabel}
+                {config.column3.viewAllLabel || "→ Xem tất cả kỹ thuật"}
               </Link>
             </li>
           </ul>
