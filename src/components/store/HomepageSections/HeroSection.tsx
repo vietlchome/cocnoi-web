@@ -12,7 +12,7 @@ export default function HeroSection({ config }: HeroSectionProps) {
   const showShowcase = config.showShowcaseCard === true;
 
   // Phase 9g: split title to highlight "Nối" in terracotta accent color
-  const titleParts = (config.title || "").split(/(Nối)/g);
+  const titleParts: string[] = String(config.title || "").split(/(Nối)/g);
 
   return (
     <section className="relative overflow-hidden bg-subtle border-b border-border min-h-[80vh] flex items-center">
@@ -72,7 +72,7 @@ export default function HeroSection({ config }: HeroSectionProps) {
             </div>
 
             <h1 className="font-playfair italic font-semibold text-2xl md:text-3xl lg:text-4xl mb-5 text-primary leading-tight whitespace-nowrap">
-              {titleParts.map((part, idx) =>
+              {titleParts.map((part: string, idx: number) =>
                 part === "Nối" ? (
                   <span key={idx} style={{ color: "var(--color-terracotta)" }}>{part}</span>
                 ) : (
