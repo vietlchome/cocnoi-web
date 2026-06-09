@@ -246,6 +246,13 @@ export async function getSiteConfig(): Promise<SiteConfig> {
     patched.hero.ctaSecondary.text = "";
     patched.hero.ctaSecondary.url = "";
   }
+  // Phase 9h: migrate /journey to /journal (HÀNH TRÌNH item)
+  if (patched.navigation?.topNavItems) {
+    patched.navigation.topNavItems = patched.navigation.topNavItems.map((item: any) => {
+      if (item.href === "/journey") item.href = "/journal";
+      return item;
+    });
+  }
   // Phase 9f: migrate megaMenu.column* from legacy string -> object {title, viewAllLabel}
   if (patched.navigation?.megaMenu) {
     const mm = patched.navigation.megaMenu;

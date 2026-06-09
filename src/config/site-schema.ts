@@ -638,7 +638,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
             { label: "Trở thành đối tác", href: "/partners/become-a-stockist" },
             { label: "Quà tặng doanh nghiệp", href: "/partners/corporate-gifting" },
           ], openInNewTab: false },
-          { label: "HÀNH TRÌNH", href: "/journey", submenuType: "none", simpleSubmenu: [], openInNewTab: false },
+          { label: "HÀNH TRÌNH", href: "/journal", submenuType: "none", simpleSubmenu: [], openInNewTab: false },
         ],
         itemSchema: {
           label: { type: "text", label: "Nhãn hiển thị", default: "" },

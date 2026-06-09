@@ -41,6 +41,7 @@ export default async function Header({ config }: HeaderProps) {
   const headerShowTopBar = config.header.showTopBar;
   const headerTopBarText = config.header.topBarText || "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ";
   const headerTopBarLink = config.header.topBarLink || "";
+  const isSticky = config.header.stickyHeader;
 
   // 1. Fetch categories, groups, finishes for both desktop and mobile drawer
   const { categories, productGroups, finishes } = await getCachedHeaderData();
@@ -55,7 +56,7 @@ export default async function Header({ config }: HeaderProps) {
   const megaMenuContent = <MegaMenu config={megaMenuConfig} />;
 
   return (
-    <div className="w-full flex flex-col z-50 relative">
+    <div className={`w-full flex flex-col z-50 ${isSticky ? "sticky top-0" : "relative"}`}>
       {/* 1. TOP BAR TINH */}
       {headerShowTopBar && (
         <div 
