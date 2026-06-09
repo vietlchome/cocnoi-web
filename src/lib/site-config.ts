@@ -241,6 +241,11 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       return item;
     });
   }
+  // Phase 9g: clear legacy default ctaSecondary text "Chiến dịch 'Người Nối'"
+  if (patched.hero?.ctaSecondary?.text === "Chiến dịch 'Người Nối'") {
+    patched.hero.ctaSecondary.text = "";
+    patched.hero.ctaSecondary.url = "";
+  }
   // Phase 9f: migrate megaMenu.column* from legacy string -> object {title, viewAllLabel}
   if (patched.navigation?.megaMenu) {
     const mm = patched.navigation.megaMenu;

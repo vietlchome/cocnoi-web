@@ -7,16 +7,13 @@ interface HeroSectionProps {
   quickChips?: Array<{ text: string; url: string }>;
 }
 
-export default function HeroSection({ config, quickChips }: HeroSectionProps) {
+export default function HeroSection({ config }: HeroSectionProps) {
   const isVideo = config.mediaType === "video" && !!config.videoUrl;
   const showSecondaryCta = config.ctaSecondary?.text && config.ctaSecondary.text.trim() !== "";
   const showShowcase = config.showShowcaseCard === true;
 
-  // Phase 9g: quickLinks from schema preferred; fallback to legacy quickChips prop for backward compat
-  const links: Array<{ label: string; href: string }> = Array.isArray(config.quickLinks) && config.quickLinks.length > 0
-    ? config.quickLinks
-    : (quickChips || []).map((c) => ({ label: c.text, href: c.url }));
-  const showQuickLinks = links.length > 0;
+  // Phase 9g: split title to highlight "Nối" in terracotta accent color
+  const titleParts = (config.title || "").split(/(Nối)/g);
 
   return (
     <section className="relative overflow-hidden bg-subtle border-b border-border min-h-[80vh] flex items-center">
@@ -75,19 +72,25 @@ export default function HeroSection({ config, quickChips }: HeroSectionProps) {
               </span>
             </div>
 
-            <h1 className="font-playfair font-semibold text-4xl md:text-6xl lg:text-7xl mb-6 text-primary leading-tight">
-              {config.title}
+            <h1 className="font-playfair italic font-semibold text-3xl md:text-4xl lg:text-5xl mb-5 text-primary leading-tight">
+              {titleParts.map((part, idx) =>
+                part === "Nối" ? (
+                  <span key={idx} style={{ color: "var(--color-terracotta)" }}>{part}</span>
+                ) : (
+                  <span key={idx}>{part}</span>
+                )
+              )}
             </h1>
 
-            <p className="font-bvp text-base md:text-lg max-w-xl mb-10 leading-relaxed text-justify" style={{ color: "var(--color-dark-brown)" }}>
+            <p className="font-bvp text-sm md:text-base max-w-xl mb-6 leading-relaxed" style={{ color: "var(--color-dark-brown)" }}>
               {config.subtitle}
             </p>
 
-            <div className="flex flex-wrap gap-4 w-full sm:w-auto">
+            <div className="flex flex-wrap gap-3 w-full sm:w-auto">
               <Link
                 href={config.ctaPrimary?.url || "/cua-hang"}
                 style={{ backgroundColor: "var(--color-deep-indigo)" }}
-                className="inline-flex items-center justify-center text-canvas font-bvp font-medium text-sm md:text-base px-8 py-4 rounded-2 hover:opacity-90 transition-all duration-300 w-full sm:w-auto text-center group"
+                className="inline-flex items-center justify-center text-canvas font-bvp font-medium text-sm px-6 py-3 rounded-2 hover:opacity-90 transition-all duration-300 w-full sm:w-auto text-center group"
               >
                 {config.ctaPrimary?.text || "Khám phá Cửa Hàng"}
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -95,27 +98,12 @@ export default function HeroSection({ config, quickChips }: HeroSectionProps) {
               {showSecondaryCta && (
                 <Link
                   href={config.ctaSecondary?.url || "/"}
-                  className="inline-flex items-center justify-center bg-transparent border border-border text-primary font-bvp font-medium text-sm md:text-base px-8 py-4 rounded-2 hover:bg-canvas hover:border-accent transition-all duration-300 w-full sm:w-auto text-center"
+                  className="inline-flex items-center justify-center bg-transparent border border-border text-primary font-bvp font-medium text-sm px-6 py-3 rounded-2 hover:bg-canvas hover:border-accent transition-all duration-300 w-full sm:w-auto text-center"
                 >
                   {config.ctaSecondary.text}
                 </Link>
               )}
             </div>
-
-            {showQuickLinks && (
-              <div className="flex flex-wrap items-center gap-2.5 mt-8 pt-6 border-t border-border/60 w-full">
-                <span className="font-bvp text-xs font-bold text-secondary mr-2 uppercase tracking-wider">Tìm nhanh:</span>
-                {links.map((link, idx) => (
-                  <Link
-                    key={idx}
-                    href={link.href}
-                    className="font-bvp text-xs bg-canvas text-secondary hover:text-accent hover:border-accent border border-border px-3 py-1.5 rounded-2 transition-all"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
