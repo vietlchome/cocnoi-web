@@ -67,7 +67,7 @@ export const SiteConfigSchema = z.object({
     title: textValidator,
     desc1: textValidator,
     desc2: textValidator,
-    storyImageUrl: imageValidator,
+    storyImageUrl: imageValidator.optional(),
     stat1Val: textValidator,
     stat1Lbl: textValidator,
     stat2Val: textValidator,

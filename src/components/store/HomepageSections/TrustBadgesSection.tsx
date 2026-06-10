@@ -15,11 +15,11 @@ interface TrustBadgesSectionProps {
 
 // Inline SVG fallback - 4 icons phù hợp ý nghĩa từng badge
 const fallbackIcons = [
-  // 1. Handmade - bàn tay nắn gốm
+  // 1. Handmade - bàn xoay gốm (pottery wheel)
   <svg key="handmade" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
-    <path d="M9 11V6a2 2 0 0 1 4 0v3" />
-    <path d="M13 9V4a2 2 0 0 1 4 0v8" />
-    <path d="M17 10V7a2 2 0 0 1 4 0v8a7 7 0 0 1-7 7H9a8 8 0 0 1-7-4l-2-3 2-2 5 2V6a2 2 0 0 1 4 0v6" />
+    <ellipse cx="12" cy="18" rx="9" ry="2.5" />
+    <path d="M8 18v-5a4 4 0 0 1 8 0v5" />
+    <path d="M10 13v-3a2 2 0 0 1 4 0v3" />
   </svg>,
   // 2. Earth-friendly - chiếc lá
   <svg key="earth" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>

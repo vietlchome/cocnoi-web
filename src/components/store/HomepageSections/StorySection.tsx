@@ -9,14 +9,12 @@ function isVideo(url: string): boolean {
   return lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov");
 }
 
-function FeatureMedia({ url, alt, placeholder }: { url?: string; alt?: string; placeholder: string }) {
-  if (!url) {
-    return <div className="text-secondary/50 font-bvp text-xs">{placeholder}</div>;
-  }
-  if (isVideo(url)) {
+function FeatureMedia({ imgUrl, videoUrl, alt, placeholder }: { imgUrl?: string; videoUrl?: string; alt?: string; placeholder: string }) {
+  // videoUrl takes precedence over imgUrl
+  if (videoUrl) {
     return (
       <video
-        src={url}
+        src={videoUrl}
         autoPlay
         muted
         loop
@@ -25,7 +23,23 @@ function FeatureMedia({ url, alt, placeholder }: { url?: string; alt?: string; p
       />
     );
   }
-  return <img src={url} alt={alt || ""} className="w-full h-full object-cover" />;
+  if (imgUrl) {
+    // Backward compat: imgUrl could also be a video URL if user pasted directly
+    if (isVideo(imgUrl)) {
+      return (
+        <video
+          src={imgUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+      );
+    }
+    return <img src={imgUrl} alt={alt || ""} className="w-full h-full object-cover" />;
+  }
+  return <div className="text-secondary/50 font-bvp text-xs">{placeholder}</div>;
 }
 
 export default function StorySection({ config }: StorySectionProps) {
@@ -65,16 +79,16 @@ export default function StorySection({ config }: StorySectionProps) {
 
         <div className="lg:col-span-6 grid grid-cols-2 gap-4">
           <div className="bg-subtle rounded-4 border border-border flex items-center justify-center text-center aspect-square overflow-hidden relative">
-            <FeatureMedia url={config.features?.[0]?.imgUrl} alt={config.features?.[0]?.alt} placeholder="Ảnh đặc trưng 1" />
+            <FeatureMedia imgUrl={config.features?.[0]?.imgUrl} videoUrl={config.features?.[0]?.videoUrl} alt={config.features?.[0]?.alt} placeholder="Ảnh đặc trưng 1" />
           </div>
           <div className="bg-canvas rounded-4 border border-border flex items-center justify-center text-center aspect-square mt-6 overflow-hidden relative">
-            <FeatureMedia url={config.features?.[1]?.imgUrl} alt={config.features?.[1]?.alt} placeholder="Ảnh đặc trưng 2" />
+            <FeatureMedia imgUrl={config.features?.[1]?.imgUrl} videoUrl={config.features?.[1]?.videoUrl} alt={config.features?.[1]?.alt} placeholder="Ảnh đặc trưng 2" />
           </div>
           <div className="bg-canvas rounded-4 border border-border flex items-center justify-center text-center aspect-square -mt-6 overflow-hidden relative">
-            <FeatureMedia url={config.features?.[2]?.imgUrl} alt={config.features?.[2]?.alt} placeholder="Ảnh đặc trưng 3" />
+            <FeatureMedia imgUrl={config.features?.[2]?.imgUrl} videoUrl={config.features?.[2]?.videoUrl} alt={config.features?.[2]?.alt} placeholder="Ảnh đặc trưng 3" />
           </div>
           <div className="bg-subtle rounded-4 border border-border flex items-center justify-center text-center aspect-square overflow-hidden relative">
-            <FeatureMedia url={config.features?.[3]?.imgUrl} alt={config.features?.[3]?.alt} placeholder="Ảnh đặc trưng 4" />
+            <FeatureMedia imgUrl={config.features?.[3]?.imgUrl} videoUrl={config.features?.[3]?.videoUrl} alt={config.features?.[3]?.alt} placeholder="Ảnh đặc trưng 4" />
           </div>
         </div>
 
