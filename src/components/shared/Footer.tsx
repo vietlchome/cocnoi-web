@@ -32,8 +32,8 @@ export default function Footer({ config }: FooterProps) {
             {footerLogoUrl ? (
               <img 
                 src={footerLogoUrl} 
-                alt={footerLogoText} 
-                className="h-10 max-h-12 w-auto object-contain"
+                alt={footerLogoText}
+                className="h-10 md:h-12 max-h-14 w-auto object-contain"
               />
             ) : (
               <>

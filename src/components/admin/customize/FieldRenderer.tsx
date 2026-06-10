@@ -1,6 +1,6 @@
 import React from "react";
-import type { 
-  SchemaField, TextField, TextareaField, UrlField, ImageField, 
+import type {
+  SchemaField, TextField, TextareaField, UrlField, ImageField, LogoImageField,
   BooleanField, SelectField, ColorField, JsonField, GroupField, RepeatableField,
   ProductPickerField
 } from "@/config/site-schema";
@@ -8,6 +8,7 @@ import TextFieldInput from "./fields/TextFieldInput";
 import TextareaFieldInput from "./fields/TextareaFieldInput";
 import UrlFieldInput from "./fields/UrlFieldInput";
 import ImageFieldInput from "./fields/ImageFieldInput";
+import LogoFieldInput from "./fields/LogoFieldInput";
 import BooleanFieldInput from "./fields/BooleanFieldInput";
 import SelectFieldInput from "./fields/SelectFieldInput";
 import ColorFieldInput from "./fields/ColorFieldInput";
@@ -118,6 +119,24 @@ export default function FieldRenderer({
       return (
         <ImageFieldInput
           field={field as ImageField}
+          value={coerced as string}
+          onChange={onChange}
+          path={path}
+          error={error}
+          disabled={disabled}
+        />
+      );
+    }
+
+    case "logo-image": {
+      let coerced = value;
+      if (value !== undefined && typeof value !== "string") {
+        console.warn(`Type mismatch at ${path}. Expected string, got ${typeof value}. Coercing.`);
+        coerced = String(value ?? "");
+      }
+      return (
+        <LogoFieldInput
+          field={field as LogoImageField}
           value={coerced as string}
           onChange={onChange}
           path={path}

@@ -117,10 +117,10 @@ export default function HeaderClient({
           {/* LOGO AREA */}
           <Link href="/" className="flex items-center gap-3 group">
             {headerLogoUrl ? (
-              <img 
-                src={headerLogoUrl} 
-                alt={headerLogoText} 
-                className="h-10 max-h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+              <img
+                src={headerLogoUrl}
+                alt={headerLogoText}
+                className="h-10 md:h-14 lg:h-16 max-h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
               />
             ) : (
               <>

@@ -24,6 +24,7 @@ export interface TextField extends BaseField { type: 'text'; default: string; }
 export interface TextareaField extends BaseField { type: 'textarea'; default: string; }
 export interface UrlField extends BaseField { type: 'url'; default: string; }
 export interface ImageField extends BaseField { type: 'image'; default: string; aspectRatio?: number; folder?: string; }
+export interface LogoImageField extends BaseField { type: 'logo-image'; default: string; folder?: string; previewHeight?: number; }
 export interface BooleanField extends BaseField { type: 'boolean'; default: boolean; }
 export interface SelectField extends BaseField { type: 'select'; default: string; options: {value: string, label: string}[]; }
 export interface ColorField extends BaseField { type: 'color'; default: string; }
@@ -46,16 +47,17 @@ export interface RepeatableField extends BaseField {
   aliasGroups?: Record<string, string>[]; // Mảng map alias cho từng phần tử cũ. VD: [{ title: 'value_1_title', desc: 'value_1_desc' }]
 }
 
-export type SchemaField = 
-  | TextField 
-  | TextareaField 
-  | UrlField 
-  | ImageField 
-  | BooleanField 
-  | SelectField 
-  | ColorField 
+export type SchemaField =
+  | TextField
+  | TextareaField
+  | UrlField
+  | ImageField
+  | LogoImageField
+  | BooleanField
+  | SelectField
+  | ColorField
   | JsonField
-  | GroupField 
+  | GroupField
   | RepeatableField
   | ProductPickerField
   | IconPickerField;
@@ -69,7 +71,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
   header: {
     label: "Header (Thanh điều hướng)",
     fields: {
-      logoUrl: { type: "image", label: "Logo Website", default: "", aliases: ["logo_image_url"] },
+      logoUrl: { type: "logo-image", label: "Logo Website", default: "", aliases: ["logo_image_url"], previewHeight: 64, folder: "theme/logo", helpText: "PNG transparent giữ nguyên trong suốt. Tự fit chiều cao header. Khuyến nghị 300x83px, tối đa 2MB." },
       logoText: { type: "text", label: "Tên thương hiệu", default: "CỐC NỐI", aliases: ["logo_text"] },
       showTopBar: { type: "boolean", label: "Hiển thị Top Bar", default: true, aliases: ["show_top_bar"] },
       topBarText: { type: "text", label: "Nội dung Top Bar", default: "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ", aliases: ["top_bar_text"] },
