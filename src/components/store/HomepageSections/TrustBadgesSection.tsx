@@ -15,11 +15,25 @@ interface TrustBadgesSectionProps {
 
 // Inline SVG fallback - 4 icons phù hợp ý nghĩa từng badge
 const fallbackIcons = [
-  // 1. Handmade - bàn xoay gốm (pottery wheel)
+  // 1. Handmade - 2 bàn tay vuốt gốm trên bàn xoay
   <svg key="handmade" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
-    <ellipse cx="12" cy="18" rx="9" ry="2.5" />
-    <path d="M8 18v-5a4 4 0 0 1 8 0v5" />
-    <path d="M10 13v-3a2 2 0 0 1 4 0v3" />
+    {/* Left hand grasping clay */}
+    <path d="M6 6.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v3" />
+    <path d="M5 7.5c-1 0-1.8.8-1.8 1.8 0 .9.5 1.7 1.3 2.1l3 1.5c.5.3 1 .4 1.5.4h.7" />
+    <path d="M9 6.5v4" />
+    {/* Right hand grasping clay */}
+    <path d="M18 6.5c0-.8-.7-1.5-1.5-1.5S15 5.7 15 6.5v3" />
+    <path d="M19 7.5c1 0 1.8.8 1.8 1.8 0 .9-.5 1.7-1.3 2.1l-3 1.5c-.5.3-1 .4-1.5.4h-.7" />
+    <path d="M15 6.5v4" />
+    {/* Clay column being shaped */}
+    <path d="M10 11h4" />
+    <path d="M10.5 11v4" />
+    <path d="M13.5 11v4" />
+    {/* Pottery wheel disc */}
+    <ellipse cx="12" cy="17" rx="6" ry="1.3" />
+    {/* Rotation motion lines */}
+    <path d="M4 19h2" strokeDasharray="1 1" />
+    <path d="M18 19h2" strokeDasharray="1 1" />
   </svg>,
   // 2. Earth-friendly - chiếc lá
   <svg key="earth" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
