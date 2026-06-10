@@ -201,8 +201,8 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           { imgUrl: "", alt: "" }
         ],
         itemSchema: {
-          imgUrl: { type: "image", label: "Ảnh (JPG/PNG/WEBP)", default: "", aspectRatio: 1, folder: "theme/story-features", helpText: "Tỷ lệ vuông 1:1 (vd 800x800). Dùng nếu KHÔNG fill URL video bên dưới." },
-          videoUrl: { type: "url", label: "HOẶC URL video (Cloudinary MP4)", default: "", helpText: "Paste URL .mp4/.webm trực tiếp (vd https://res.cloudinary.com/.../v.mp4). Khi có giá trị, sẽ override ảnh trên." },
+          imgUrl: { type: "image", label: "Upload ảnh (JPG/PNG/WEBP)", default: "", aspectRatio: 1, folder: "theme/story-features", helpText: "Tỷ lệ vuông 1:1 (vd 800x800). Dùng nếu KHÔNG fill URL bên dưới." },
+          videoUrl: { type: "url", label: "HOẶC URL ảnh/video Cloudinary", default: "", helpText: "Paste URL trực tiếp (vd https://res.cloudinary.com/.../v.mp4 hoặc .jpg/.png). Khi có giá trị, sẽ override upload trên. Hệ thống tự detect: extension .mp4/.webm/.mov → render video, còn lại render ảnh." },
           alt: { type: "text", label: "Mô tả (alt text - SEO)", default: "", helpText: "Bắt buộc cho SEO + accessibility" }
         },
         aliasGroups: [

@@ -10,11 +10,16 @@ function isVideo(url: string): boolean {
 }
 
 function FeatureMedia({ imgUrl, videoUrl, alt, placeholder }: { imgUrl?: string; videoUrl?: string; alt?: string; placeholder: string }) {
-  // videoUrl takes precedence over imgUrl
-  if (videoUrl) {
+  // URL paste field (videoUrl) takes precedence over upload (imgUrl)
+  // Detect video extension to decide <video> vs <img>
+  const url = videoUrl || imgUrl;
+  if (!url) {
+    return <div className="text-secondary/50 font-bvp text-xs">{placeholder}</div>;
+  }
+  if (isVideo(url)) {
     return (
       <video
-        src={videoUrl}
+        src={url}
         autoPlay
         muted
         loop
@@ -23,23 +28,7 @@ function FeatureMedia({ imgUrl, videoUrl, alt, placeholder }: { imgUrl?: string;
       />
     );
   }
-  if (imgUrl) {
-    // Backward compat: imgUrl could also be a video URL if user pasted directly
-    if (isVideo(imgUrl)) {
-      return (
-        <video
-          src={imgUrl}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-        />
-      );
-    }
-    return <img src={imgUrl} alt={alt || ""} className="w-full h-full object-cover" />;
-  }
-  return <div className="text-secondary/50 font-bvp text-xs">{placeholder}</div>;
+  return <img src={url} alt={alt || ""} className="w-full h-full object-cover" />;
 }
 
 export default function StorySection({ config }: StorySectionProps) {
