@@ -72,7 +72,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
   header: {
     label: "Header (Thanh điều hướng)",
     fields: {
-      logoUrl: { type: "logo-image", label: "Logo Website", default: "", aliases: ["logo_image_url"], previewHeight: 48, folder: "theme/logo", helpText: "PNG transparent giữ nguyên trong suốt. Tự fit chiều cao header. Khuyến nghị 200x60px, tối đa 2MB." },
+      logoUrl: { type: "logo-image", label: "Logo Website", default: "", aliases: ["logo_image_url"], previewHeight: 40, folder: "theme/logo", helpText: "PNG transparent giữ nguyên trong suốt. Tự fit chiều cao header. Khuyến nghị 160x50px, tối đa 2MB." },
       logoText: { type: "text", label: "Tên thương hiệu", default: "CỐC NỐI", aliases: ["logo_text"] },
       showTopBar: { type: "boolean", label: "Hiển thị Top Bar", default: true, aliases: ["show_top_bar"] },
       topBarText: { type: "text", label: "Nội dung Top Bar", default: "Miễn phí vận chuyển toàn quốc cho đơn hàng trên 1.000.000 đ", aliases: ["top_bar_text"] },

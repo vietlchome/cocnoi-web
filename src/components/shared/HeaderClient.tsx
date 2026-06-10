@@ -120,7 +120,7 @@ export default function HeaderClient({
               <img
                 src={headerLogoUrl}
                 alt={headerLogoText}
-                className="h-8 md:h-10 lg:h-12 max-h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                className="h-7 md:h-9 lg:h-10 max-h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
               />
             ) : (
               <>
