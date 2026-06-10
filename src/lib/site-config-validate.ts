@@ -74,6 +74,7 @@ export const SiteConfigSchema = z.object({
     stat2Lbl: textValidator,
     features: z.array(z.object({
       imgUrl: imageValidator,
+      videoUrl: urlValidator.optional().default(""),
       alt: textValidator,
     })),
   }),
