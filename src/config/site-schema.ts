@@ -106,7 +106,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       },
       showShowcaseCard: { type: "boolean", label: "Hiển thị card showcase bên phải", default: false, helpText: "Tắt mặc định để focus vào video Hero." },
       floatingLabel: { type: "text", label: "Nhãn nổi trang trí (chỉ hiện khi card showcase bật)", default: "Gốm mộc từ đất mẹ", aliases: ["hero_floating_label"] },
-      imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"] },
+      imageUrl: { type: "image", label: "Ảnh Hero", default: "", aliases: ["hero_image_url"], aspectRatio: 16/9, folder: "theme/hero", helpText: "Tỷ lệ 16:9 (vd 1920x1080). Dùng khi mediaType = 'Ảnh tĩnh'." },
       imageAlt: { type: "text", label: "Alt text ảnh Hero", default: "Cốc Nối - Gốm thủ công" },
       mediaType: {
         type: "select",
@@ -140,7 +140,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       badge: { type: "text", label: "Campaign Badge", default: "Signature Campaign", aliases: ["campaign_badge"] },
       title: { type: "text", label: "Tiêu đề", default: "Chiến dịch 'Người Nối' - Vinh danh sự gắn kết thầm lặng.", aliases: ["campaign_title"] },
       desc: { type: "textarea", label: "Mô tả", default: "Lấy cảm hứng từ những cống hiến âm thầm của cộng đồng, Người Nối là chiến dịch trọng tâm của Cốc Nối nhằm tôn vinh những người lao động nghệ thuật, những người kết nối sợi dây tình cảm trong gia đình và xã hội.", aliases: ["campaign_desc"] },
-      heroImageUrl: { type: "image", label: "Ảnh Nhân vật", default: "", aliases: ["campaign_hero_image_url"] },
+      heroImageUrl: { type: "image", label: "Ảnh Nhân vật", default: "", aliases: ["campaign_hero_image_url"], aspectRatio: 4/5, folder: "theme/campaign", helpText: "Tỷ lệ 4:5 (vd 800x1000). Ảnh portrait nhân vật trong chiến dịch." },
       heroName: { type: "text", label: "Tên nhân vật", default: "Bác Cường Lò Bầu", aliases: ["campaign_hero_name"] },
       heroQuote: { type: "text", label: "Câu trích dẫn", default: "Đất có linh hồn, gốm có sinh mệnh. Người thợ chỉ là người đánh thức vẻ đẹp ẩn sâu trong đó.", aliases: ["campaign_hero_quote"] },
       cta: {
@@ -187,7 +187,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       title: { type: "text", label: "Tiêu đề", default: "Khởi nguồn từ lòng đất, Giữ lửa qua ba thập kỷ.", aliases: ["intro_title", "story_title"] },
       desc1: { type: "textarea", label: "Đoạn văn 1", default: "Năm 1994, giữa lòng ngôi làng cổ Bát Tràng có bề dày lịch sử hơn 700 năm, một lò nung gốm nhỏ gia đình đã đỏ lửa. Đó chính là khởi đầu của Cốc Nối ngày nay.", aliases: ["intro_desc_1", "story_content"] },
       desc2: { type: "textarea", label: "Đoạn văn 2", default: "Chúng tôi tin rằng, một sản phẩm gốm tốt không chỉ nằm ở chất đất đanh, lớp men mịn mà còn nằm ở sự truyền tải cảm xúc. Mỗi mẻ gốm của Cốc Nối được làm từ đất sét lọc kỹ, xoay tay thủ công cẩn trọng, tráng men tự nhiên và nung ở nhiệt độ tiêu chuẩn để đảm bảo sự gắn kết tuyệt đối của xương gốm.", aliases: ["intro_desc_2"] },
-      storyImageUrl: { type: "image", label: "Ảnh minh họa chính", default: "", aliases: ["story_image_url"] },
+      storyImageUrl: { type: "image", label: "Ảnh minh họa chính (deprecated, không hiển thị)", default: "", aliases: ["story_image_url"], helpText: "Không dùng nữa. Dùng 4 'Ảnh đặc trưng' bên dưới." },
       stat1Val: { type: "text", label: "Thống kê 1 (Số)", default: "30+", aliases: ["intro_stat_1_val"] },
       stat1Lbl: { type: "text", label: "Thống kê 1 (Nhãn)", default: "Năm giữ lửa", aliases: ["intro_stat_1_lbl"] },
       stat2Val: { type: "text", label: "Thống kê 2 (Số)", default: "100k+", aliases: ["intro_stat_2_val"] },
@@ -202,8 +202,8 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           { imgUrl: "", alt: "" }
         ],
         itemSchema: {
-          imgUrl: { type: "image", label: "Ảnh", default: "" },
-          alt: { type: "text", label: "Mô tả ảnh (alt text - SEO)", default: "", helpText: "Bắt buộc cho SEO + accessibility" }
+          imgUrl: { type: "image", label: "Ảnh / Video", default: "", aspectRatio: 1, folder: "theme/story-features", helpText: "Tỷ lệ vuông 1:1 (vd 800x800). Hỗ trợ ảnh JPG/PNG/GIF hoặc video MP4 (tự autoplay muted loop). URL .mp4/.webm/.mov sẽ render video, còn lại render ảnh." },
+          alt: { type: "text", label: "Mô tả (alt text - SEO)", default: "", helpText: "Bắt buộc cho SEO + accessibility" }
         },
         aliasGroups: [
           { imgUrl: "intro_feat_1_img_url" },

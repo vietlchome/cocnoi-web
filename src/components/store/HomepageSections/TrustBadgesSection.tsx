@@ -13,26 +13,34 @@ interface TrustBadgesSectionProps {
   };
 }
 
-// Map cac inline SVGs lam bieu tuong mac dinh cho 4 loai badge
+// Inline SVG fallback - 4 icons phù hợp ý nghĩa từng badge
 const fallbackIcons = [
-  // 1. Handmade in Bat Trang (Bieu tuong chiec coc/lo gom thu cong)
-  <svg key="handmade" className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
-    <path d="M12 3v18M17 8H7M19 13H5M18 18H6" />
-    <path d="M6 8v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
+  // 1. Handmade - bàn tay nắn gốm
+  <svg key="handmade" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
+    <path d="M9 11V6a2 2 0 0 1 4 0v3" />
+    <path d="M13 9V4a2 2 0 0 1 4 0v8" />
+    <path d="M17 10V7a2 2 0 0 1 4 0v8a7 7 0 0 1-7 7H9a8 8 0 0 1-7-4l-2-3 2-2 5 2V6a2 2 0 0 1 4 0v6" />
   </svg>,
-  // 2. Earth-friendly (Bieu tuong chiec la tu nhien)
-  <svg key="earth" className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
+  // 2. Earth-friendly - chiếc lá
+  <svg key="earth" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
     <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 21 3c-1.5 4-2 5.5-3.1 11.2A7 7 0 0 1 11 20z" />
-    <path d="M9 11l3 3" />
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
   </svg>,
-  // 3. Contemporary design (Bieu tuong cac duong net hien dai)
-  <svg key="design" className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <path d="M3 9h18M9 21V9" />
+  // 3. Contemporary design - chiếc cốc hiện đại
+  <svg key="design" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
+    <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+    <line x1="6" y1="2" x2="6" y2="4" />
+    <line x1="10" y1="2" x2="10" y2="4" />
+    <line x1="14" y1="2" x2="14" y2="4" />
   </svg>,
-  // 4. Ethical & sustainable (Bieu tuong trai tim ket noi)
-  <svg key="ethical" className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
-    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  // 4. Ethical & sustainable - tay bắt tay (kết nối / công bằng)
+  <svg key="ethical" className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--color-terracotta)" }}>
+    <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+    <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+    <path d="m21 3 1 11h-2" />
+    <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+    <path d="M3 4h8" />
   </svg>
 ];
 
@@ -42,7 +50,7 @@ export default function TrustBadgesSection({ config }: TrustBadgesSectionProps) 
   return (
     <section className="py-20 md:py-24 bg-subtle/40 border-b border-border">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8">
-        
+
         <div className="text-center max-w-2xl mx-auto mb-16 font-bvp">
           <span className="font-quicksand font-bold text-xs uppercase tracking-widest text-accent mb-3 block" style={{ color: "var(--color-terracotta)" }}>
             {config?.tagline || "Why Cốc Nối"}
@@ -59,17 +67,18 @@ export default function TrustBadgesSection({ config }: TrustBadgesSectionProps) 
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {items.map((value, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className="bg-canvas p-8 rounded-3 border border-border flex flex-col items-start hover:border-accent transition-colors duration-300"
               style={{ borderColor: "transparent", borderStyle: "solid", borderWidth: "1px" }}
             >
-              <div className="mb-6 p-3 rounded-2 bg-subtle flex items-center justify-center min-w-[48px] min-h-[48px]">
+              {/* Icon container - icon-only, no upload */}
+              <div className="mb-6 rounded-2 bg-subtle flex items-center justify-center w-14 h-14">
                 {value.iconImage ? (
-                  <img 
-                    src={value.iconImage} 
-                    alt={value.title} 
-                    className="w-6 h-6 object-contain"
+                  <img
+                    src={value.iconImage}
+                    alt={value.title}
+                    className="w-8 h-8 object-contain"
                   />
                 ) : (
                   fallbackIcons[idx % fallbackIcons.length]
