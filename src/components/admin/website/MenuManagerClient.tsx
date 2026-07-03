@@ -5,9 +5,11 @@ import { SITE_SCHEMA } from "@/config/site-schema";
 import { updateSiteConfigAction } from "@/lib/actions/settings.actions";
 import SectionEditor from "@/components/admin/customize/SectionEditor";
 import type { SiteConfig } from "@/lib/site-config-validate";
-import { Save, Eye, Loader2, ExternalLink } from "lucide-react";
+import type { SchemaField } from "@/config/site-schema";
+import { Save, Eye, Loader2, ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
+import MenuBuilder from "./MenuBuilder";
 
-// Flat error map -> grouped by top-level section key (same helper as SiteCustomizerClient)
+// Flat error map -> grouped by top-level section key
 function regroupErrors(flat: Record<string, string> | null): Record<string, Record<string, string>> | null {
   if (!flat) return null;
   const grouped: Record<string, Record<string, string>> = {};
@@ -19,6 +21,11 @@ function regroupErrors(flat: Record<string, string> | null): Record<string, Reco
   return grouped;
 }
 
+// Schema slice for the megaMenu group only - keeps SectionEditor rendering the sub-group
+const MEGA_MENU_SCHEMA: Record<string, SchemaField> = {
+  megaMenu: SITE_SCHEMA.navigation.fields.megaMenu,
+};
+
 interface Props {
   initialConfig: SiteConfig;
 }
@@ -28,6 +35,7 @@ export default function MenuManagerClient({ initialConfig }: Props) {
   const [isPending, startTransition] = useTransition();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string> | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
 
   const groupedErrors = regroupErrors(fieldErrors);
 
@@ -81,11 +89,7 @@ export default function MenuManagerClient({ initialConfig }: Props) {
             disabled={isPending}
             className="flex items-center gap-2 px-6 py-2 rounded-3 font-bvp text-sm font-semibold text-canvas bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
+            {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>{saveLabel}</span>
           </button>
         </div>
@@ -105,18 +109,65 @@ export default function MenuManagerClient({ initialConfig }: Props) {
         </div>
       )}
 
-      {/* Navigation section editor - single section, no 2-col rail needed */}
+      {/* Menu builder */}
       <div className="border border-border rounded-4 bg-canvas overflow-hidden">
         <div className="p-6">
-          <SectionEditor
-            schema={SITE_SCHEMA.navigation.fields}
-            value={(config.navigation || {}) as any}
-            onChange={(val) => setConfig((prev) => ({ ...prev, navigation: val as SiteConfig["navigation"] }))}
-            path="navigation"
-            errors={groupedErrors?.navigation}
+          <MenuBuilder
+            items={config.navigation?.topNavItems ?? []}
+            onChange={(nextItems) =>
+              setConfig((prev) => ({
+                ...prev,
+                navigation: {
+                  ...(prev.navigation ?? {}),
+                  topNavItems: nextItems,
+                } as SiteConfig["navigation"],
+              }))
+            }
             disabled={isPending}
           />
         </div>
+      </div>
+
+      {/* Mega menu panel - collapsible */}
+      <div className="border border-border rounded-4 bg-canvas overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setMegaMenuOpen((o) => !o)}
+          className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-subtle/30 transition-colors cursor-pointer"
+        >
+          <div>
+            <span className="text-sm font-semibold text-primary">Cấu hình Mega Menu (nâng cao)</span>
+            <p className="text-xs text-secondary/60 mt-0.5">Chỉnh tiêu đề các cột trong mega menu của mục CUA HANG.</p>
+          </div>
+          {megaMenuOpen ? (
+            <ChevronDown className="w-4 h-4 text-secondary shrink-0" />
+          ) : (
+            <ChevronRight className="w-4 h-4 text-secondary shrink-0" />
+          )}
+        </button>
+
+        {megaMenuOpen && (
+          <div className="px-6 pb-6 border-t border-border/30">
+            <div className="pt-4">
+              <SectionEditor
+                schema={MEGA_MENU_SCHEMA}
+                value={{ megaMenu: config.navigation?.megaMenu ?? {} }}
+                onChange={(val) =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    navigation: {
+                      ...(prev.navigation ?? {}),
+                      megaMenu: val.megaMenu as SiteConfig["navigation"]["megaMenu"],
+                    } as SiteConfig["navigation"],
+                  }))
+                }
+                path="navigation"
+                errors={groupedErrors?.navigation}
+                disabled={isPending}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
