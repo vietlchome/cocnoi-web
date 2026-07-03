@@ -14,7 +14,7 @@ export default async function CustomizePage() {
   const initialConfig = await getSiteConfig();
 
   return (
-    <div className="max-w-6xl mx-auto py-8">
+    <div className="max-w-7xl mx-auto py-8 px-4">
       <SiteCustomizerClient initialConfig={initialConfig} />
     </div>
   );
