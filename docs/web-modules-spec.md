@@ -94,6 +94,32 @@ Lưu trữ lịch sử giao dịch một cách bất biến và thiết lập b�
 
 ---
 
+## MÔ-ĐUN 9/10: CMS Trang Nội Dung (Pages CMS - Phase 10c)
+
+### 1. Mục tiêu
+Cung cấp hệ thống quản lý trang nội dung tĩnh do admin tạo tại `/admin/website/pages`. Mỗi trang render công khai tại `/trang/[slug]`. Thay thế các trang hard-code dần dần (không đụng route tĩnh cũ như /privacy, /faq...).
+
+### 2. Prisma model
+Model `Page` với các trường: id, title, slug (unique), content (db.Text - HTML format), excerpt (optional), metaTitle, metaDescription, ogImage, visible (boolean, default true), sortOrder, createdAt, updatedAt.
+
+### 3. Files kỹ thuật
+- Validator: `src/lib/validators/page.schema.ts` (Zod)
+- Service: `src/lib/services/page.service.ts` (PageService static - listPages, getPageById, getPageBySlugPublic, getVisiblePageSlugs, createPage, updatePage, deletePage, togglePageVisibility)
+- Actions: `src/lib/actions/page.actions.ts` (createPageAction, updatePageAction, deletePageAction, togglePageVisibilityAction)
+
+### 4. Admin CRUD
+- `/admin/website/pages` - danh sach trang (PagesListClient.tsx - table layout, badge Hien thi/An, search, sticky action column)
+- `/admin/website/pages/create` - tao trang moi (PageEditorClient.tsx)
+- `/admin/website/pages/[id]` - chinh sua trang (PageEditorClient.tsx)
+
+### 5. Storefront
+- `/trang/[slug]` - render trang visible, notFound neu an hoac khong ton tai
+- generateMetadata voi metaTitle, metaDescription, ogImage fallback
+- Content render qua `dangerouslySetInnerHTML` (mirror journal/[slug])
+- Sitemap tu dong them cac slug visible
+
+---
+
 ## MÔ-ĐUN 5: Bảng Chỉ Huy Trung Tâm & Phân Tích Dữ Liệu
 
 ### 1. Mục tiêu

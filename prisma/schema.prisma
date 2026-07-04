@@ -484,5 +484,30 @@ model Stockist {
   updatedAt   DateTime @updatedAt
 }
 
+// ---------------------------------------------------------
+// MODULE 12: TRANG NOI DUNG (PAGES CMS)
+// ---------------------------------------------------------
+
+model Page {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  content         String   @db.Text   // HTML format (tiptap) - mirror Post.content
+  excerpt         String?  @db.Text
+
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  ogImage         String?  // Cloudinary URL
+
+  visible         Boolean  @default(true)  // Hien thi / An tren storefront
+  sortOrder       Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([visible])
+  @@index([slug])
+}
+
 
 

@@ -56,6 +56,9 @@ src/app/
 │   │   └── page.tsx           # Trang Chiến dịch Người Nối (/nguoi-noi)
 │   ├── partners/
 │   │   └── page.tsx           # Trang Đối tác (/partners)
+│   ├── trang/
+│   │   └── [slug]/
+│   │       └── page.tsx       # Trang nội dung CMS động (/trang/[slug]) - Phase 10c
 │   └── shop/
 │       ├── page.tsx           # Trang Cửa hàng chính (/shop)
 │       └── [slug]/
@@ -91,6 +94,22 @@ src/components/
 │   ├── Header.tsx             # Component Navigation Header (Store)
 │   └── Footer.tsx             # Component Footer (Store)
 └── ui/                        # Chứa các UI element cơ bản
+```
+
+## Files mới bổ sung (Phase 10c - Pages CMS)
+
+```text
+src/lib/validators/page.schema.ts         # Zod schema cho Page
+src/lib/services/page.service.ts          # PageService static class (CRUD)
+src/lib/actions/page.actions.ts           # Server actions (create/update/delete/toggle)
+src/components/admin/website/
+  PagesListClient.tsx                     # Bảng danh sách trang admin
+  PageEditorClient.tsx                    # Form tạo/sửa trang (tiptap RichTextEditor)
+src/app/(admin)/admin/website/pages/
+  page.tsx                                # /admin/website/pages - danh sach
+  create/page.tsx                         # /admin/website/pages/create
+  [id]/page.tsx                           # /admin/website/pages/[id] - chinh sua
+src/app/(store)/trang/[slug]/page.tsx     # /trang/[slug] - storefront public
 ```
 
 ## Ghi chú cập nhật (Dành cho AI & Developer)

@@ -83,6 +83,7 @@ const SALES_CHANNELS = [
     submenus: [
       { title: "Giao diện", href: "/admin/customize", icon: Palette },
       { title: "Menu", href: "/admin/website/navigation", icon: Menu },
+      { title: "Trang nội dung", href: "/admin/website/pages", icon: FileText },
       { title: "Blogs", href: "/admin/website/blogs", icon: FileEdit },
     ]
   }
