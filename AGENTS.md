@@ -13,7 +13,14 @@ Tài liệu này định nghĩa ngữ cảnh kỹ thuật và tiêu chuẩn th�
 ## 2. Câu lệnh thực thi (Commands)
 - Cài đặt thư viện: `npm install`
 - Khởi chạy môi trường phát triển: `npm run dev`
-- Cập nhật schema CSDL: `npx prisma generate` và `npx prisma db push`
+- Cập nhật schema CSDL: `npx prisma generate` va `npx prisma db push`
+- Safe migration (tranh shadow DB BOM): `npx prisma migrate diff --from-schema-datasource --to-schema-datamodel --script` + tao folder migration thu cong + `npx prisma migrate deploy`
+
+### Routes canonical quan trong
+- Cua hang: `/cua-hang` (khong dung /shop)
+- Blog: `/journal/[slug]`
+- Trang noi dung CMS (Phase 10c): `/trang/[slug]` - chi render khi `visible=true`
+- Admin pages CMS: `/admin/website/pages`, `/admin/website/pages/create`, `/admin/website/pages/[id]`
 
 ---
 
