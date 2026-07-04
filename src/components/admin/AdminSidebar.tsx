@@ -82,6 +82,7 @@ const SALES_CHANNELS = [
     actionHref: "/",
     submenus: [
       { title: "Giao diện", href: "/admin/customize", icon: Palette },
+      { title: "Menu", href: "/admin/website/navigation", icon: Menu },
       { title: "Blogs", href: "/admin/website/blogs", icon: FileEdit },
     ]
   }
