@@ -160,6 +160,20 @@ export const SiteConfigSchema = z.object({
     closingTitle: textValidator,
     closingBody: textValidator,
   }),
+  discover_story: z.object({
+    eyebrow: textValidator,
+    title: textValidator,
+    subtitle: textValidator,
+    paragraphs: z.array(z.object({
+      text: textValidator,
+    })),
+    quote: textValidator,
+    quoteCite: textValidator,
+    ctaEyebrow: textValidator,
+    ctaHeading: textValidator,
+    ctaButtonText: textValidator,
+    ctaButtonHref: urlValidator,
+  }).optional(),
   partners_meta: z.object({
     stockistMinOrder: textValidator,
     stockistDiscount: textValidator,
