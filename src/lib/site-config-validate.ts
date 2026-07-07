@@ -220,6 +220,8 @@ export const SiteConfigSchema = z.object({
     primaryButtonHref: urlValidator,
     secondaryButtonText: textValidator,
     secondaryButtonHref: urlValidator,
+    closingImage: imageValidator.optional().default(""),
+    closingImageAlt: textValidator.optional().default(""),
   }).optional(),
   partners_meta: z.object({
     stockistMinOrder: textValidator,

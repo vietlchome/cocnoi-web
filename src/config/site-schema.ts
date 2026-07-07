@@ -668,6 +668,8 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       primaryButtonHref:   { type: "url",      label: "Nút chính - link",      default: "/cua-hang" },
       secondaryButtonText: { type: "text",     label: "Nút phụ - nhãn",        default: "Xem 4 Brand Pillar" },
       secondaryButtonHref: { type: "url",      label: "Nút phụ - link",        default: "/discover/our-values" },
+      closingImage:        { type: "image",    label: "Ảnh closing (tùy chọn)", default: "", aspectRatio: 16/9, folder: "discover", helpText: "16:9. Hiển thị phía trên biểu tượng Award khi có URL." },
+      closingImageAlt:     { type: "text",     label: "Mô tả ảnh closing (alt)", default: "" },
     }
   },
   partners_meta: {

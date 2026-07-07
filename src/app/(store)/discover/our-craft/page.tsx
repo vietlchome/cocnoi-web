@@ -33,6 +33,8 @@ export default async function OurCraftPage() {
   const primaryButtonHref  = s?.primaryButtonHref  || "/cua-hang";
   const secondaryButtonText = s?.secondaryButtonText || "Xem 4 Brand Pillar";
   const secondaryButtonHref = s?.secondaryButtonHref || "/discover/our-values";
+  const closingImage        = s?.closingImage        || "";
+  const closingImageAlt     = s?.closingImageAlt     || s?.closingHeading || "";
 
   return (
     <main className="w-full bg-canvas text-primary">
@@ -75,6 +77,16 @@ export default async function OurCraftPage() {
       {/* Why Handcrafted closing section */}
       <section className="py-20 md:py-28 bg-[#FAF8F5] border-t border-border/40 relative">
         <div className="max-w-3xl mx-auto px-4 md:px-8 text-center relative z-10">
+          {closingImage && (
+            <div className="overflow-hidden rounded-4 border border-border/60 aspect-[16/9] mb-10">
+              <img
+                src={closingImage}
+                alt={closingImageAlt}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
           <Award className="w-10 h-10 text-accent mx-auto mb-6" />
           <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-6">
             {closingHeading}
