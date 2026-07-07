@@ -9,10 +9,10 @@ export const metadata = {
 };
 
 const DEFAULT_CARDS = [
-  { en: "Our Story",  title: "Câu chuyện",         desc: "Khởi nguồn từ Bát Tràng, ý nghĩa cái tên, lý do là đôi cốc.",     href: "/discover/our-story"  },
-  { en: "Our Human",  title: "Con người",           desc: "Những đôi tay làm nên Cốc Nối. Nghệ nhân, đối tác, founders.",    href: "/discover/our-human"  },
-  { en: "Our Craft",  title: "Quy trình thủ công",  desc: "7 bước từ đất đến cốc. Vì sao chúng tôi chọn làm thủ công.",      href: "/discover/our-craft"  },
-  { en: "Our Values", title: "Giá trị",             desc: "4 pillar: KẾT NỐI, CHÂN THÀNH, CHỈN CHU, CỞI MỞ.",               href: "/discover/our-values" },
+  { en: "Our Story",  title: "Câu chuyện",         desc: "Khởi nguồn từ Bát Tràng, ý nghĩa cái tên, lý do là đôi cốc.",     href: "/discover/our-story",  image: "" },
+  { en: "Our Human",  title: "Con người",           desc: "Những đôi tay làm nên Cốc Nối. Nghệ nhân, đối tác, founders.",    href: "/discover/our-human",  image: "" },
+  { en: "Our Craft",  title: "Quy trình thủ công",  desc: "7 bước từ đất đến cốc. Vì sao chúng tôi chọn làm thủ công.",      href: "/discover/our-craft",  image: "" },
+  { en: "Our Values", title: "Giá trị",             desc: "4 pillar: KẾT NỐI, CHÂN THÀNH, CHỈN CHU, CỞI MỞ.",               href: "/discover/our-values", image: "" },
 ];
 
 export default async function DiscoverLandingPage() {
@@ -44,8 +44,19 @@ export default async function DiscoverLandingPage() {
             <Link
               key={idx}
               href={c.href}
-              className="group block bg-[#FAF8F5] border border-border/65 rounded-4 p-8 md:p-10 hover:border-accent transition-all duration-300 hover:shadow-md"
+              className="group block bg-[#FAF8F5] border border-border/65 rounded-4 overflow-hidden hover:border-accent transition-all duration-300 hover:shadow-md"
             >
+              {c.image && (
+                <div className="aspect-[16/9] overflow-hidden">
+                  <img
+                    src={c.image}
+                    alt={c.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div className="p-8 md:p-10">
               <span className="font-quicksand text-xs font-bold uppercase tracking-widest text-accent block mb-2">
                 {c.en}
               </span>
@@ -55,6 +66,7 @@ export default async function DiscoverLandingPage() {
               <p className="font-bvp text-sm text-secondary leading-relaxed">
                 {c.desc}
               </p>
+              </div>
             </Link>
           ))}
         </div>

@@ -185,6 +185,7 @@ export const SiteConfigSchema = z.object({
       title: textValidator,
       desc: textValidator,
       href: urlValidator,
+      image: imageValidator.optional().default(""),
     })),
   }).optional(),
   discover_human: z.object({

@@ -579,6 +579,7 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
           title: { type: "text",     label: "Tiêu đề card",              default: "" },
           desc:  { type: "textarea", label: "Mô tả card",                default: "" },
           href:  { type: "url",      label: "Đường dẫn",                 default: "/" },
+          image: { type: "image",    label: "Ảnh thumbnail card (tùy chọn)", default: "", aspectRatio: 16/9, folder: "discover", helpText: "16:9. Hiển thị phía trên eyebrow khi có URL." },
         },
       },
     }
