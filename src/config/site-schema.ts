@@ -553,8 +553,10 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       quoteCite:     { type: "text",     label: "Câu trích dẫn (EN)",           default: "Crafted bonds. Connected souls." },
       ctaEyebrow:    { type: "text",     label: "CTA - chữ nhỏ",               default: "Tiếp tục tìm hiểu" },
       ctaHeading:    { type: "text",     label: "CTA - tiêu đề",               default: "Bốn trụ cột định hình thương hiệu" },
-      ctaButtonText: { type: "text",     label: "CTA - nhãn nút",              default: "Khám phá 4 Brand Pillar" },
-      ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",             default: "/discover/our-values" },
+      ctaButtonText:   { type: "text",  label: "CTA - nhãn nút",                              default: "Khám phá 4 Brand Pillar" },
+      ctaButtonHref:   { type: "url",   label: "CTA - đường dẫn",                             default: "/discover/our-values" },
+      featureImage:    { type: "image", label: "Ảnh feature (giữa tiêu đề và nội dung)",       default: "", aspectRatio: 16/9, folder: "discover", helpText: "Tỷ lệ 16:9. Chỉ hiển thị khi có ảnh." },
+      featureImageAlt: { type: "text",  label: "Mô tả ảnh feature (alt)",                      default: "" },
     }
   },
   discover_index: {

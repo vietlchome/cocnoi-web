@@ -173,6 +173,8 @@ export const SiteConfigSchema = z.object({
     ctaHeading: textValidator,
     ctaButtonText: textValidator,
     ctaButtonHref: urlValidator,
+    featureImage: imageValidator.optional().default(""),
+    featureImageAlt: textValidator.optional().default(""),
   }).optional(),
   discover_index: z.object({
     eyebrow: textValidator,
