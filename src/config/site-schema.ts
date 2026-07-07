@@ -533,6 +533,30 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       }
     }
   },
+  discover_story: {
+    label: "Trang Câu chuyện (/discover/our-story)",
+    fields: {
+      eyebrow:       { type: "text",     label: "Chữ nhỏ trên tiêu đề",       default: "Our Story" },
+      title:         { type: "text",     label: "Tiêu đề chính",               default: "Câu chuyện Cốc Nối" },
+      subtitle:      { type: "textarea", label: "Câu mô tả dưới tiêu đề",      default: "Khởi nguồn từ xưởng gốm nhỏ tại Bát Tràng, nối sợi dây gắn kết giữa người với người." },
+      paragraphs: {
+        type: "repeatable",
+        label: "Các đoạn thân bài",
+        default: [
+          { text: "Chúng ta thấy chiếc cốc ở khắp mọi nơi: ở nhà, ở trường, hay ngay trên bàn làm việc. Nó gần gũi đến mức đôi khi ta quên mất rằng: mỗi chiếc cốc đều có thể là một khởi đầu cho những tâm sự và sẻ chia." },
+          { text: "Cái tên Cốc Nối ra đời từ một chữ \"Nối\" mang nhiều lớp nghĩa. Đó là sự kết nối giữa những người thân thương đang cần một khoảnh khắc thật để hiểu nhau. Đó là sự giao thoa của những miền đất, nơi mỗi loại men gốm đều kể một câu chuyện riêng. Đó còn là kỳ vọng nối truyền thống trăm năm của gốm thủ công Bát Tràng vào nhịp thở đầy năng lượng của năm 2026, cân bằng giữa mỹ thuật và công năng sử dụng." },
+          { text: "Trong một thế giới mà chỉ một cái chạm là có thể gửi tin, gọi video, thì những kết nối \"thật\" lại trở nên xa xỉ. Mỗi chiếc Cốc Nối gửi đến bạn một lời nhắn: những gì đi từ trái tim, sẽ chạm được đến trái tim." },
+        ],
+        itemSchema: { text: { type: "textarea", label: "Nội dung đoạn", default: "" } },
+      },
+      quote:         { type: "text",     label: "Câu trích dẫn",               default: "Kết tình thân, Nối tinh thần." },
+      quoteCite:     { type: "text",     label: "Câu trích dẫn (EN)",           default: "Crafted bonds. Connected souls." },
+      ctaEyebrow:    { type: "text",     label: "CTA - chữ nhỏ",               default: "Tiếp tục tìm hiểu" },
+      ctaHeading:    { type: "text",     label: "CTA - tiêu đề",               default: "Bốn trụ cột định hình thương hiệu" },
+      ctaButtonText: { type: "text",     label: "CTA - nhãn nút",              default: "Khám phá 4 Brand Pillar" },
+      ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",             default: "/discover/our-values" },
+    }
+  },
   partners_meta: {
     label: "Thông tin Đối Tác (Partners pages)",
     fields: {
