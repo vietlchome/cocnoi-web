@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { deletePageAction, togglePageVisibilityAction } from "@/lib/actions/page.actions";
 import { formatDate } from "@/lib/utils/format";
-import { Edit, Trash2, Plus, Search, Eye, EyeOff, Loader2, FileText } from "lucide-react";
+import { Edit, Trash2, Plus, Search, Eye, EyeOff, Loader2, FileText, Lock } from "lucide-react";
+import { RESERVED_PAGE_ROUTES } from "@/lib/reserved-pages";
 
 interface Page {
   id: string;
@@ -133,9 +134,17 @@ export default function PagesListClient({ initialPages }: PagesListClientProps) 
                     className="hover:bg-subtle/20 transition-colors group"
                   >
                     <td className="px-5 py-4">
-                      <span className="font-medium text-primary text-sm leading-tight line-clamp-2">
-                        {page.title}
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-primary text-sm leading-tight line-clamp-2">
+                          {page.title}
+                        </span>
+                        {RESERVED_PAGE_ROUTES[page.slug] && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                            <Lock className="w-2.5 h-2.5" />
+                            Trang hệ thống
+                          </span>
+                        )}
+                      </div>
                       {page.excerpt && (
                         <span className="block text-xs text-secondary/60 mt-0.5 truncate max-w-xs">
                           {page.excerpt}
@@ -187,18 +196,20 @@ export default function PagesListClient({ initialPages }: PagesListClientProps) 
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </Link>
-                        <button
-                          onClick={() => handleDelete(page)}
-                          disabled={loadingId === page.id}
-                          className="inline-flex items-center justify-center p-2 rounded-2 border border-border hover:border-rose-500 hover:text-rose-500 text-secondary transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                          title="Xóa trang"
-                        >
-                          {loadingId === page.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                        </button>
+                        {!RESERVED_PAGE_ROUTES[page.slug] && (
+                          <button
+                            onClick={() => handleDelete(page)}
+                            disabled={loadingId === page.id}
+                            className="inline-flex items-center justify-center p-2 rounded-2 border border-border hover:border-rose-500 hover:text-rose-500 text-secondary transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                            title="Xóa trang"
+                          >
+                            {loadingId === page.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
