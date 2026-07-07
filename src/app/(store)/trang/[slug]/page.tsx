@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PageService } from "@/lib/services/page.service";
+import { RESERVED_PAGE_ROUTES } from "@/lib/reserved-pages";
 import { getSiteConfig } from "@/lib/site-config";
 import { formatDate } from "@/lib/utils/format";
 
@@ -11,6 +12,10 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
+
+  // Reserved slugs have canonical URLs elsewhere - no metadata needed here
+  if (RESERVED_PAGE_ROUTES[slug]) return {};
+
   const page = await PageService.getPageBySlugPublic(slug);
 
   if (!page) return {};
@@ -42,6 +47,13 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function StorefrontPageDetail({ params }: PageProps) {
   const { slug } = await params;
+
+  // Redirect reserved slugs to their canonical routes (301)
+  const canonicalRoute = RESERVED_PAGE_ROUTES[slug];
+  if (canonicalRoute) {
+    redirect(canonicalRoute);
+  }
+
   const page = await PageService.getPageBySlugPublic(slug);
 
   if (!page) notFound();
