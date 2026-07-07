@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, updatePost } from "@/lib/actions/content.actions";
+import { getPostCategoryDescription, POST_CATEGORY_OPTIONS, POST_CATEGORY_VALUES } from "@/lib/post-categories";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import ImageCropUploader from "@/components/admin/ImageCropUploader";
 import { FormField } from "@/components/ui/FormField";
@@ -42,7 +43,7 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
   const [excerpt, setExcerpt] = useState(post?.excerpt || "");
   const [content, setContent] = useState(post?.content || "");
   const [coverImage, setCoverImage] = useState(post?.coverImage || "");
-  const [category, setCategory] = useState(post?.category || "UNCATEGORIZED");
+  const [category, setCategory] = useState(post?.category || POST_CATEGORY_VALUES.uncategorized);
   
   // New Metadata Fields
   const [status, setStatus] = useState<PostStatus>(post?.status || PostStatus.DRAFT);
@@ -295,11 +296,15 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full text-xs bg-canvas border border-border/40 px-3 py-2.5 rounded-2 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all cursor-pointer font-medium text-primary"
                 >
-                  <option value="UNCATEGORIZED">Chưa phân loại</option>
-                  <option value="UNSUNG_HEROES">Người Nối (Vinh danh)</option>
-                  <option value="JOURNEY">Hành trình (Câu chuyện)</option>
-                  <option value="KNOWLEDGE">Kiến thức / Tạp chí</option>
+                  {POST_CATEGORY_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
+                <p className="mt-2 text-[11px] leading-relaxed text-secondary">
+                  {getPostCategoryDescription(category)}
+                </p>
               </FormField>
 
               <FormField label="Tác giả">
@@ -317,7 +322,7 @@ export default function PostEditor({ post, onClose }: PostEditorProps) {
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  placeholder="gốm, nghệ nhân, hành trình (cách nhau bởi dấu phẩy)"
+                  placeholder="gốm, nghệ nhân, branding, quà tặng (cách nhau bởi dấu phẩy)"
                   className="w-full text-xs bg-canvas border border-border/40 px-3.5 py-2.5 rounded-2 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
                 />
               </FormField>

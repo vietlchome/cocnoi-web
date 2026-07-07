@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { POST_CATEGORY_VALUES } from '@/lib/post-categories';
 import { slugify } from '@/lib/utils/slug';
 import { PostStatus } from '@prisma/client';
 
@@ -57,7 +58,7 @@ export class ContentService {
         excerpt: data.excerpt || null,
         content: data.content,
         coverImage: data.coverImage || null,
-        category: data.category || 'UNCATEGORIZED',
+        category: data.category || POST_CATEGORY_VALUES.uncategorized,
         status,
         publishedAt,
         scheduledFor: data.scheduledFor || null,

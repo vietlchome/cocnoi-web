@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { deletePost, publishPost, unpublishPost } from "@/lib/actions/content.actions";
+import { getPostCategoryLabel } from "@/lib/post-categories";
 import { formatDate } from "@/lib/utils/format";
 import { Edit, Trash2, Globe, EyeOff, Search, Plus, Calendar, BookOpen, Loader2, Clock } from "lucide-react";
 import { PostStatus } from "@prisma/client";
@@ -160,13 +161,7 @@ export default function PostsList({ initialPosts, onEdit }: PostsListProps) {
 
                     {/* Category Tag */}
                     <span className="inline-block px-2 py-0.5 bg-primary/80 border border-primary/60 text-canvas rounded text-[9px] font-semibold uppercase tracking-wider">
-                      {post.category === "UNSUNG_HEROES"
-                        ? "Người Nối"
-                        : post.category === "JOURNEY"
-                        ? "Hành trình"
-                        : post.category === "KNOWLEDGE"
-                        ? "Tạp chí"
-                        : "Chưa phân loại"}
+                      {getPostCategoryLabel(post.category)}
                     </span>
                   </div>
                 </div>

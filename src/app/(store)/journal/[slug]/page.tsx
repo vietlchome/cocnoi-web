@@ -2,6 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getPostCategoryLabel } from "@/lib/post-categories";
 import { formatDate } from "@/lib/utils/format";
 import { PostStatus } from "@prisma/client";
 import { getSiteConfig } from "@/lib/site-config";
@@ -73,10 +74,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  let tag = "Nhật ký";
-  if (post.category === "UNSUNG_HEROES") tag = "Người Nối";
-  else if (post.category === "JOURNEY") tag = "Hành trình";
-  else if (post.category === "KNOWLEDGE") tag = "Tạp chí";
+  const tag = getPostCategoryLabel(post.category);
 
   const coverSrc =
     post.coverImage ||

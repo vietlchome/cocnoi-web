@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, Users, Heart, Sparkles, MessageSquare, Briefcase, Building, Quote, CheckCircle } from "lucide-react";
+import { POST_CATEGORY_VALUES } from "@/lib/post-categories";
+import { ArrowRight, Users, Sparkles, MessageSquare, Briefcase, CheckCircle } from "lucide-react";
 import PartnerCarousel from "@/components/store/PartnerCarousel";
 
 export const revalidate = 0; // Vô hiệu hóa bộ nhớ đệm để tải các câu chuyện trực tiếp từ database
@@ -10,10 +11,12 @@ export default async function NguoiNoiCampaignPage() {
     where: {
       status: "PUBLISHED",
       publishedAt: { lte: new Date() },
-      category: "UNSUNG_HEROES" // Chỉ lấy các bài viết thuộc danh mục Người Nối
+      category: POST_CATEGORY_VALUES.nguoiNoi, // Chỉ lấy các bài viết thuộc danh mục Người-Nối
     },
     orderBy: { publishedAt: "desc" },
   });
+
+  type NguoiNoiPost = (typeof posts)[number];
 
   const teamMembers = [
     {
@@ -73,10 +76,10 @@ export default async function NguoiNoiCampaignPage() {
             Chiến dịch thương hiệu
           </span>
           <h1 className="font-playfair font-bold text-4xl md:text-6xl text-primary leading-tight mb-6">
-            Người Nối
+            Người-Nối
           </h1>
           <p className="font-bvp text-sm md:text-base text-secondary leading-relaxed max-w-2xl mx-auto mb-8">
-            Chúng tôi tin rằng gốm mộc không tự nói chuyện. Linh hồn của Cốc Nối thuộc về ba nhóm Người Nối thầm lặng: những người thợ trực tiếp chế tác, những đối tác đồng hành chia sẻ giá trị, và những con người đang ngày đêm kết nối yêu thương trong xã hội.
+            Chân dung những người thầm lặng gìn giữ sự gắn kết. Cốc Nối muốn kể về những con người đang âm thầm nối một giá trị đẹp với hiện tại, từ người giữ nghề, người giữ nếp sống, đến những người kết nối cộng đồng bằng việc làm giản dị mà bền bỉ.
           </p>
           <div className="flex flex-wrap gap-4 justify-center font-bvp text-xs font-semibold text-secondary">
             <a href="#team" className="bg-primary text-canvas px-5 py-3 rounded-2 hover:bg-[#0E1220] transition-colors">
@@ -86,7 +89,7 @@ export default async function NguoiNoiCampaignPage() {
               2. Đối tác & Khách hàng
             </a>
             <a href="#unsung-heroes" className="border border-border bg-canvas px-5 py-3 rounded-2 hover:border-accent hover:text-accent transition-colors">
-              3. Người Nối - Unsung Heroes
+              3. Người-Nối - chân dung vinh danh
             </a>
           </div>
         </div>
@@ -214,8 +217,8 @@ export default async function NguoiNoiCampaignPage() {
           {/* Database-sourced posts */}
           {posts.length > 0 && (
             <div className="flex flex-col gap-12">
-              {posts.map((post: any) => (
-                <Link href={`/journal/${(post as any).slug || post.id}`} key={post.id} className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start border border-border/60 rounded-4 p-6 md:p-10 bg-canvas hover:border-accent transition-colors cursor-pointer group block">
+              {posts.map((post: NguoiNoiPost) => (
+                <Link href={`/journal/${post.slug}`} key={post.id} className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start border border-border/60 rounded-4 p-6 md:p-10 bg-canvas hover:border-accent transition-colors cursor-pointer group block">
                   <div className="lg:col-span-4 relative aspect-square md:aspect-video lg:aspect-square bg-[#EFE9DF] rounded-3 border border-border flex items-center justify-center p-8 overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(#C2703E_1px,transparent_1px)] [background-size:16px_16px] opacity-15"></div>
                     <Users className="w-12 h-12 text-accent group-hover:scale-110 transition-transform duration-300" />
@@ -224,9 +227,9 @@ export default async function NguoiNoiCampaignPage() {
                     </span>
                   </div>
                   <div className="lg:col-span-8 flex flex-col items-start gap-4">
-                    <span className="font-bvp text-xs text-accent font-bold uppercase tracking-wider">Cộng đồng Người Nối</span>
+                    <span className="font-bvp text-xs text-accent font-bold uppercase tracking-wider">Chuyên mục Người-Nối</span>
                     <h3 className="font-playfair text-xl md:text-3xl font-bold text-primary group-hover:text-accent transition-colors">{post.title}</h3>
-                    {post.excerpt && <p className="font-bvp text-sm text-secondary italic font-medium text-justify">"{post.excerpt}"</p>}
+                    {post.excerpt && <p className="font-bvp text-sm text-secondary italic font-medium text-justify">&ldquo;{post.excerpt}&rdquo;</p>}
                     <p className="font-bvp text-sm text-secondary leading-relaxed whitespace-pre-wrap line-clamp-3 text-justify">{post.content}</p>
                     <div className="border-t border-border w-full pt-4 mt-2 flex items-center justify-between text-xs text-secondary font-bvp">
                       <span>Ngày đăng: {new Date(post.createdAt).toLocaleDateString("vi-VN")}</span>
@@ -247,7 +250,7 @@ export default async function NguoiNoiCampaignPage() {
           <MessageSquare className="w-8 h-8 text-accent mx-auto mb-4" />
           <h3 className="font-playfair text-2xl font-bold text-primary mb-3">Kể cho chúng tôi nghe câu chuyện của bạn</h3>
           <p className="font-bvp text-xs md:text-sm text-secondary leading-relaxed mb-6">
-            Bạn có biết một "Người Nối" trong cuộc sống của mình? Một người luôn âm thầm kết nối yêu thương hay mang lại hơi ấm bằng những cử chỉ bình dị? Hãy chia sẻ câu chuyện ấy với chúng tôi để cùng lan tỏa sự ấm áp.
+            Bạn có biết một Người-Nối trong cuộc sống của mình? Một người luôn âm thầm kết nối yêu thương hay mang lại hơi ấm bằng những cử chỉ bình dị? Hãy chia sẻ câu chuyện ấy với chúng tôi để cùng lan tỏa sự ấm áp.
           </p>
           <Link 
             href="/contact"

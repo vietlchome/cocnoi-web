@@ -1,6 +1,6 @@
 import { getPosts } from "@/lib/actions/content.actions";
 import AdminContentClient from "@/components/admin/content/AdminContentClient";
-import { FileText, AlertCircle } from "lucide-react";
+import { FileText } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -15,16 +15,16 @@ export default async function AdminContentPage() {
         <div className="flex items-center gap-2">
           <FileText className="w-6 h-6 text-accent" />
           <h1 className="font-playfair text-2xl font-bold text-primary tracking-tight">
-            Quản Trị Bài Viết Blog CMS
+            Quản Trị Bài Viết
           </h1>
         </div>
         <p className="text-xs text-secondary mt-0.5 pl-8">
-          Quản trị bài viết tạp chí, bài đăng khám phá truyền thông, giới thiệu nghệ nhân gốm thủ công Cốc Nối.
+          Quản trị 3 nhóm bài viết chính của website: Người-Nối, Câu chuyện Cốc Nối, và Kiến thức & Cảm hứng.
         </p>
       </div>
 
       {/* Main CMS switcher */}
-      <AdminContentClient initialPosts={posts as any} />
+      <AdminContentClient initialPosts={posts} />
     </div>
   );
 }

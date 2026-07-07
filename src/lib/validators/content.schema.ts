@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import { POST_CATEGORY_VALUES } from '@/lib/post-categories';
 
 export const CreatePostSchema = z.object({
   title: z.string().min(1, 'Tiêu đề bài viết không được để trống'),
   excerpt: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
   content: z.string().min(1, 'Nội dung bài viết không được để trống'),
   coverImage: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),
-  category: z.string().default('UNCATEGORIZED'),
+  category: z.string().default(POST_CATEGORY_VALUES.uncategorized),
   status: z.enum(['DRAFT', 'PUBLISHED', 'SCHEDULED']).default('DRAFT'),
   scheduledFor: z.preprocess((val) => (val === '' || val === null ? undefined : val), z.coerce.date().optional()),
   metaTitle: z.string().nullable().optional().transform((val) => (val === '' ? null : val)),

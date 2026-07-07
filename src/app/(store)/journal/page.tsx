@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getPostCategoryLabel } from "@/lib/post-categories";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/format";
 import { PostStatus } from "@prisma/client";
@@ -45,12 +46,7 @@ export default async function JournalPage() {
     tag: string;
   }
 
-  const dbArticles: Article[] = posts.map((p: any) => {
-    let tag = "Nhật ký";
-    if (p.category === "UNSUNG_HEROES") tag = "Người Nối";
-    else if (p.category === "JOURNEY") tag = "Hành trình";
-    else if (p.category === "KNOWLEDGE") tag = "Tạp chí";
-
+  const dbArticles: Article[] = posts.map((p) => {
     return {
       id: p.id,
       slug: p.slug,
@@ -61,7 +57,7 @@ export default async function JournalPage() {
       coverImage:
         p.coverImage ||
         "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=960&q=80",
-      tag,
+      tag: getPostCategoryLabel(p.category),
     };
   });
 

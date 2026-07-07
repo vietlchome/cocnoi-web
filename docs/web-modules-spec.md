@@ -1,108 +1,321 @@
-# Đặc Tả Kỹ Thuật Hợp Nhất Website Cốc Nối (Next.js & Prisma)
+# Đặc Tả Kỹ Thuật Hợp Nhất Website Cốc Nối
 
-> **Mục tiêu:** Tổng hợp toàn bộ yêu cầu phát triển của 5 mô-đun cốt lõi cho dự án website `cocnoi-web` nhằm tối ưu cấu trúc tài liệu hướng dẫn cho AI và nhà phát triển.
-> **Tech Stack:** Next.js (App Router), Prisma ORM (SQLite / PostgreSQL), Tailwind CSS, Auth.js (NextAuth), Zustand.
-
----
-
-## MÔ-ĐUN 1: Xác Thực, Phân Quyền Và Quản Lý Người Dùng
-
-### 1. Mục tiêu
-Thiết lập hệ thống xác thực người dùng sử dụng Auth.js (NextAuth.js) kết hợp với Prisma Adapter. Xây dựng nền tảng phân quyền (RBAC) giữa người dùng bình thường (USER) và quản trị viên (ADMIN).
-
-### 2. Yêu cầu Cơ sở dữ liệu (Prisma Schema)
-Bắt buộc tuân thủ cấu trúc mô hình chuẩn của Auth.js để tránh lỗi:
-* **User:** Gồm các trường `id`, `name`, `email` (unique), `emailVerified`, `image`. Thêm trường `role` với kiểu `Enum Role { USER, ADMIN }` mặc định là `USER`.
-* **Account:** Quản lý liên kết tài khoản mạng xã hội (`provider`, `providerAccountId`, v.v.).
-* **Session:** Quản lý phiên đăng nhập (`sessionToken`, `userId`, `expires`).
-* **VerificationToken:** Quản lý token xác thực qua email.
-
-### 3. Yêu cầu Tính năng (Storefront)
-* Thiết lập luồng Đăng nhập/Đăng ký.
-* Cấu hình OAuth Provider (ví dụ: Google).
-* Tạo trang Hồ sơ cá nhân (Profile) cơ bản để người dùng xem và cập nhật thông tin.
-
-### 4. Yêu cầu Tính năng (Admin)
-* Tạo Middleware bảo vệ các định tuyến `/admin/*`. Nếu `role !== 'ADMIN'`, trả về HTTP 403 hoặc chuyển hướng về trang chủ.
-* Xây dựng trang Quản lý Người dùng: Hiển thị danh sách, tìm kiếm theo email, và tính năng cập nhật quyền (`role`) hoặc khóa tài khoản.
-
-### 5. Yêu cầu Kỹ thuật
-* Sử dụng Server Actions cho các thao tác thay đổi dữ liệu.
-* Validate dữ liệu đầu vào bằng Zod.
+> Mục tiêu của file này là mô tả các mô-đun kỹ thuật đang vận hành trong `cocnoi-web` theo trạng thái codebase hiện tại, không phải blueprint lịch sử.
+>
+> Cập nhật theo codebase ngày 01/07/2026.
 
 ---
 
-## MÔ-ĐUN 2: Quản Lý Thông Tin Sản Phẩm (PIM)
+## 0. Source of truth cho tài liệu web
 
-### 1. Mục tiêu
-Xây dựng kiến trúc dữ liệu và giao diện quản lý danh mục, sản phẩm cho website bán hàng.
+Khi đọc hoặc cập nhật tài liệu website, dùng thứ tự ưu tiên sau:
 
-### 2. Yêu cầu Cơ sở dữ liệu (Prisma Schema)
-* **Category:** Mô hình danh mục gồm `id`, `name`, `slug`.
-* **Product:** Mô hình sản phẩm gồm `id`, `name`, `slug`, `description`, `price`, `stockQuantity`, `images` (mảng string), `isActive` (boolean, mặc định true).
-* Thiết lập quan hệ giữa `Product` và `Category` (Quan hệ nhiều-nhiều hoặc 1-nhiều).
+1. `src/app`, `src/components`, `src/lib`, `src/config`, `prisma/schema.prisma`
+2. `docs/cocnoi-web-structure.md`
+3. `../site-architecture.md`
+4. `README.md` và `AGENTS.md`
 
-### 3. Yêu cầu Tính năng (Storefront)
-* Xây dựng API (hoặc Server Components) để lấy danh sách sản phẩm nổi bật hiển thị ở Trang chủ.
-* Xây dựng trang Danh sách Sản phẩm (`/shop`) có hỗ trợ phân trang và lọc theo danh mục.
-* Trang Chi tiết Sản phẩm: Tối ưu hiển thị hình ảnh với `next/image`. Nút "Thêm vào giỏ" bị vô hiệu hóa nếu `stockQuantity === 0`.
+Nếu tài liệu nào mâu thuẫn với source code, source code hiện tại thắng.
 
-### 4. Yêu cầu Tính năng (Admin)
-* Xây dựng giao diện CRUD (Tạo, Đọc, Cập nhật, Xóa) cho Danh mục và Sản phẩm.
-* Tích hợp tính năng tải ảnh lên (mô phỏng hoặc kết nối Cloudinary/AWS S3).
-* Implement tính năng Xóa mềm (Soft Delete): Khi xóa sản phẩm, chỉ cập nhật trường `isActive = false` thay vì xóa hẳn khỏi CSDL để bảo toàn lịch sử.
+Các điểm chuẩn đang phải giữ thống nhất:
 
----
-
-## MÔ-ĐUN 3: Giỏ Hàng Và Thanh Toán VietQR
-
-### 1. Mục tiêu
-Quản lý trạng thái giỏ hàng ở phía client và khởi tạo luồng thanh toán tích hợp mã quét VietQR.
-
-### 2. Yêu cầu Kỹ thuật Giỏ hàng (Client State)
-* Sử dụng Zustand để quản lý trạng thái giỏ hàng toàn cục (thêm, sửa số lượng, xóa sản phẩm khỏi giỏ).
-* Đồng bộ hóa giỏ hàng với `localStorage` để giữ trạng thái khi tải lại trang.
-
-### 3. Yêu cầu Tính năng Thanh toán (Checkout)
-* Xây dựng trang Thanh toán cho phép người dùng điền thông tin giao hàng (Sử dụng React Hook Form + Zod).
-* Tự động tính toán: `Tổng tiền = Giá sản phẩm * Số lượng + Phí vận chuyển`.
-* Tích hợp bộ tạo mã VietQR động trực tiếp tại phía máy khách để bảo mật.
-    * Sử dụng thư viện React sinh mã QR.
-    * Cấu hình mức độ sửa lỗi (Error Correction Level) ở mức Medium (~15%) hoặc High (~30% nếu có chèn logo).
-    * Dữ liệu mã QR phải chứa: STK ngân hàng thụ hưởng, số tiền chính xác, và mã giao dịch ngẫu nhiên.
+- route storefront canonical là `/cua-hang`
+- DB chính là PostgreSQL
+- media upload đi theo hướng Cloudinary
+- website chạy hybrid mode qua `NEXT_PUBLIC_ENABLE_CART`
+- form public đi qua API -> Prisma -> admin, không mặc định đi sang spreadsheet
+- homepage được quản trị theo section-based customizer
 
 ---
 
-## MÔ-ĐUN 4: Quản Lý Đơn Hàng Và Tính Toàn Vẹn Giao Dịch
+## Mô-đun 1: Auth và phân quyền admin
 
-### 1. Mục tiêu
-Lưu trữ lịch sử giao dịch một cách bất biến và thiết lập bảng điều khiển quản lý quy trình xử lý đơn hàng.
+### Mục tiêu
 
-### 2. Yêu cầu Cơ sở dữ liệu (Prisma Schema)
-* Cần định nghĩa Enum cho trạng thái để đảm bảo tính nhất quán: `enum OrderStatus { PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED }`.
-* **Order:** Lưu trữ `id`, `userId` (optional), `totalAmount`, `shippingAddress`, `status` (OrderStatus), `paymentStatus` (boolean).
-* **OrderItem:** Lưu `orderId`, `productId`, `quantity`, và **BẮT BUỘC** có trường `priceAtPurchase` (lưu giá trị sản phẩm tại thời điểm mua để tránh sai lệch nếu giá sản phẩm thay đổi sau này). Thiết lập khóa ngoại tham chiếu đến `Product`.
+Thiết lập xác thực và phân quyền cho khu vực quản trị.
 
-### 3. Yêu cầu Tính năng (Storefront)
-* Xây dựng trang Lịch sử đơn hàng cho người dùng đã đăng nhập.
-* Hiển thị chi tiết từng đơn hàng, trạng thái hiện tại và lịch sử thanh toán.
+### Trạng thái hiện tại
 
-### 4. Yêu cầu Tính năng (Admin)
-* Xây dựng giao diện Bảng điều khiển Đơn hàng (Order Fulfillment Panel) hiển thị danh sách đơn hàng.
-* Cho phép Admin thay đổi trạng thái đơn hàng (ví dụ: `PENDING` -> `PROCESSING`).
-* Tính năng xác nhận thanh toán thủ công (Đối soát với mã VietQR).
+- Auth route: `src/app/api/auth/[...nextauth]/route.ts`
+- Schema auth chuẩn nằm trong Prisma:
+  - `User`
+  - `Account`
+  - `Session`
+  - `VerificationToken`
+- `User.role` dùng enum `UserRole` với `USER` và `ADMIN`
+- Có route đăng nhập tại `/login`
+
+### Phạm vi chính
+
+- bảo vệ khu vực admin
+- xác thực tài khoản quản trị
+- chuẩn bị nền cho workflow user/account trong tương lai
+
+### Điều cần giữ đúng trong docs
+
+- gọi đúng là Auth.js / NextAuth
+- không mô tả schema auth như một bài toán chưa triển khai
+- không ghi stack DB kiểu "SQLite cho dev, PostgreSQL cho prod" như mặc định cũ
 
 ---
 
-## MÔ-ĐUN 5: Bảng Chỉ Huy Trung Tâm & Phân Tích Dữ Liệu
+## Mô-đun 2: Catalog / PIM
 
-### 1. Mục tiêu
-Biến Admin Dashboard thành một trung tâm khai thác dữ liệu thực tế bằng các truy vấn nâng cao của Prisma.
+### Mục tiêu
 
-### 2. Yêu cầu Kỹ thuật & Giao diện (Admin)
-* **Widget KPIs:** Hiển thị tổng doanh thu, tổng số đơn hàng trong tháng.
-* **Cảnh báo Tồn kho:** Truy vấn danh sách các sản phẩm có `stockQuantity < 10` để cảnh báo nhập hàng.
-* **Xếp hạng Khách hàng (Leaderboard):**
-    * Khai thác tính năng tập hợp quan hệ (Relation Aggregates) của Prisma.
-    * Truy vấn 10 khách hàng mua nhiều đơn nhất bằng cách sử dụng `orderBy: { orders: { _count: 'desc' } }` để tối ưu hóa hiệu suất cơ sở dữ liệu gốc.
-* **Hệ thống thông báo:** Cài đặt hệ thống thông báo trạng thái Toast (ví dụ: Sonner) để phản hồi ngay lập tức cho Admin khi các thao tác (như cập nhật trạng thái đơn hàng) thành công hoặc thất bại.
+Quản trị sản phẩm, taxonomy và hiển thị catalog public.
+
+### Trạng thái hiện tại
+
+Schema liên quan:
+
+- `Category`
+- `ProductGroup`
+- `ColorOption`
+- `SizeOption`
+- `FinishOption`
+- `Product`
+
+Admin surface hiện có:
+
+- `/admin/products`
+- `/admin/products/create`
+- `/admin/products/[id]`
+- `/admin/products/bulk-upload`
+- `/admin/products/inventory`
+- `/admin/products/pricing`
+- `/admin/products/reviews`
+- `/admin/products/settings`
+
+API/admin actions hiện có:
+
+- `api/admin/products/*`
+- `api/admin/finishes/route.ts`
+- `src/lib/actions/product.actions.ts`
+- `src/lib/services/product.service.ts`
+
+### Storefront hiện tại
+
+- landing catalog public nằm ở `/cua-hang`
+- trang chi tiết sản phẩm ở `/cua-hang/[slug]`
+- `/shop` chỉ là redirect legacy
+
+### Điều cần giữ đúng trong docs
+
+- không dùng `/shop` như route canonical mới
+- không mô tả catalog public như đã có cây URL category/collection sâu nếu code chưa có route thật
+- không quên rằng catalog public và admin PIM đang ở cùng một app
+
+---
+
+## Mô-đun 3: Hybrid commerce, inquiry và checkout
+
+### Mục tiêu
+
+Cho phép website vận hành linh hoạt giữa hai mode:
+
+- lead-gen + QR/COD
+- full cart/checkout
+
+### Trạng thái hiện tại
+
+- biến điều khiển chính: `NEXT_PUBLIC_ENABLE_CART`
+- khi biến này khác `"true"`:
+  - storefront ưu tiên inquiry flow
+  - product detail hiển thị tư vấn / inquiry / payment guidance
+  - cart UI bị ẩn
+- khi biến này bằng `"true"`:
+  - cart UI xuất hiện
+  - `/checkout` hoạt động như luồng đặt hàng đầy đủ
+
+### Thành phần liên quan
+
+- `src/app/(store)/checkout/page.tsx`
+- `src/app/(store)/cua-hang/[slug]/ProductDetailClient.tsx`
+- `src/components/store/CartDrawer.tsx`
+- `src/components/store/PaymentInstructionsBlock.tsx`
+- `src/components/shared/HeaderClient.tsx`
+- `src/components/store/FloatingActions.tsx`
+
+### Điều cần giữ đúng trong docs
+
+- không mô tả website như full e-commerce cố định
+- cũng không mô tả nó như site chỉ có form prototype
+- phải ghi rõ đây là hybrid model
+
+---
+
+## Mô-đun 4: Orders, inquiries và CRM
+
+### Mục tiêu
+
+Gom các tín hiệu chuyển đổi và vận hành hậu cần trong cùng hệ thống dữ liệu.
+
+### Trạng thái hiện tại
+
+Schema liên quan:
+
+- `Order`
+- `OrderItem`
+- `OrderInquiry`
+- `Customer`
+- `CustomerNote`
+
+Các enum quan trọng:
+
+- `OrderStatus`
+- `OrderType`
+- `InquiryStatus`
+- `InquiryType`
+- `CustomerType`
+
+Admin surface hiện có:
+
+- `/admin/orders/retail`
+- `/admin/orders/b2b`
+- `/admin/inquiries`
+- `/admin/customers`
+- `/admin/customers/[id]`
+- `/admin/finance`
+
+API liên quan:
+
+- `api/inquiry/route.ts`
+- `api/inquiry/draft/route.ts`
+- `api/contact/route.ts`
+
+### Điều cần giữ đúng trong docs
+
+- form public mặc định vào app qua API + Prisma + admin
+- không mô tả Google Sheet là nguồn chuẩn
+- B2B và retail đang dùng chung nền dữ liệu, chỉ khác loại intent/workflow
+
+---
+
+## Mô-đun 5: Content, journal và site customizer
+
+### Mục tiêu
+
+Cho đội ngũ chỉnh website public mà không phải đụng code cho mọi thay đổi nhỏ.
+
+### Trạng thái hiện tại
+
+Schema/content:
+
+- `Post`
+- `ThemeSetting`
+- `Review`
+- `Promotion`
+- `Notification`
+- `Stockist`
+
+Admin/content surfaces:
+
+- `/admin/website/blogs`
+- `/admin/website/navigation`
+- `/admin/website/pages`
+- `/admin/website/theme`
+- `/admin/customize`
+
+Tệp lõi:
+
+- `src/config/site-schema.ts`
+- `src/lib/site-config.ts`
+- `src/lib/site-config-validate.ts`
+
+Section đang được quản trị qua customizer gồm:
+
+- header
+- hero
+- campaign
+- products
+- story
+- trust_badges
+- faq
+- contact
+- footer
+- social
+- seo
+- analytics
+- homepage
+- our_values
+- partners_meta
+- payment_info
+- navigation
+- community_stories
+
+Taxonomy bài viết đã chốt cho khu `HÀNH TRÌNH` / `/journal`:
+
+- `Người-Nối`
+  - chú giải: `Chân dung những người thầm lặng gìn giữ sự gắn kết.`
+- `Câu chuyện Cốc Nối`
+- `Kiến thức & Cảm hứng`
+
+Ghi chú triển khai hiện tại:
+
+- UI/admin/public copy dùng bộ tên ở trên
+- giá trị nội bộ đang lưu trong DB vẫn là các mã legacy:
+  - `UNSUNG_HEROES`
+  - `JOURNEY`
+  - `KNOWLEDGE`
+- khi nào cần migrate sang slug/value mới ở tầng dữ liệu thì làm thành một thay đổi riêng, không gộp lẫn với đổi nhãn hiển thị
+
+### Điều cần giữ đúng trong docs
+
+- homepage hiện là section-based, không xem như landing page hard-code cố định
+- navigation và footer là dữ liệu có thể quản trị
+- journal/blog là CMS nội bộ thật, không phải placeholder
+
+---
+
+## Mô-đun 6: Hạ tầng, deploy và media
+
+### Mục tiêu
+
+Giữ app chạy ổn trên mô hình deploy gọn nhẹ, phù hợp giai đoạn hiện tại.
+
+### Trạng thái hiện tại
+
+- app framework: Next.js App Router
+- ORM: Prisma
+- database: PostgreSQL
+- media upload: Cloudinary
+- deploy docs hiện có:
+  - `docs/deployment-vercel-hobby.md`
+  - `docs/dev-db-setup.md`
+
+### Điều cần giữ đúng trong docs
+
+- không ghi lại giả định SQLite như setup chuẩn hiện tại
+- không mô tả upload local filesystem như chiến lược production chính
+- mọi ghi chú về env cần khớp với `README.md` và source đang dùng
+
+---
+
+## 7. Quy tắc cập nhật tài liệu khi web đổi
+
+Khi có thay đổi ở một trong các nhóm sau:
+
+- route public hoặc redirects
+- DB provider hoặc model chính
+- env toggle ảnh hưởng storefront
+- form flow public
+- customizer schema
+- admin surface mới
+
+thì phải kiểm tra đồng bộ ít nhất 6 file:
+
+1. `../_README.md`
+2. `../site-architecture.md`
+3. `README.md`
+4. `docs/cocnoi-web-structure.md`
+5. `docs/web-modules-spec.md`
+6. `AGENTS.md`
+
+Sau khi sửa, chạy:
+
+```bash
+npm run docs:check
+```
+
+Script này dùng để bắt các dấu hiệu drift phổ biến trong tài liệu web.

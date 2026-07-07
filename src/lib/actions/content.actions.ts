@@ -19,6 +19,7 @@ export async function createPost(data: z.infer<typeof CreatePostSchema>) {
 
     revalidatePath('/admin/website/blogs');
     revalidatePath('/journal');
+    revalidatePath('/community/nguoi-noi');
     return { success: true, data: post };
   } catch (error: any) {
     console.error('Lỗi khi tạo bài viết blog:', error);
@@ -36,6 +37,7 @@ export async function updatePost(id: string, data: z.infer<typeof UpdatePostSche
     revalidatePath('/admin/website/blogs');
     revalidatePath('/journal');
     revalidatePath(`/journal/${post.slug}`);
+    revalidatePath('/community/nguoi-noi');
     return { success: true, data: post };
   } catch (error: any) {
     console.error('Lỗi khi cập nhật bài viết blog:', error);
@@ -51,6 +53,7 @@ export async function deletePost(id: string) {
 
     revalidatePath('/admin/website/blogs');
     revalidatePath('/journal');
+    revalidatePath('/community/nguoi-noi');
     return { success: true };
   } catch (error: any) {
     console.error('Lỗi khi xóa bài viết blog:', error);
@@ -93,6 +96,7 @@ export async function publishPost(id: string) {
     revalidatePath('/admin/website/blogs');
     revalidatePath('/journal');
     revalidatePath(`/journal/${post.slug}`);
+    revalidatePath('/community/nguoi-noi');
     return { success: true, data: post };
   } catch (error: any) {
     console.error('Lỗi khi xuất bản bài viết:', error);
@@ -109,6 +113,7 @@ export async function unpublishPost(id: string) {
     revalidatePath('/admin/website/blogs');
     revalidatePath('/journal');
     revalidatePath(`/journal/${post.slug}`);
+    revalidatePath('/community/nguoi-noi');
     return { success: true, data: post };
   } catch (error: any) {
     console.error('Lỗi khi hủy xuất bản bài viết:', error);

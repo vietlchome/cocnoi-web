@@ -7,6 +7,7 @@
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
+    "docs:check": "node scripts/check-doc-consistency.mjs",
     "postinstall": "prisma generate",
     "db:seed-finishes": "npx tsx prisma/seed-finishes.ts"
   },

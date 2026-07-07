@@ -1,97 +1,438 @@
 # Cấu trúc Source Code Website Cốc Nối
 
-Dựa trên quá trình kiểm tra thư mục mã nguồn tại `d:\CỐC NỐI\07_Website\cocnoi-web`, đây là cấu trúc hiện tại của dự án website đang được xây dựng (sử dụng Next.js và Prisma):
+> Ảnh chụp nhanh cấu trúc codebase `cocnoi-web` tại thời điểm 01/07/2026.
+>
+> Mục tiêu của file này là giúp đọc repo nhanh, nắm route groups, module chính và vị trí những phần quan trọng nhất.
 
-## Cấu trúc Tổng quan
+---
 
-Dự án được phát triển theo kiến trúc App Router của Next.js, kết hợp Prisma cho cơ sở dữ liệu.
+## 1. Tổng quan
+
+`cocnoi-web` là một ứng dụng Next.js App Router gom nhiều lớp trong cùng một codebase:
+
+- storefront public
+- admin dashboard
+- journal/blog CMS
+- site customizer
+- các API phục vụ inquiry, contact, search, upload, admin data
+
+Stack chính đang dùng:
+
+- Next.js 16
+- React 19
+- Tailwind CSS 4
+- Prisma ORM
+- PostgreSQL
+- Auth.js / NextAuth
+- Zustand
+- Cloudinary
+
+---
+
+## 2. Cấu trúc thư mục gốc
 
 ```text
 cocnoi-web/
-├── prisma/
-│   ├── dev.db              # SQLite Database cho môi trường dev
-│   ├── schema.prisma       # Định nghĩa model dữ liệu (Prisma schema)
-│   └── seed.js             # Script tạo dữ liệu mẫu ban đầu
-├── public/                 # Các tài nguyên tĩnh công khai (ảnh, svg, icon...)
-│   ├── uploads/            # Thư mục lưu trữ ảnh người dùng tải lên
-│   │   └── products/       # Ảnh riêng biệt cho từng sản phẩm
-│   └── ...                 # Các file SVG hệ thống (next.svg, vercel.svg...)
-├── src/
-│   ├── app/                # Chứa các Route và Layout chính (Next.js App Router)
-│   ├── components/         # Chứa các UI Component dùng chung (React components)
-│   └── lib/                # Chứa thư viện, cấu hình logic phụ (Prisma Client, utils...)
-├── .env                    # Biến môi trường
-├── package.json            # Quản lý các dependencies và scripts (npm/yarn)
-├── tsconfig.json           # Cấu hình TypeScript
-└── next.config.ts          # Cấu hình framework Next.js
+├── docs/                 # Tài liệu kỹ thuật, phase notes, deployment, DB setup
+├── prisma/               # Schema, migrations, seed scripts
+├── public/               # Tài nguyên tĩnh public
+├── scripts/              # Script hỗ trợ migration / backfill / kiểm thử
+├── src/                  # Mã nguồn ứng dụng
+├── AGENTS.md             # Hướng dẫn cộng tác trong repo
+├── next.config.ts        # Redirects + cấu hình Next
+├── package.json          # Scripts và dependencies
+└── README.md             # Điểm vào cho developer
 ```
+
+### Ghi chú
+
+- `docs/` chứa cả tài liệu hiện hành lẫn phase specs lịch sử.
+- `public/` có một số asset mặc định và thư mục `uploads/` legacy, nhưng production media upload hiện nên xem theo hướng Cloudinary/Vercel-friendly.
+- `prisma/` dùng PostgreSQL làm nguồn dữ liệu chính, không còn mô hình dev SQLite như một số tài liệu cũ.
 
 ---
 
-## Chi tiết Thư mục `src/app` (Kiến trúc Routes)
+## 3. `src/app` - Route tree
 
-Toàn bộ logic và các trang (pages) của website được cấu trúc trong `src/app`. Dự án sử dụng **Route Groups** để tách biệt phần quản trị (Admin) và giao diện người dùng (Store).
+Ứng dụng dùng App Router và chia 3 nhóm lớn:
+
+- `(store)` cho storefront
+- `(admin)` cho khu vực quản trị
+- `api` cho backend routes
 
 ```text
 src/app/
-├── favicon.ico
-├── globals.css                # Style chung toàn cục
-├── layout.tsx                 # Root layout bọc toàn bộ ứng dụng
-│
-├── (admin)/                   # [Route Group] Dành cho Quản trị viên
-│   ├── layout.tsx             # Layout riêng cho màn hình Admin
-│   └── admin/
-│       └── page.tsx           # Trang Dashboard quản trị chính
-│
-├── (store)/                   # [Route Group] Dành cho Giao diện Khách hàng
-│   ├── layout.tsx             # Layout riêng cho phần Store (chứa Header, Footer chung)
-│   ├── page.tsx               # Trang chủ (Home - /)
-│   ├── contact/
-│   │   └── page.tsx           # Trang Liên hệ (/contact)
-│   ├── discover/
-│   │   └── page.tsx           # Trang Khám phá (/discover)
-│   ├── journal/
-│   │   └── page.tsx           # Trang Hành trình/Blog (/journal)
-│   ├── nguoi-noi/
-│   │   └── page.tsx           # Trang Chiến dịch Người Nối (/nguoi-noi)
-│   ├── partners/
-│   │   └── page.tsx           # Trang Đối tác (/partners)
-│   └── shop/
-│       ├── page.tsx           # Trang Cửa hàng chính (/shop)
-│       └── [slug]/
-│           ├── page.tsx               # Route cho Chi tiết sản phẩm (/shop/[slug])
-│           └── ProductDetailClient.tsx # Client component hiển thị chi tiết sản phẩm
-│
-└── api/                       # API Routes (Backend chạy trên Next.js)
-    ├── admin/
-    │   ├── data/route.ts      # API lấy/cập nhật dữ liệu quản trị
-    │   ├── inquiries/route.ts # API quản lý yêu cầu đơn hàng
-    │   ├── posts/route.ts     # API quản lý bài viết/journal
-    │   ├── products/route.ts  # API quản lý sản phẩm
-    │   └── settings/route.ts  # API quản lý cấu hình chung
-    ├── contact/
-    │   └── route.ts           # API xử lý form liên hệ
-    ├── inquiry/
-    │   └── route.ts           # API xử lý form đặt hàng (inquiry) từ user
-    └── upload/
-    │   └── route.ts           # API xử lý việc tải lên file/hình ảnh
+├── (store)/
+├── (admin)/
+├── api/
+├── login/
+├── layout.tsx
+├── globals.css
+└── sitemap.ts
+```
+
+### 3.1. Storefront route group
+
+```text
+src/app/(store)/
+├── page.tsx                           # /
+├── cua-hang/
+│   ├── page.tsx                       # /cua-hang
+│   └── [slug]/
+│       ├── page.tsx                   # /cua-hang/[slug]
+│       └── ProductDetailClient.tsx
+├── discover/
+│   ├── page.tsx                       # /discover
+│   ├── our-story/page.tsx
+│   ├── our-human/page.tsx
+│   ├── our-craft/page.tsx
+│   └── our-values/page.tsx
+├── community/
+│   ├── nguoi-noi/page.tsx
+│   └── your-stories/page.tsx
+├── partners/
+│   ├── page.tsx
+│   ├── stockists/page.tsx
+│   ├── become-a-stockist/page.tsx
+│   └── corporate-gifting/page.tsx
+├── journal/
+│   ├── page.tsx
+│   └── [slug]/page.tsx
+├── contact/page.tsx
+├── faq/page.tsx
+├── privacy/page.tsx
+├── terms/page.tsx
+├── checkout/page.tsx
+├── don-hang/
+│   ├── page.tsx
+│   └── OrderTrackingClient.tsx
+├── about/page.tsx                     # legacy compatibility route
+├── layout.tsx
+├── loading.tsx
+└── error.tsx
+```
+
+### 3.2. Canonical public routes
+
+- `/`
+- `/cua-hang`
+- `/cua-hang/[slug]`
+- `/discover`
+- `/discover/our-story`
+- `/discover/our-human`
+- `/discover/our-craft`
+- `/discover/our-values`
+- `/community/nguoi-noi`
+- `/community/your-stories`
+- `/partners`
+- `/partners/stockists`
+- `/partners/become-a-stockist`
+- `/partners/corporate-gifting`
+- `/journal`
+- `/journal/[slug]`
+- `/contact`
+- `/faq`
+- `/privacy`
+- `/terms`
+- `/don-hang`
+- `/checkout` khi cart mode bật
+
+### 3.3. Redirects cần nhớ
+
+`next.config.ts` hiện redirect:
+
+- `/shop` -> `/cua-hang`
+- `/shop/:slug*` -> `/cua-hang/:slug*`
+- `/nguoi-noi` -> `/community/nguoi-noi`
+- `/community` -> `/community/nguoi-noi`
+- `/about` -> `/discover/our-story`
+
+### 3.4. Admin route group
+
+```text
+src/app/(admin)/admin/
+├── page.tsx
+├── analytics/page.tsx
+├── complaints/page.tsx
+├── customers/
+│   ├── page.tsx
+│   └── [id]/page.tsx
+├── customize/page.tsx
+├── finance/page.tsx
+├── inquiries/page.tsx
+├── orders/
+│   ├── retail/page.tsx
+│   └── b2b/page.tsx
+├── products/
+│   ├── page.tsx
+│   ├── create/page.tsx
+│   ├── [id]/page.tsx
+│   ├── bulk-upload/page.tsx
+│   ├── inventory/page.tsx
+│   ├── pricing/page.tsx
+│   ├── reviews/page.tsx
+│   └── settings/page.tsx
+├── promotions/page.tsx
+├── settings/
+│   ├── page.tsx
+│   ├── bank-account/page.tsx
+│   ├── export/page.tsx
+│   └── notifications/page.tsx
+├── website/
+│   ├── blogs/page.tsx
+│   ├── navigation/page.tsx
+│   ├── pages/page.tsx
+│   └── theme/page.tsx
+└── sandbox/
+    └── customize-preview/page.tsx
+```
+
+Admin là nơi gom nhiều chức năng vận hành:
+- catalog
+- inquiries
+- orders retail/B2B
+- customers/CRM
+- finance
+- promotions
+- content/blog
+- navigation/theme/site customizer
+
+### 3.5. API routes
+
+```text
+src/app/api/
+├── auth/[...nextauth]/route.ts
+├── contact/route.ts
+├── inquiry/
+│   ├── route.ts
+│   └── draft/route.ts
+├── search/route.ts
+├── site-config/route.ts
+└── admin/
+    ├── data/route.ts
+    ├── finishes/route.ts
+    ├── products/
+    │   ├── route.ts
+    │   ├── bulk-upload/route.ts
+    │   ├── bulk-commit/route.ts
+    │   └── bulk-template/route.ts
+    ├── settings/route.ts
+    └── upload/route.ts
 ```
 
 ---
 
-## Chi tiết Thư mục `src/components` (Kiến trúc UI)
-
-Thư mục này tổ chức các thành phần giao diện được chia sẻ và tái sử dụng qua nhiều trang.
+## 4. `src/components` - UI theo lớp chức năng
 
 ```text
 src/components/
 ├── admin/
-│   └── ImageCropUploader.tsx  # Component hỗ trợ upload và cắt ảnh (dành cho Admin)
 ├── shared/
-│   ├── Header.tsx             # Component Navigation Header (Store)
-│   └── Footer.tsx             # Component Footer (Store)
-└── ui/                        # Chứa các UI element cơ bản
+├── store/
+└── ui/
 ```
 
-## Ghi chú cập nhật (Dành cho AI & Developer)
-- **Lưu ý quan trọng**: File cấu trúc này cần được **cập nhật song song** mỗi khi có thay đổi (thêm file, đổi tên thư mục, thêm route mới) trong quá trình phát triển mã nguồn website.
+### `components/store`
+
+Chứa phần giao diện public đặc thù như:
+
+- `MegaMenu`, `MegaMenuMobile`
+- `CartDrawer`
+- `FloatingActions`
+- `PaymentInstructionsBlock`
+- `ReviewSection`, `ReviewList`
+- `StockistApplicationForm`, `CorporateGiftingForm`, `PartnerContactForm`
+- `HomepageSections/*` cho các section động của homepage
+
+### `components/shared`
+
+Các thành phần dùng chung giữa nhiều page:
+
+- `Header`
+- `HeaderClient`
+- `Footer`
+- `FooterNewsletterForm`
+- `SearchOverlay`
+- `FormErrorAlert`
+
+### `components/admin`
+
+Các client/admin surfaces lớn:
+
+- dashboard widgets
+- products / product form / bulk upload
+- orders / inquiries / customers
+- analytics / finance / promotions
+- content/blog editor
+- site customizer
+- settings / notifications / export / bank account
+
+### `components/ui`
+
+UI primitives và generic building blocks:
+
+- `Button`
+- `Modal`
+- `DataTable`
+- `ConfirmDialog`
+- `SearchInput`
+- `Tabs`
+- `StatusBadge`
+
+---
+
+## 5. `src/lib` và `src/config` - logic ứng dụng
+
+### `src/lib/actions`
+
+Server-side actions để gom thao tác nghiệp vụ theo module:
+
+- analytics
+- auth
+- content
+- customer
+- export
+- finish
+- inquiry
+- order
+- product
+- promotion
+- review
+- search
+- settings
+
+### `src/lib/services`
+
+Lớp service truy vấn và xử lý domain:
+
+- `product.service.ts`
+- `order.service.ts`
+- `inquiry.service.ts`
+- `customer.service.ts`
+- `content.service.ts`
+- `analytics.service.ts`
+- `finance.service.ts`
+- `inventory.service.ts`
+- `search.service.ts`
+- `settings.service.ts`
+
+### `src/lib/validators`
+
+Schema validate bằng Zod cho:
+
+- product
+- order
+- inquiry
+- customer
+- content
+- review
+
+### `src/lib/utils`
+
+Utility cho:
+
+- format
+- slug
+- phone
+- rate limit
+- telegram
+- video handling
+- error messages
+
+### Các file lõi khác
+
+- `src/lib/prisma.ts`: Prisma client bootstrap
+- `src/lib/site-config.ts`: đọc/ghi cấu hình site
+- `src/lib/site-config-validate.ts`: validate dữ liệu customizer
+- `src/lib/auth-helpers.ts`: helper auth
+- `src/lib/constants.ts`: constant app-level
+
+### `src/config/site-schema.ts`
+
+Đây là schema trung tâm của site customizer, mô tả các section và field đang có thể quản trị trong admin, ví dụ:
+
+- header
+- hero
+- campaign
+- products
+- story
+- trust_badges
+- faq
+- footer
+- social
+- seo
+- analytics
+- homepage
+- our_values
+- partners_meta
+- payment_info
+- navigation
+- community_stories
+
+---
+
+## 6. `prisma/` - dữ liệu và migrations
+
+```text
+prisma/
+├── schema.prisma
+├── seed.js
+├── seed-finishes.ts
+├── seed-reviews.ts
+└── migrations/
+```
+
+### Những nhóm model chính trong schema hiện tại
+
+- Auth: `User`, `Account`, `Session`, `VerificationToken`
+- Catalog/PIM: `Category`, `ProductGroup`, `ColorOption`, `SizeOption`, `FinishOption`, `Product`
+- Orders/Inquiries: `Order`, `OrderItem`, `OrderInquiry`
+- CRM: `Customer`, `CustomerNote`
+- Content & Theme: `Post`, `ThemeSetting`, `Review`
+- Commercial ops: `Promotion`, `Notification`, `Stockist`
+
+### Ghi chú
+
+- DB provider hiện tại là PostgreSQL.
+- Đã có migration history trong `prisma/migrations/`.
+- Không dùng file `dev.db` SQLite như mô tả ở tài liệu cũ.
+
+---
+
+## 7. `scripts/` - công cụ hỗ trợ
+
+Một số script nổi bật:
+
+- `migrate-settings-to-sections.ts`
+- `migrate-images-to-cloudinary.ts`
+- `backfill-inquiry-types.ts`
+- `download-pages.ts`
+- `compare-html.ts`
+- `read-posts.ts`
+- `test-site-config.ts`
+
+Nhóm này phục vụ migration dữ liệu, import/export, backfill và test nhanh.
+
+---
+
+## 8. Runtime notes quan trọng
+
+- Route storefront chuẩn là `/cua-hang`, không phải `/shop`.
+- Chế độ cart phụ thuộc `NEXT_PUBLIC_ENABLE_CART`.
+- `NEXT_PUBLIC_SITE_URL` ảnh hưởng sitemap và canonical URL.
+- Upload media admin đang đi theo hướng Cloudinary.
+- Storefront, admin và CMS nằm chung app; thay đổi dữ liệu thường có tác động chéo giữa catalog, inquiry, content và customizer.
+
+---
+
+## 9. Khi nào cần cập nhật file này
+
+Hãy sửa file này khi có một trong các thay đổi sau:
+
+- thêm/bớt route public hoặc admin
+- đổi route canonical
+- thêm API route mới
+- đổi vị trí module trong `src/components`, `src/lib`, `src/config`
+- thay đổi đáng kể schema Prisma
+
+Nếu chỉ đổi copy hoặc layout intent của website, ưu tiên cập nhật `../site-architecture.md` trước.
