@@ -197,6 +197,7 @@ export const SiteConfigSchema = z.object({
       desc: textValidator,
       tag: textValidator,
       initial: textValidator,
+      image: imageValidator.optional().default(""),
     })),
     memberBadge: textValidator,
     ctaHeading: textValidator,

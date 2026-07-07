@@ -16,6 +16,7 @@ const DEFAULT_MEMBERS = [
     desc: "Người giữ ấm nhiệt độ nung Bát Tràng. Bác Minh điều tiết ngọn lửa bằng trực giác và kinh nghiệm tích lũy lâu năm, giúp lớp men tro chín ngọt đồng đều.",
     tag: "Trưởng thợ lò",
     initial: "M",
+    image: "",
   },
   {
     name: "Chị Nguyễn Thị Hương",
@@ -23,6 +24,7 @@ const DEFAULT_MEMBERS = [
     desc: "Với đôi bàn tay bền bỉ và sự nhạy bén nghệ thuật, chị Hương đã định hình hàng vạn chiếc cốc. Mỗi sản phẩm đều có sự cân đối hoàn mỹ nhưng vẫn giữ lại vết hằn tay mộc mạc.",
     tag: "Nghệ nhân tạo hình",
     initial: "H",
+    image: "",
   },
   {
     name: "Chị Lâm Mỹ Duyên",
@@ -30,6 +32,7 @@ const DEFAULT_MEMBERS = [
     desc: "Chăm chút từng nét vẽ thanh tao trên chất liệu gốm mộc chưa nung. Đôi tay khéo léo của chị Duyên thổi hồn vào đất sét những nét hoa cỏ tự nhiên.",
     tag: "Nghệ nhân họa tiết",
     initial: "D",
+    image: "",
   },
   {
     name: "Anh Trần Chí Tâm",
@@ -37,6 +40,7 @@ const DEFAULT_MEMBERS = [
     desc: "Chuyên gia chế tạo và phối men tro từ vỏ trấu và gỗ cây tự nhiên. Kỹ thuật tráng dội khéo léo của anh Tâm đảm bảo lớp men chín đều, lên màu mộc mạc đặc trưng.",
     tag: "Thợ tráng men",
     initial: "T",
+    image: "",
   },
 ];
 
@@ -83,10 +87,14 @@ export default async function OurHumanPage() {
               {/* Clay avatar frame */}
               <div className="sm:col-span-4 relative aspect-square bg-[#EFE9DF] rounded-3 border border-border flex items-center justify-center p-6 overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#C2703E_1px,transparent_1px)] [background-size:12px_12px] opacity-15"></div>
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-canvas text-sm font-playfair font-bold group-hover:scale-105 transition-transform duration-300" style={{ backgroundColor: "var(--color-deep-indigo)" }}>
-                  {art.initial}
-                </div>
-                <span className="absolute bottom-2 left-2 right-2 text-center bg-accent text-canvas font-bvp text-[8px] font-bold py-0.5 rounded-1 uppercase tracking-wider" style={{ backgroundColor: "var(--color-terracotta)" }}>
+                {art.image ? (
+                  <img src={art.image} alt={art.name} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-canvas text-sm font-playfair font-bold group-hover:scale-105 transition-transform duration-300" style={{ backgroundColor: "var(--color-deep-indigo)" }}>
+                    {art.initial}
+                  </div>
+                )}
+                <span className="absolute bottom-2 left-2 right-2 text-center bg-accent text-canvas font-bvp text-[8px] font-bold py-0.5 rounded-1 uppercase tracking-wider z-10" style={{ backgroundColor: "var(--color-terracotta)" }}>
                   {art.tag}
                 </span>
               </div>
