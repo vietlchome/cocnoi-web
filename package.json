@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "db:seed-finishes": "npx tsx prisma/seed-finishes.ts"
+    "db:seed-finishes": "npx tsx prisma/seed-finishes.ts",
+    "db:seed-legal": "npx tsx prisma/seed-legal-pages.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
