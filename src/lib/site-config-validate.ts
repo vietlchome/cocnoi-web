@@ -185,6 +185,23 @@ export const SiteConfigSchema = z.object({
       href: urlValidator,
     })),
   }).optional(),
+  discover_human: z.object({
+    eyebrow: textValidator,
+    title: textValidator,
+    subtitle: textValidator,
+    members: z.array(z.object({
+      name: textValidator,
+      role: textValidator,
+      desc: textValidator,
+      tag: textValidator,
+      initial: textValidator,
+    })),
+    memberBadge: textValidator,
+    ctaHeading: textValidator,
+    ctaText: textValidator,
+    ctaButtonText: textValidator,
+    ctaButtonHref: urlValidator,
+  }).optional(),
   partners_meta: z.object({
     stockistMinOrder: textValidator,
     stockistDiscount: textValidator,

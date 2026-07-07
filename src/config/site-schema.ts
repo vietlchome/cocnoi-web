@@ -581,6 +581,60 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       },
     }
   },
+  discover_human: {
+    label: "Trang Con người (/discover/our-human)",
+    fields: {
+      eyebrow:       { type: "text",     label: "Chữ nhỏ trên tiêu đề",    default: "Our Human" },
+      title:         { type: "text",     label: "Tiêu đề chính",            default: "Những đôi tay làm nên Cốc Nối" },
+      subtitle:      { type: "textarea", label: "Câu mô tả hero",           default: "Mỗi đôi cốc đi qua nhiều đôi tay. Đây là những con người dệt nên Cốc Nối, từ đất sét thô sơ đến bàn tay nâng niu của bạn." },
+      members: {
+        type: "repeatable",
+        label: "Danh sách nghệ nhân",
+        default: [
+          {
+            name: "Nghệ nhân Lê Minh",
+            role: "Trực giác ngọn lửa lò (32 năm kinh nghiệm)",
+            desc: "Người giữ ấm nhiệt độ nung Bát Tràng. Bác Minh điều tiết ngọn lửa bằng trực giác và kinh nghiệm tích lũy lâu năm, giúp lớp men tro chín ngọt đồng đều.",
+            tag: "Trưởng thợ lò",
+            initial: "M",
+          },
+          {
+            name: "Chị Nguyễn Thị Hương",
+            role: "Xoay tay vuốt mộc độc bản (18 năm kinh nghiệm)",
+            desc: "Với đôi bàn tay bền bỉ và sự nhạy bén nghệ thuật, chị Hương đã định hình hàng vạn chiếc cốc. Mỗi sản phẩm đều có sự cân đối hoàn mỹ nhưng vẫn giữ lại vết hằn tay mộc mạc.",
+            tag: "Nghệ nhân tạo hình",
+            initial: "H",
+          },
+          {
+            name: "Chị Lâm Mỹ Duyên",
+            role: "Họa nét cọ hoa văn mộc (12 năm kinh nghiệm)",
+            desc: "Chăm chút từng nét vẽ thanh tao trên chất liệu gốm mộc chưa nung. Đôi tay khéo léo của chị Duyên thổi hồn vào đất sét những nét hoa cỏ tự nhiên.",
+            tag: "Nghệ nhân họa tiết",
+            initial: "D",
+          },
+          {
+            name: "Anh Trần Chí Tâm",
+            role: "Phủ men tro tự nhiên (15 năm kinh nghiệm)",
+            desc: "Chuyên gia chế tạo và phối men tro từ vỏ trấu và gỗ cây tự nhiên. Kỹ thuật tráng dội khéo léo của anh Tâm đảm bảo lớp men chín đều, lên màu mộc mạc đặc trưng.",
+            tag: "Thợ tráng men",
+            initial: "T",
+          },
+        ],
+        itemSchema: {
+          name:    { type: "text",     label: "Tên nghệ nhân",          default: "" },
+          role:    { type: "text",     label: "Vai trò / kinh nghiệm",  default: "" },
+          desc:    { type: "textarea", label: "Mô tả",                  default: "" },
+          tag:     { type: "text",     label: "Badge vai trò",           default: "" },
+          initial: { type: "text",     label: "Chữ cái avatar",          default: "" },
+        },
+      },
+      memberBadge:   { type: "text",     label: "Dòng dưới thẻ nghệ nhân", default: "Nghệ nhân Bát Tràng truyền thống" },
+      ctaHeading:    { type: "text",     label: "CTA - tiêu đề",            default: "Đồng hành cùng Cốc Nối" },
+      ctaText:       { type: "textarea", label: "CTA - đoạn văn",           default: "Chúng tôi luôn tìm kiếm những cửa hàng kí gửi, đối tác phân phối và các doanh nghiệp muốn chia sẻ câu chuyện gốm thủ công ý nghĩa đến khách hàng." },
+      ctaButtonText: { type: "text",     label: "CTA - nhãn nút",           default: "Tìm hiểu cơ hội hợp tác" },
+      ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",          default: "/partners" },
+    }
+  },
   partners_meta: {
     label: "Thông tin Đối Tác (Partners pages)",
     fields: {
