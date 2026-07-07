@@ -8,7 +8,7 @@ import type { SiteConfig } from "@/lib/site-config-validate";
 import {
   Save, Eye, Loader2, Layout, Image as ImageIcon,
   Sparkles, LayoutGrid, MessageSquare, HelpCircle, Share2, Paintbrush,
-  Phone, CreditCard, Users, Heart, BarChart3, Home, BookOpen,
+  Phone, CreditCard, Users, Heart, BarChart3, Home, BookOpen, Compass, Hammer,
 } from "lucide-react";
 
 const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
@@ -27,6 +27,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
   homepage: Home,
   our_values: Heart,
   discover_story: BookOpen,
+  discover_index: Compass,
   partners_meta: Users,
   payment_info: CreditCard,
   community_stories: MessageSquare,
@@ -37,7 +38,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
 const SECTION_GROUPS: { label: string; keys: string[] }[] = [
   { label: "Tổng quát", keys: ["header", "footer", "social", "contact"] },
   { label: "Trang chủ", keys: ["homepage", "hero", "campaign", "products", "story", "trust_badges", "faq"] },
-  { label: "Trang nội dung khác", keys: ["our_values", "discover_story", "partners_meta", "payment_info", "community_stories"] },
+  { label: "Trang nội dung khác", keys: ["our_values", "discover_story", "discover_index", "partners_meta", "payment_info", "community_stories"] },
   { label: "SEO & Tracking", keys: ["seo", "analytics"] },
 ];
 

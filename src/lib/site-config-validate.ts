@@ -174,6 +174,17 @@ export const SiteConfigSchema = z.object({
     ctaButtonText: textValidator,
     ctaButtonHref: urlValidator,
   }).optional(),
+  discover_index: z.object({
+    eyebrow: textValidator,
+    title: textValidator,
+    subtitle: textValidator,
+    cards: z.array(z.object({
+      en: textValidator,
+      title: textValidator,
+      desc: textValidator,
+      href: urlValidator,
+    })),
+  }).optional(),
   partners_meta: z.object({
     stockistMinOrder: textValidator,
     stockistDiscount: textValidator,

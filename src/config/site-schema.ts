@@ -557,6 +557,30 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",             default: "/discover/our-values" },
     }
   },
+  discover_index: {
+    label: "Trang Khám phá (/discover)",
+    fields: {
+      eyebrow:  { type: "text",     label: "Chữ nhỏ trên tiêu đề", default: "Khám Phá" },
+      title:    { type: "text",     label: "Tiêu đề",               default: "Khám phá Cốc Nối" },
+      subtitle: { type: "textarea", label: "Câu mô tả",             default: "Câu chuyện, con người, quy trình, và giá trị làm nên thương hiệu." },
+      cards: {
+        type: "repeatable",
+        label: "Các card khám phá",
+        default: [
+          { en: "Our Story",  title: "Câu chuyện",          desc: "Khởi nguồn từ Bát Tràng, ý nghĩa cái tên, lý do là đôi cốc.",      href: "/discover/our-story"  },
+          { en: "Our Human",  title: "Con người",            desc: "Những đôi tay làm nên Cốc Nối. Nghệ nhân, đối tác, founders.",     href: "/discover/our-human"  },
+          { en: "Our Craft",  title: "Quy trình thủ công",  desc: "7 bước từ đất đến cốc. Vì sao chúng tôi chọn làm thủ công.",       href: "/discover/our-craft"  },
+          { en: "Our Values", title: "Giá trị",              desc: "4 pillar: KẾT NỐI, CHÂN THÀNH, CHỈN CHU, CỞI MỞ.",                href: "/discover/our-values" },
+        ],
+        itemSchema: {
+          en:    { type: "text",     label: "Tên tiếng Anh (eyebrow)",  default: "" },
+          title: { type: "text",     label: "Tiêu đề card",              default: "" },
+          desc:  { type: "textarea", label: "Mô tả card",                default: "" },
+          href:  { type: "url",      label: "Đường dẫn",                 default: "/" },
+        },
+      },
+    }
+  },
   partners_meta: {
     label: "Thông tin Đối Tác (Partners pages)",
     fields: {
