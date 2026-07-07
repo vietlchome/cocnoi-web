@@ -202,6 +202,22 @@ export const SiteConfigSchema = z.object({
     ctaButtonText: textValidator,
     ctaButtonHref: urlValidator,
   }).optional(),
+  discover_craft: z.object({
+    eyebrow: textValidator,
+    title: textValidator,
+    subtitle: textValidator,
+    steps: z.array(z.object({
+      num: textValidator,
+      title: textValidator,
+      desc: textValidator,
+    })),
+    closingHeading: textValidator,
+    closingText: textValidator,
+    primaryButtonText: textValidator,
+    primaryButtonHref: urlValidator,
+    secondaryButtonText: textValidator,
+    secondaryButtonHref: urlValidator,
+  }).optional(),
   partners_meta: z.object({
     stockistMinOrder: textValidator,
     stockistDiscount: textValidator,

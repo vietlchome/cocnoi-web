@@ -635,6 +635,38 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",          default: "/partners" },
     }
   },
+  discover_craft: {
+    label: "Trang Quy trình (/discover/our-craft)",
+    fields: {
+      eyebrow:           { type: "text",     label: "Chữ nhỏ trên tiêu đề",  default: "Our Craft" },
+      title:             { type: "text",     label: "Tiêu đề chính",          default: "Quy trình thủ công, từ đất đến cốc" },
+      subtitle:          { type: "textarea", label: "Câu mô tả hero",         default: "Mỗi mẻ cốc cần trung bình 7-10 ngày thực hiện nghiêm ngặt qua bàn tay điêu luyện của các nghệ nhân gia đình Bát Tràng." },
+      steps: {
+        type: "repeatable",
+        label: "Các bước quy trình",
+        default: [
+          { num: "01", title: "Chuẩn bị nguyên liệu & khuôn",  desc: "Đất sét cao lanh tinh khiết được chọn lọc kỹ lưỡng, trộn phối màu theo yêu cầu và tạo khuôn riêng biệt (khuôn in dáng tròn hoặc khuôn rót tạo hình đặc biệt)." },
+          { num: "02", title: "Tạo hình sản phẩm",               desc: "Đất được đặt vào máy ép khuôn hoặc rót đất lỏng vào khuôn đổ. Quá trình này đòi hỏi sự đồng đều để đảm bảo độ dày mỏng của xương gốm đạt chuẩn." },
+          { num: "03", title: "Vệ sinh sản phẩm thô",            desc: "Sau khi dỡ khuôn, người thợ gốm tỉ mỉ gọt giũa phần ba-via thừa và dùng mút ẩm làm nhẵn mịn từng góc cạnh để chuẩn bị cho các khâu nhiệt độ." },
+          { num: "04", title: "Sấy khô & Sơ nung",              desc: "Sản phẩm được sấy khô tự nhiên rồi xếp vào lò nung sơ bộ ở nhiệt độ khoảng 700 độ C. Đây là khâu nền tảng giúp xương gốm cứng cáp, không bị nứt vỡ." },
+          { num: "05", title: "Họa tiết & Phủ men",              desc: "Nghệ nhân dùng cọ mảnh vẽ tay từng nét họa tiết trơn phác, dán chìm nhãn thương hiệu, sau đó nhúng cốc vào lớp men tro Bát Tràng truyền thống đặc trưng." },
+          { num: "06", title: "Nung chín lò bầu",                desc: "Cốc được đưa vào lò nung ở nhiệt độ từ 1150 đến 1200 độ C trong 15-18 tiếng liên tục. Nhiệt độ cao giúp xương đất hóa đá và men tro chảy chín ngọt." },
+          { num: "07", title: "Kiểm tra & Đóng gói",             desc: "Từng chiếc cốc ra lò đều được gõ thử âm thanh, kiểm tra độ đanh thép của men và đóng gói chỉn chu trong hộp giấy tái chế thân thiện." },
+        ],
+        itemSchema: {
+          num:   { type: "text",     label: "Số thứ tự (vd 01)",  default: "" },
+          title: { type: "text",     label: "Tên bước",            default: "" },
+          desc:  { type: "textarea", label: "Mô tả bước",          default: "" },
+        },
+      },
+      closingHeading:      { type: "text",     label: "Tiêu đề closing",       default: "Vì sao chúng tôi chọn làm thủ công?" },
+      closingText:         { type: "textarea", label: "Đoạn văn closing",      default: "Giữa thế giới công nghiệp hóa đồng đều, chúng tôi chọn giữ lại những nét hằn tay mộc mạc và sự biến thiên màu sắc tự nhiên của từng mẻ nung lò. Những khiếm khuyết nhỏ chính là nét độc bản làm nên hồn của gốm thủ công Cốc Nối. Chúng tôi muốn mỗi chiếc cốc khi cầm trên tay đều mang một câu chuyện chân thật, kết nối cảm xúc trọn vẹn của bạn với những người xung quanh." },
+      primaryButtonText:   { type: "text",     label: "Nút chính - nhãn",      default: "Mua sắm ngay" },
+      primaryButtonHref:   { type: "url",      label: "Nút chính - link",      default: "/cua-hang" },
+      secondaryButtonText: { type: "text",     label: "Nút phụ - nhãn",        default: "Xem 4 Brand Pillar" },
+      secondaryButtonHref: { type: "url",      label: "Nút phụ - link",        default: "/discover/our-values" },
+    }
+  },
   partners_meta: {
     label: "Thông tin Đối Tác (Partners pages)",
     fields: {
