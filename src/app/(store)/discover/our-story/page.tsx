@@ -28,7 +28,9 @@ export default async function OurStoryPage() {
   const ctaEyebrow    = s?.ctaEyebrow    || "Tiếp tục tìm hiểu";
   const ctaHeading    = s?.ctaHeading    || "Bốn trụ cột định hình thương hiệu";
   const ctaButtonText = s?.ctaButtonText || "Khám phá 4 Brand Pillar";
-  const ctaButtonHref = s?.ctaButtonHref || "/discover/our-values";
+  const ctaButtonHref  = s?.ctaButtonHref  || "/discover/our-values";
+  const featureImage   = s?.featureImage   || "";
+  const featureImageAlt = s?.featureImageAlt || s?.title || "";
 
   return (
     <main className="w-full bg-canvas text-primary">
@@ -47,6 +49,20 @@ export default async function OurStoryPage() {
           </p>
         </div>
       </section>
+
+      {/* Feature image - only rendered when URL is set */}
+      {featureImage && (
+        <div className="max-w-3xl mx-auto px-4 md:px-8 -mt-6 md:-mt-10">
+          <div className="overflow-hidden rounded-4 border border-border/60 aspect-[16/9]">
+            <img
+              src={featureImage}
+              alt={featureImageAlt}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Story body */}
       <section className="py-20 md:py-24">

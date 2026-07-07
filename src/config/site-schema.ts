@@ -553,8 +553,124 @@ export const SITE_SCHEMA: Record<string, SectionSchema> = {
       quoteCite:     { type: "text",     label: "Câu trích dẫn (EN)",           default: "Crafted bonds. Connected souls." },
       ctaEyebrow:    { type: "text",     label: "CTA - chữ nhỏ",               default: "Tiếp tục tìm hiểu" },
       ctaHeading:    { type: "text",     label: "CTA - tiêu đề",               default: "Bốn trụ cột định hình thương hiệu" },
-      ctaButtonText: { type: "text",     label: "CTA - nhãn nút",              default: "Khám phá 4 Brand Pillar" },
-      ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",             default: "/discover/our-values" },
+      ctaButtonText:   { type: "text",  label: "CTA - nhãn nút",                              default: "Khám phá 4 Brand Pillar" },
+      ctaButtonHref:   { type: "url",   label: "CTA - đường dẫn",                             default: "/discover/our-values" },
+      featureImage:    { type: "image", label: "Ảnh feature (giữa tiêu đề và nội dung)",       default: "", aspectRatio: 16/9, folder: "discover", helpText: "Tỷ lệ 16:9. Chỉ hiển thị khi có ảnh." },
+      featureImageAlt: { type: "text",  label: "Mô tả ảnh feature (alt)",                      default: "" },
+    }
+  },
+  discover_index: {
+    label: "Trang Khám phá (/discover)",
+    fields: {
+      eyebrow:  { type: "text",     label: "Chữ nhỏ trên tiêu đề", default: "Khám Phá" },
+      title:    { type: "text",     label: "Tiêu đề",               default: "Khám phá Cốc Nối" },
+      subtitle: { type: "textarea", label: "Câu mô tả",             default: "Câu chuyện, con người, quy trình, và giá trị làm nên thương hiệu." },
+      cards: {
+        type: "repeatable",
+        label: "Các card khám phá",
+        default: [
+          { en: "Our Story",  title: "Câu chuyện",          desc: "Khởi nguồn từ Bát Tràng, ý nghĩa cái tên, lý do là đôi cốc.",      href: "/discover/our-story"  },
+          { en: "Our Human",  title: "Con người",            desc: "Những đôi tay làm nên Cốc Nối. Nghệ nhân, đối tác, founders.",     href: "/discover/our-human"  },
+          { en: "Our Craft",  title: "Quy trình thủ công",  desc: "7 bước từ đất đến cốc. Vì sao chúng tôi chọn làm thủ công.",       href: "/discover/our-craft"  },
+          { en: "Our Values", title: "Giá trị",              desc: "4 pillar: KẾT NỐI, CHÂN THÀNH, CHỈN CHU, CỞI MỞ.",                href: "/discover/our-values" },
+        ],
+        itemSchema: {
+          en:    { type: "text",     label: "Tên tiếng Anh (eyebrow)",  default: "" },
+          title: { type: "text",     label: "Tiêu đề card",              default: "" },
+          desc:  { type: "textarea", label: "Mô tả card",                default: "" },
+          href:  { type: "url",      label: "Đường dẫn",                 default: "/" },
+          image: { type: "image",    label: "Ảnh thumbnail card (tùy chọn)", default: "", aspectRatio: 16/9, folder: "discover", helpText: "16:9. Hiển thị phía trên eyebrow khi có URL." },
+        },
+      },
+    }
+  },
+  discover_human: {
+    label: "Trang Con người (/discover/our-human)",
+    fields: {
+      eyebrow:       { type: "text",     label: "Chữ nhỏ trên tiêu đề",    default: "Our Human" },
+      title:         { type: "text",     label: "Tiêu đề chính",            default: "Những đôi tay làm nên Cốc Nối" },
+      subtitle:      { type: "textarea", label: "Câu mô tả hero",           default: "Mỗi đôi cốc đi qua nhiều đôi tay. Đây là những con người dệt nên Cốc Nối, từ đất sét thô sơ đến bàn tay nâng niu của bạn." },
+      members: {
+        type: "repeatable",
+        label: "Danh sách nghệ nhân",
+        default: [
+          {
+            name: "Nghệ nhân Lê Minh",
+            role: "Trực giác ngọn lửa lò (32 năm kinh nghiệm)",
+            desc: "Người giữ ấm nhiệt độ nung Bát Tràng. Bác Minh điều tiết ngọn lửa bằng trực giác và kinh nghiệm tích lũy lâu năm, giúp lớp men tro chín ngọt đồng đều.",
+            tag: "Trưởng thợ lò",
+            initial: "M",
+          },
+          {
+            name: "Chị Nguyễn Thị Hương",
+            role: "Xoay tay vuốt mộc độc bản (18 năm kinh nghiệm)",
+            desc: "Với đôi bàn tay bền bỉ và sự nhạy bén nghệ thuật, chị Hương đã định hình hàng vạn chiếc cốc. Mỗi sản phẩm đều có sự cân đối hoàn mỹ nhưng vẫn giữ lại vết hằn tay mộc mạc.",
+            tag: "Nghệ nhân tạo hình",
+            initial: "H",
+          },
+          {
+            name: "Chị Lâm Mỹ Duyên",
+            role: "Họa nét cọ hoa văn mộc (12 năm kinh nghiệm)",
+            desc: "Chăm chút từng nét vẽ thanh tao trên chất liệu gốm mộc chưa nung. Đôi tay khéo léo của chị Duyên thổi hồn vào đất sét những nét hoa cỏ tự nhiên.",
+            tag: "Nghệ nhân họa tiết",
+            initial: "D",
+          },
+          {
+            name: "Anh Trần Chí Tâm",
+            role: "Phủ men tro tự nhiên (15 năm kinh nghiệm)",
+            desc: "Chuyên gia chế tạo và phối men tro từ vỏ trấu và gỗ cây tự nhiên. Kỹ thuật tráng dội khéo léo của anh Tâm đảm bảo lớp men chín đều, lên màu mộc mạc đặc trưng.",
+            tag: "Thợ tráng men",
+            initial: "T",
+          },
+        ],
+        itemSchema: {
+          name:    { type: "text",     label: "Tên nghệ nhân",                                      default: "" },
+          role:    { type: "text",     label: "Vai trò / kinh nghiệm",                              default: "" },
+          desc:    { type: "textarea", label: "Mô tả",                                              default: "" },
+          tag:     { type: "text",     label: "Badge vai trò",                                      default: "" },
+          initial: { type: "text",     label: "Chữ cái avatar (hiện khi chưa có ảnh)",              default: "" },
+          image:   { type: "image",    label: "Ảnh nghệ nhân (thay avatar khi có)",                 default: "", aspectRatio: 1, folder: "discover/human", helpText: "Vuông 1:1. Khi có ảnh sẽ phủ kín khung avatar." },
+        },
+      },
+      memberBadge:   { type: "text",     label: "Dòng dưới thẻ nghệ nhân", default: "Nghệ nhân Bát Tràng truyền thống" },
+      ctaHeading:    { type: "text",     label: "CTA - tiêu đề",            default: "Đồng hành cùng Cốc Nối" },
+      ctaText:       { type: "textarea", label: "CTA - đoạn văn",           default: "Chúng tôi luôn tìm kiếm những cửa hàng kí gửi, đối tác phân phối và các doanh nghiệp muốn chia sẻ câu chuyện gốm thủ công ý nghĩa đến khách hàng." },
+      ctaButtonText: { type: "text",     label: "CTA - nhãn nút",           default: "Tìm hiểu cơ hội hợp tác" },
+      ctaButtonHref: { type: "url",      label: "CTA - đường dẫn",          default: "/partners" },
+    }
+  },
+  discover_craft: {
+    label: "Trang Quy trình (/discover/our-craft)",
+    fields: {
+      eyebrow:           { type: "text",     label: "Chữ nhỏ trên tiêu đề",  default: "Our Craft" },
+      title:             { type: "text",     label: "Tiêu đề chính",          default: "Quy trình thủ công, từ đất đến cốc" },
+      subtitle:          { type: "textarea", label: "Câu mô tả hero",         default: "Mỗi mẻ cốc cần trung bình 7-10 ngày thực hiện nghiêm ngặt qua bàn tay điêu luyện của các nghệ nhân gia đình Bát Tràng." },
+      steps: {
+        type: "repeatable",
+        label: "Các bước quy trình",
+        default: [
+          { num: "01", title: "Chuẩn bị nguyên liệu & khuôn",  desc: "Đất sét cao lanh tinh khiết được chọn lọc kỹ lưỡng, trộn phối màu theo yêu cầu và tạo khuôn riêng biệt (khuôn in dáng tròn hoặc khuôn rót tạo hình đặc biệt)." },
+          { num: "02", title: "Tạo hình sản phẩm",               desc: "Đất được đặt vào máy ép khuôn hoặc rót đất lỏng vào khuôn đổ. Quá trình này đòi hỏi sự đồng đều để đảm bảo độ dày mỏng của xương gốm đạt chuẩn." },
+          { num: "03", title: "Vệ sinh sản phẩm thô",            desc: "Sau khi dỡ khuôn, người thợ gốm tỉ mỉ gọt giũa phần ba-via thừa và dùng mút ẩm làm nhẵn mịn từng góc cạnh để chuẩn bị cho các khâu nhiệt độ." },
+          { num: "04", title: "Sấy khô & Sơ nung",              desc: "Sản phẩm được sấy khô tự nhiên rồi xếp vào lò nung sơ bộ ở nhiệt độ khoảng 700 độ C. Đây là khâu nền tảng giúp xương gốm cứng cáp, không bị nứt vỡ." },
+          { num: "05", title: "Họa tiết & Phủ men",              desc: "Nghệ nhân dùng cọ mảnh vẽ tay từng nét họa tiết trơn phác, dán chìm nhãn thương hiệu, sau đó nhúng cốc vào lớp men tro Bát Tràng truyền thống đặc trưng." },
+          { num: "06", title: "Nung chín lò bầu",                desc: "Cốc được đưa vào lò nung ở nhiệt độ từ 1150 đến 1200 độ C trong 15-18 tiếng liên tục. Nhiệt độ cao giúp xương đất hóa đá và men tro chảy chín ngọt." },
+          { num: "07", title: "Kiểm tra & Đóng gói",             desc: "Từng chiếc cốc ra lò đều được gõ thử âm thanh, kiểm tra độ đanh thép của men và đóng gói chỉn chu trong hộp giấy tái chế thân thiện." },
+        ],
+        itemSchema: {
+          num:   { type: "text",     label: "Số thứ tự (vd 01)",  default: "" },
+          title: { type: "text",     label: "Tên bước",            default: "" },
+          desc:  { type: "textarea", label: "Mô tả bước",          default: "" },
+        },
+      },
+      closingHeading:      { type: "text",     label: "Tiêu đề closing",       default: "Vì sao chúng tôi chọn làm thủ công?" },
+      closingText:         { type: "textarea", label: "Đoạn văn closing",      default: "Giữa thế giới công nghiệp hóa đồng đều, chúng tôi chọn giữ lại những nét hằn tay mộc mạc và sự biến thiên màu sắc tự nhiên của từng mẻ nung lò. Những khiếm khuyết nhỏ chính là nét độc bản làm nên hồn của gốm thủ công Cốc Nối. Chúng tôi muốn mỗi chiếc cốc khi cầm trên tay đều mang một câu chuyện chân thật, kết nối cảm xúc trọn vẹn của bạn với những người xung quanh." },
+      primaryButtonText:   { type: "text",     label: "Nút chính - nhãn",      default: "Mua sắm ngay" },
+      primaryButtonHref:   { type: "url",      label: "Nút chính - link",      default: "/cua-hang" },
+      secondaryButtonText: { type: "text",     label: "Nút phụ - nhãn",        default: "Xem 4 Brand Pillar" },
+      secondaryButtonHref: { type: "url",      label: "Nút phụ - link",        default: "/discover/our-values" },
+      closingImage:        { type: "image",    label: "Ảnh closing (tùy chọn)", default: "", aspectRatio: 16/9, folder: "discover", helpText: "16:9. Hiển thị phía trên biểu tượng Award khi có URL." },
+      closingImageAlt:     { type: "text",     label: "Mô tả ảnh closing (alt)", default: "" },
     }
   },
   partners_meta: {
